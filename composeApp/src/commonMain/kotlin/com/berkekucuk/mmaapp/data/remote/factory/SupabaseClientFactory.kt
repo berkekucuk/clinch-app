@@ -9,7 +9,6 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.Json
-import kotlin.time.Duration.Companion.seconds
 
 object SupabaseClientFactory {
     fun create(
@@ -27,8 +26,6 @@ object SupabaseClientFactory {
                 googleNativeLogin(serverClientId = googleClientId)
                 appleNativeLogin()
             }
-            requestTimeout = 15.seconds
-
             defaultSerializer = KotlinXSerializer(
                 Json {
                     ignoreUnknownKeys = true

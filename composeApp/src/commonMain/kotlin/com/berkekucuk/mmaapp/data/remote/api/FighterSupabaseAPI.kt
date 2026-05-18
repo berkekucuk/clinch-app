@@ -3,7 +3,8 @@ package com.berkekucuk.mmaapp.data.remote.api
 import com.berkekucuk.mmaapp.data.remote.dto.FighterDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
-import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
 
 class FighterSupabaseAPI(
     private val client: SupabaseClient
@@ -18,13 +19,9 @@ class FighterSupabaseAPI(
     }
 
     override suspend fun searchFighters(query: String): List<FighterDto> {
-        return client.from("fighters").select(
-            columns = Columns.raw("fighter_id,name,image_url,record,country_code")
-        ) {
-            filter {
-                ilike("name", "%$query%")
-            }
-            limit(15)
-        }.decodeList<FighterDto>()
+        return client.postgrest.rpc(
+            function = "search_fighters_unaccent",
+            parameters = mapOf("search_query" to query)
+        ).decodeList<FighterDto>()
     }
 }

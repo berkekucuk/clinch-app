@@ -4,6 +4,7 @@ import com.berkekucuk.mmaapp.data.remote.dto.InteractionDto
 import com.berkekucuk.mmaapp.data.remote.dto.FighterInteractionInsertDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import kotlin.coroutines.cancellation.CancellationException
 
 class InteractionSupabaseAPI(
     private val client: SupabaseClient
@@ -24,9 +25,11 @@ class InteractionSupabaseAPI(
     ): InteractionDto {
         val request = FighterInteractionInsertDto(userId, fighterId, interactionType)
 
-        return client.from("user_fighter_interactions").insert(request) {
+        val inserted = client.from("user_fighter_interactions").insert(request) {
             select()
         }.decodeSingle<InteractionDto>()
+
+        return fetchInteractionFromViewOrFallback(inserted.id, inserted)
     }
 
     override suspend fun removeInteraction(interactionId: String) {
@@ -34,6 +37,22 @@ class InteractionSupabaseAPI(
             filter {
                 eq("id", interactionId)
             }
+        }
+    }
+
+    private suspend fun fetchInteractionFromViewOrFallback(
+        interactionId: String,
+        fallback: InteractionDto
+    ): InteractionDto {
+        return try {
+            client.from("fighter_interaction_view").select {
+                filter {
+                    eq("id", interactionId)
+                }
+            }.decodeSingle<InteractionDto>()
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            fallback
         }
     }
 }

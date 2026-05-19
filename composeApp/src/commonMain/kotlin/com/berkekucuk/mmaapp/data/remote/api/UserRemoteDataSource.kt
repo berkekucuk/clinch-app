@@ -6,8 +6,8 @@ interface UserRemoteDataSource {
 
     suspend fun fetchUser(userId: String): UserDto
     suspend fun fetchUsers(limit: Int): List<UserDto>
-
-    suspend fun updateUser(userId: String, fullName: String, username: String)
+    suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String)
+    suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): String
     suspend fun deleteUser(userId: String)
     suspend fun reportUser(reporterId: String, reportedId: String, reason: String)
 }

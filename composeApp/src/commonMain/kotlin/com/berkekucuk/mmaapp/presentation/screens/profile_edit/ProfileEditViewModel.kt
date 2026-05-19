@@ -27,10 +27,10 @@ class ProfileEditViewModel(
     private val knownTakenUsernames = mutableSetOf<String>()
 
     init {
-        loadUser()
+        observeUser()
     }
 
-    private fun loadUser() {
+    private fun observeUser() {
         viewModelScope.launch {
             val userId = authRepository.getAuthenticatedUserId()
             val email = authRepository.getAuthenticatedUserEmail()
@@ -48,6 +48,7 @@ class ProfileEditViewModel(
                     it.copy(
                         fullName = user?.fullName ?: "",
                         username = user?.username ?: "",
+                        avatarUrl = user?.avatarUrl ?: "",
                         originalFullName = user?.fullName ?: "",
                         originalUsername = user?.username ?: "",
                         error = null,
@@ -88,6 +89,10 @@ class ProfileEditViewModel(
                 _state.update { it.copy(username = newValue, error = getUsernameError(newValue)) }
             }
 
+            is ProfileEditUiAction.OnImageSelected -> {
+                _state.update { it.copy(selectedImageBytes = action.bytes) }
+            }
+
             is ProfileEditUiAction.OnSaveClicked -> validateAndSave()
             is ProfileEditUiAction.OnBackClicked -> navigateTo(ProfileEditNavigationEvent.Back)
             is ProfileEditUiAction.OnDeleteAccountClicked -> deleteAccount()
@@ -123,7 +128,7 @@ class ProfileEditViewModel(
             return
         }
 
-        if (username == currentState.originalUsername && fullName == currentState.originalFullName) {
+        if (username == currentState.originalUsername && fullName == currentState.originalFullName && currentState.selectedImageBytes == null) {
             navigateTo(ProfileEditNavigationEvent.Back)
             return
         }
@@ -137,10 +142,23 @@ class ProfileEditViewModel(
             val userId = authRepository.getAuthenticatedUserId() ?: return@launch
             _state.update { it.copy(isSaving = true) }
 
+            var finalAvatarUrl = currentState.avatarUrl
+            val selectedBytes = currentState.selectedImageBytes
+            if (selectedBytes != null) {
+                val uploadResult = userRepository.uploadAvatar(userId, selectedBytes)
+                uploadResult.onSuccess { uploadedUrl ->
+                    finalAvatarUrl = uploadedUrl
+                }.onFailure { e ->
+                    _state.update { it.copy(isSaving = false, error = AppErrorMapper.map(e)) }
+                    return@launch
+                }
+            }
+
             val result = userRepository.updateUser(
                 userId = userId,
                 fullName = fullName,
-                username = username
+                username = username,
+                avatarUrl = finalAvatarUrl
             )
 
             result.onSuccess {

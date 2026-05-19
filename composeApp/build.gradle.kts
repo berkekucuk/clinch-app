@@ -19,7 +19,6 @@ kotlin {
     androidTarget()
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -45,6 +44,7 @@ kotlin {
                 implementation(libs.supabase.postgrest)
                 implementation(libs.supabase.auth)
                 implementation(libs.supabase.compose.auth)
+                implementation(libs.supabase.storage)
 
                 implementation(libs.ktor.client.core)
 
@@ -62,6 +62,7 @@ kotlin {
                 implementation(libs.navigation.compose)
                 implementation(libs.coil.compose)
                 implementation(libs.coil.network.ktor)
+                implementation(libs.imagepickerkmp)
 
             }
         }
@@ -122,8 +123,8 @@ android {
         applicationId = "com.berkekucuk.mmaapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3.0"
     }
     packaging {
         resources {
@@ -162,7 +163,6 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
 }
 

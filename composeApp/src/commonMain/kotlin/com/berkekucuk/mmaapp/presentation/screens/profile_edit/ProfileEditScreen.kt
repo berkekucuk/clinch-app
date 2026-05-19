@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -35,14 +36,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.presentation.components.ErrorBox
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import com.berkekucuk.mmaapp.presentation.components.ErrorBox
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.ismoy.imagepickerkmp.domain.config.GalleryConfig
+import io.github.ismoy.imagepickerkmp.domain.config.CropConfig
+import io.github.ismoy.imagepickerkmp.features.imagepicker.config.ImagePickerKMPConfig
+import io.github.ismoy.imagepickerkmp.features.imagepicker.ui.rememberImagePickerKMP
+import io.github.ismoy.imagepickerkmp.features.imagepicker.model.*
+import io.github.ismoy.imagepickerkmp.domain.extensions.loadBytes
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.compose.LocalPlatformContext
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.ui.draw.clip
+import com.berkekucuk.mmaapp.core.utils.compressImageByteArray
 
 @Composable
 fun ProfileEditScreenRoot(
@@ -87,21 +105,47 @@ fun ProfileEditScreen(
         }
     }
 
+    val context = LocalPlatformContext.current
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
     val focusManager = LocalFocusManager.current
     val errorMessage = strings.mapError(state.error)
 
-    if (showDeleteDialog.value) {
-        AppAlertDialog(
-            onDismissRequest = onDeleteDialogDismiss,
-            onConfirmClick = onDeleteConfirmed,
-            title = strings.profileEditDeleteAccountTitle,
-            text = strings.profileEditDeleteAccountConfirm,
-            confirmText = strings.profileEditDeleteAccount,
-            dismissText = strings.commonCancel,
-            isDestructive = true
+    val avatarModel = remember(state.selectedImageBytes, state.avatarUrl) {
+        state.selectedImageBytes ?: state.avatarUrl
+    }
+
+    val imageRequest = remember(avatarModel) {
+        ImageRequest.Builder(context)
+            .data(avatarModel)
+            .crossfade(true)
+            .build()
+    }
+
+    val picker = rememberImagePickerKMP(
+        config = ImagePickerKMPConfig(
+            galleryConfig = GalleryConfig(),
+            cropConfig = CropConfig(
+                enabled = true,
+                circularCrop = true
+            ),
         )
+    )
+    val result = picker.result
+
+    LaunchedEffect(result) {
+        if (result is ImagePickerResult.Success) {
+            val photo = result.photos.firstOrNull()
+            if (photo != null) {
+                val bytes = photo.loadBytes()
+                val compressed = try {
+                    compressImageByteArray(bytes)
+                } catch (t: Throwable) {
+                    bytes
+                }
+                onAction(ProfileEditUiAction.OnImageSelected(compressed))
+            }
+        }
     }
 
     Scaffold(
@@ -118,6 +162,13 @@ fun ProfileEditScreen(
                             text = strings.profileEditTitle,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    actions = {
+                        SaveButton(
+                            text = strings.profileEditSaveChanges,
+                            onClick = onSaveClicked,
+                            isSaving = state.isSaving,
                         )
                     },
                     navigationIcon = {
@@ -149,6 +200,49 @@ fun ProfileEditScreen(
                 }
                 .padding(24.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier.size(100.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    ) {
+                        AsyncImage(
+                            model = imageRequest,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(32.dp)
+                            .background(colors.winnerFrame, CircleShape)
+                            .border(1.5.dp, colors.topBarBackground, CircleShape)
+                            .clickable {
+                                picker.launchGallery()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            tint = colors.white,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
             Text(
                 text = strings.profileEditPersonalInfo,
                 fontSize = 16.sp,
@@ -234,14 +328,6 @@ fun ProfileEditScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SaveButton(
-                text = strings.profileEditSaveChanges,
-                onClick = onSaveClicked,
-                isSaving = state.isSaving,
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -258,5 +344,16 @@ fun ProfileEditScreen(
                 }
             }
         }
+    }
+    if (showDeleteDialog.value) {
+        AppAlertDialog(
+            onDismissRequest = onDeleteDialogDismiss,
+            onConfirmClick = onDeleteConfirmed,
+            title = strings.profileEditDeleteAccountTitle,
+            text = strings.profileEditDeleteAccountConfirm,
+            confirmText = strings.profileEditDeleteAccount,
+            dismissText = strings.commonCancel,
+            isDestructive = true
+        )
     }
 }

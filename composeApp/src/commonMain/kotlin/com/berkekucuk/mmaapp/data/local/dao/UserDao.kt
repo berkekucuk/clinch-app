@@ -25,8 +25,8 @@ interface UserDao {
     @Upsert
     suspend fun upsertUsers(users: List<UserEntity>)
 
-    @Query("UPDATE users SET username = :username, full_name = :fullName WHERE id = :userId")
-    suspend fun updateUser(userId: String, fullName: String, username: String)
+    @Query("UPDATE users SET username = :username, full_name = :fullName, avatar_url = :avatarUrl WHERE id = :userId")
+    suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String)
 
     @Query("DELETE FROM users WHERE id = :userId")
     suspend fun deleteUser(userId: String)

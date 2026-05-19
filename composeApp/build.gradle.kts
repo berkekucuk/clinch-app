@@ -45,6 +45,7 @@ kotlin {
                 implementation(libs.supabase.postgrest)
                 implementation(libs.supabase.auth)
                 implementation(libs.supabase.compose.auth)
+                implementation(libs.supabase.storage)
 
                 implementation(libs.ktor.client.core)
 
@@ -62,6 +63,7 @@ kotlin {
                 implementation(libs.navigation.compose)
                 implementation(libs.coil.compose)
                 implementation(libs.coil.network.ktor)
+                implementation(libs.imagepickerkmp)
 
             }
         }

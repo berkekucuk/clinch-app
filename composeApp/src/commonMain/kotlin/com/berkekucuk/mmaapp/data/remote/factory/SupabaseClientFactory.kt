@@ -8,6 +8,7 @@ import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.serializer.KotlinXSerializer
+import io.github.jan.supabase.storage.Storage
 import kotlinx.serialization.json.Json
 
 object SupabaseClientFactory {
@@ -26,6 +27,7 @@ object SupabaseClientFactory {
                 googleNativeLogin(serverClientId = googleClientId)
                 appleNativeLogin()
             }
+            install(Storage)
             defaultSerializer = KotlinXSerializer(
                 Json {
                     ignoreUnknownKeys = true

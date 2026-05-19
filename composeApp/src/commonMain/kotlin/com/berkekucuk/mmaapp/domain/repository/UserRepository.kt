@@ -10,7 +10,8 @@ interface UserRepository {
     fun getUserProfile(userId: String): Flow<UserProfile?>
     suspend fun syncUser(userId: String): Result<Unit>
     suspend fun syncUsers(limit: Int, currentUserId: String? = null): Result<Unit>
-    suspend fun updateUser(userId: String, fullName: String, username: String): Result<Unit>
+    suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String): Result<Unit>
+    suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): Result<String>
     suspend fun deleteUser(userId: String): Result<Unit>
     suspend fun reportUser(reporterId: String, reportedId: String, reason: String): Result<Unit>
     fun getBlockedUsers(currentUserId: String): Flow<List<User>>

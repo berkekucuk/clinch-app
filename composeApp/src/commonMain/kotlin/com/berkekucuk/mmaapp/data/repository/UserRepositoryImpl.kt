@@ -82,11 +82,21 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun updateUser(userId: String, fullName: String, username: String): Result<Unit> {
+    override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                remoteDataSource.updateUser(userId, fullName, username)
-                dao.updateUser(userId, fullName, username)
+                remoteDataSource.updateUser(userId, fullName, username, avatarUrl)
+                dao.updateUser(userId, fullName, username, avatarUrl)
+            }.onFailure {
+                if (it is CancellationException) throw it
+            }
+        }
+    }
+
+    override suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): Result<String> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                remoteDataSource.uploadAvatar(userId, imageBytes)
             }.onFailure {
                 if (it is CancellationException) throw it
             }

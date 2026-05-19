@@ -144,7 +144,7 @@ val appModule = module {
     }
 
     single<UserRemoteDataSource> {
-        UserSupabaseAPI(client = get())
+        UserSupabaseAPI(client = get(), dateTimeProvider = get())
     }
 
     single<DeviceTokenRemoteDataSource> {

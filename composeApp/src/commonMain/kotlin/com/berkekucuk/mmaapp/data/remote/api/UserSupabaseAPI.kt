@@ -1,12 +1,15 @@
 package com.berkekucuk.mmaapp.data.remote.api
 
+import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
 import com.berkekucuk.mmaapp.data.remote.dto.UserDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.storage
 
 class UserSupabaseAPI(
-    private val client: SupabaseClient
+    private val client: SupabaseClient,
+    private val dateTimeProvider: DateTimeProvider
 ) : UserRemoteDataSource {
 
     override suspend fun fetchUser(userId: String): UserDto {
@@ -23,15 +26,25 @@ class UserSupabaseAPI(
         }.decodeList<UserDto>()
     }
 
-    override suspend fun updateUser(userId: String, fullName: String, username: String){
+    override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String){
         client.from("profiles").update({
             set("username", username)
             set("full_name", fullName)
+            set("avatar_url", avatarUrl)
         }) {
             filter {
                 eq("id", userId)
             }
         }
+    }
+
+    override suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): String {
+        val bucket = client.storage.from("avatars")
+        val path = "$userId/avatar_${dateTimeProvider.now.toEpochMilliseconds()}.jpg"
+        bucket.upload(path, imageBytes) {
+            upsert = true
+        }
+        return bucket.publicUrl(path)
     }
 
     override suspend fun deleteUser(userId: String) {

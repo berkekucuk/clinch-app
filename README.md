@@ -32,6 +32,12 @@ A modern, cross-platform Mixed Martial Arts application built with **Kotlin Mult
 * **Image Loading:** Coil 3
 * **Networking:** Ktor
 
+## 📲 Download
+
+<a href="https://apps.apple.com/tr/app/clinch-mobile/id6769456426">
+  <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" width="160">
+</a>
+
 ## 📬 Contact
 
 Please contact us with any questions, support requests, or feedback: **[clinchapp0@gmail.com](mailto:clinchapp0@gmail.com)**

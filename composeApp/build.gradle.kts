@@ -22,10 +22,18 @@ kotlin {
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
+
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
             linkerOpts.add("-lsqlite3")
+        }
+
+        iosTarget.binaries.all {
+            freeCompilerArgs += listOf(
+                "-Xdisable-phases=DevirtualizationAnalysis",
+                "-Xdisable-phases=StaticInitializersOptimization"
+            )
         }
     }
 

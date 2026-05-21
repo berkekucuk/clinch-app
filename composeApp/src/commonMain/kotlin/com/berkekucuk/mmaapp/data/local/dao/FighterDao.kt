@@ -1,6 +1,8 @@
 package com.berkekucuk.mmaapp.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.berkekucuk.mmaapp.data.local.entity.FighterEntity
 import com.berkekucuk.mmaapp.data.local.entity.FighterFightCrossRef
@@ -18,6 +20,9 @@ interface FighterDao {
 
     @Upsert
     suspend fun upsertFighters(fighters: List<FighterEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertFighter(fighter: FighterEntity)
 
     @Upsert
     suspend fun upsertFighterFightCrossRefs(refs: List<FighterFightCrossRef>)

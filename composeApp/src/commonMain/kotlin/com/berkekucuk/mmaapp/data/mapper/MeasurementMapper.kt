@@ -9,3 +9,10 @@ fun MeasurementDto.toDomain(): Measurement {
         imperial = imperial
     )
 }
+
+fun Measurement.toDto(): MeasurementDto {
+    return MeasurementDto(
+        metric = metric,
+        imperial = imperial
+    )
+}

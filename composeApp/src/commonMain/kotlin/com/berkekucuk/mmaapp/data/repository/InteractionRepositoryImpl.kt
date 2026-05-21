@@ -6,6 +6,7 @@ import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
 import com.berkekucuk.mmaapp.data.remote.api.InteractionRemoteDataSource
+import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.model.Interaction
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository
 import kotlinx.coroutines.Dispatchers
@@ -56,16 +57,15 @@ class InteractionRepositoryImpl(
 
     override suspend fun addInteraction(
         userId: String,
-        fighterId: String,
         interactionType: String,
+        fighter: Fighter,
     ): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                val remoteInteraction = remoteDataSource.addInteraction(userId, fighterId, interactionType)
-                
-                remoteInteraction.fighter?.let { remoteFighter ->
-                    fighterDao.upsertFighters(listOf(remoteFighter.toEntity()))
-                }
+                val remoteInteraction = remoteDataSource.addInteraction(userId, fighter.fighterId, interactionType)
+
+                fighterDao.insertFighter(fighter.toEntity())
+
                 interactionDao.upsertInteractions(listOf(remoteInteraction.toEntity()))
             }.onFailure {
                 if (it is CancellationException) throw it

@@ -102,7 +102,10 @@ class FighterSearchViewModel(
             }
             is FighterSearchUiAction.OnFighterClicked -> {
                 if (interactionType != null) {
-                    addInteraction(action.fighterId)
+                    val fighter = _state.value.results.find { it.fighterId == action.fighterId }
+                    if (fighter != null) {
+                        addInteraction(fighter)
+                    }
                 } else {
                     navigateTo(FighterSearchNavigationEvent.ToFighterDetail(action.fighterId))
                 }
@@ -111,7 +114,7 @@ class FighterSearchViewModel(
         }
     }
 
-    private fun addInteraction(fighterId: String) {
+    private fun addInteraction(fighter: Fighter) {
         val type = interactionType ?: return
         viewModelScope.launch {
             _state.update { it.copy(error = null) }
@@ -124,8 +127,8 @@ class FighterSearchViewModel(
 
             interactionRepository.addInteraction(
                 userId = userId,
-                fighterId = fighterId,
-                interactionType = type
+                interactionType = type,
+                fighter = fighter,
             ).onSuccess {
                 navigateTo(FighterSearchNavigationEvent.Back)
             }.onFailure { e ->

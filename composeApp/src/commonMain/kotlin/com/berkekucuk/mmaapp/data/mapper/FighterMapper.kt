@@ -41,6 +41,23 @@ fun FighterEntity.toDomain(): Fighter{
     )
 }
 
+fun Fighter.toEntity(): FighterEntity {
+    return FighterEntity(
+        fighterId = fighterId,
+        name = name,
+        nickname = nickname,
+        imageUrl = imageUrl,
+        record = record.toDto(),
+        height = height.toDto(),
+        reach = reach.toDto(),
+        weightClassId = weightClassId,
+        dateOfBirth = dateOfBirth,
+        born = born,
+        fightingOutOf = fightingOutOf,
+        countryCode = countryCode
+    )
+}
+
 fun FighterWithFightsRelation.toDomain(): Fighter {
     return Fighter(
         fighterId = fighter.fighterId,

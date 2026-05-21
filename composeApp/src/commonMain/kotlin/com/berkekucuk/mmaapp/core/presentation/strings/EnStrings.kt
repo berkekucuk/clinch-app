@@ -204,6 +204,7 @@ val EnStrings = AppStrings(
             AppError.FIGHT_OVER -> "Fight already over."
             AppError.FIGHT_PENDING -> "Result pending. Predictions locked."
             AppError.ALREADY_REPORTED -> "You have already reported this user."
+            AppError.UNKNOWN -> "Something went wrong."
             else -> null
         }
     }

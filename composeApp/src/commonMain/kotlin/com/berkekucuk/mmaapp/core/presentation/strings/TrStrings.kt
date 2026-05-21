@@ -212,6 +212,7 @@ val TrStrings = AppStrings(
             AppError.FIGHT_OVER -> "Bu dövüş zaten tamamlandı."
             AppError.FIGHT_PENDING -> "Sonuç bekleniyor. Tahminler kapandı."
             AppError.ALREADY_REPORTED -> "Bu kullanıcıyı zaten şikayet ettiniz."
+            AppError.UNKNOWN -> "Bir hata oluştu."
             else -> null
         }
     }

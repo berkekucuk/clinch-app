@@ -65,9 +65,6 @@ class PredictionRepositoryImpl(
             runCatching {
                 val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds)
 
-                remotePrediction.fight?.let { remoteFight ->
-                    fightDao.upsertFights(listOf(remoteFight.toEntity()))
-                }
                 predictionDao.upsertPredictions(listOf(remotePrediction.toEntity()))
             }.onFailure {
                 if (it is CancellationException) throw it

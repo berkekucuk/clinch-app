@@ -13,7 +13,7 @@ class UserSupabaseAPI(
 ) : UserRemoteDataSource {
 
     override suspend fun fetchUser(userId: String): UserDto {
-        return client.from("profile_view").select {
+        return client.from("profile_view_v2").select {
             filter {
                 eq("id", userId)
             }
@@ -21,7 +21,7 @@ class UserSupabaseAPI(
     }
 
     override suspend fun fetchUsers(limit: Int): List<UserDto> {
-        return client.from("profile_view").select {
+        return client.from("profile_view_v2").select {
             limit(limit.toLong())
         }.decodeList<UserDto>()
     }

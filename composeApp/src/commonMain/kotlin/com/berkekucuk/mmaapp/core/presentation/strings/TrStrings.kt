@@ -178,12 +178,11 @@ val TrStrings = AppStrings(
     },
     predictionQuestionTitle = "Kim kazanır?",
     leaderboardInfoTitle = "Puan Sistemi",
-    leaderboardInfoText = "Puanlar, tahmininizi yaptığınız andaki oranın sunduğu puan getirisine dayanır.\n" +
-            "\n" + "100 Puan Kuralı: Ondalık orandaki her 1.00 birimlik net kâr, 100 puan değerindedir.\n" +
-            "\n" + "Yüksek Oranlar: 3.00 oran, 2.00 birim net kâr sunar ve 200 puan kazandırır.\n" +
-            "\n" + "Düşük Oranlar: 1.25 oran, 0.25 birim net kâr sunar ve 25 puan kazandırır.\n" +
-            "\n" + "Sabitleme: Kazanacağınız puan, tahmininizi kilitlediğiniz an sabitlenir.\n" +
-            "\n" + "Sonuç: Sadece doğru tahminler puan kazandırır.",
+    leaderboardInfoText = "Sıralamanız, Tahmin Başına Puan (Toplam Puan / Tahmin Sayısı) ortalamanıza göre belirlenir.\n" +
+            "\n" + "Yüksek Oran (Örn. 3.00): Sürpriz bir sonucu doğru tahmin etmek +200 puan kazandırır.\n" +
+            "\n" + "Düşük Oran (Örn. 1.25): Güçlü bir favoriyi doğru tahmin etmek +25 puan kazandırır.\n" +
+            "\n" + "Yanlış tahminler puan kaybettirmez ancak toplam tahmin sayınızı artıracağı için genel ortalamanızı düşürür.\n" +
+            "\n" + "Kazanacağınız puan, tahmininizi kilitlediğiniz an sabitlenir.",
     leaderboardInfoClose = "Kapat",
     notificationChannelName = "Dövüş Sonuçları",
     notificationChannelDescription = "Dövüş sonuçları hakkında bildirim al",

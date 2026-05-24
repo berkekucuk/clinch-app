@@ -169,12 +169,13 @@ val EnStrings = AppStrings(
     },
     toUpperCase = { it.uppercase() },
     predictionQuestionTitle = "Who will win?",
-    leaderboardInfoTitle = "Points System",
-    leaderboardInfoText = "Your rank is determined by your Points Per Prediction average (Total Points / Number of Predictions).\n" +
+    leaderboardInfoTitle = "Score System",
+    leaderboardInfoText = "Your score is determined by your Points Per Prediction average (Total Points / Number of Predictions).\n" +
             "\n" + "High Odds (e.g., 3.00): Successfully predicting a less likely outcome awards +200 points.\n" +
             "\n" + "Low Odds (e.g., 1.25): Successfully predicting a strong favorite awards +25 points.\n" +
             "\n" + "Wrong predictions do not deduct points, but they lower your overall average by increasing your total prediction count.\n" +
-            "\n" + "The points you will earn are fixed the moment you lock your prediction.",
+            "\n" + "The points you will earn are fixed the moment you lock your prediction.\n" +
+            "\n" + "⚠️ IMPORTANT RULE: You need at least 5 completed predictions for your score to begin calculating.",
     leaderboardInfoClose = "Close",
     notificationChannelName = "Fight Results",
     notificationChannelDescription = "Get notified about fight results",

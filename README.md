@@ -2,6 +2,20 @@
 
 A modern, cross-platform Mixed Martial Arts application built with **Kotlin Multiplatform (KMP)** for Android and iOS. Stay up to date with the latest MMA events, analyze fight statistics, create predictions, and compete on the global leaderboard!
 
+<a href="https://github.com/berkekucuk/clinch-app">
+  <img src="https://img.shields.io/badge/Android%20%26%20iOS%20App-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Android & iOS App GitHub" height="40">
+</a>
+<br>
+<a href="https://github.com/berkekucuk/mma-scraping">
+  <img src="https://img.shields.io/badge/Scraping%20Pipeline-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Scraping Pipeline GitHub" height="40">
+</a>
+
+## 📲 Download
+
+<a href="https://apps.apple.com/tr/app/clinch-mobile/id6769456426">
+  <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" width="160">
+</a>
+
 ## ✨ Key Features
 
 * **Cross-Platform Experience:** Built natively for both Android and iOS, sharing business logic and UI components via Compose Multiplatform.
@@ -31,12 +45,6 @@ A modern, cross-platform Mixed Martial Arts application built with **Kotlin Mult
 * **Asynchronous Operations:** Kotlin Coroutines & Flows
 * **Image Loading:** Coil 3
 * **Networking:** Ktor
-
-## 📲 Download
-
-<a href="https://apps.apple.com/tr/app/clinch-mobile/id6769456426">
-  <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on the App Store" width="160">
-</a>
 
 ## 📬 Contact
 

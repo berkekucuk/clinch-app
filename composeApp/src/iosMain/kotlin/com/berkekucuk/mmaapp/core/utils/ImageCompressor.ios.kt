@@ -28,7 +28,7 @@ actual fun compressImageByteArray(
         NSData.create(bytes = it.addressOf(0), length = imageBytes.size.toULong())
     }
 
-    val uiImage = UIImage(data = nsData) ?: return imageBytes
+    val uiImage = UIImage(data = nsData)
 
     val origWidth = uiImage.size.useContents { width }
     val origHeight = uiImage.size.useContents { height }

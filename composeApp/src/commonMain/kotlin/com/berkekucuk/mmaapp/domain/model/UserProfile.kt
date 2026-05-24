@@ -5,8 +5,7 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class UserProfile(
     val user: User,
-    val interactions: List<Interaction>,
-    val predictions: List<Prediction>
+    val interactions: List<Interaction>
 ) {
     val topFavorite: Interaction? get() = interactions.find { it.interactionType == "favorite" && it.rankNumber == 1 }
     val topHated: Interaction? get() = interactions.find { it.interactionType == "hated" && it.rankNumber == 1 }

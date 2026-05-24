@@ -15,7 +15,7 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :userId")
     fun getUser(userId: String): Flow<UserEntity?>
 
-    @Query("SELECT * FROM users WHERE id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY total_points DESC, full_name ASC LIMIT :limit")
+    @Query("SELECT * FROM users WHERE id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY total_points DESC, full_name COLLATE NOCASE ASC LIMIT :limit")
     fun getUsers(limit: Int, currentUserId: String): Flow<List<UserEntity>>
 
     @Transaction
@@ -43,7 +43,7 @@ interface UserDao {
         }
     }
 
-    @Query("SELECT * FROM users WHERE id IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY full_name ASC")
+    @Query("SELECT * FROM users WHERE id IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY full_name COLLATE NOCASE ASC")
     fun getBlockedUsers(currentUserId: String): Flow<List<UserEntity>>
 
     @Upsert

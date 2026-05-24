@@ -170,12 +170,11 @@ val EnStrings = AppStrings(
     toUpperCase = { it.uppercase() },
     predictionQuestionTitle = "Who will win?",
     leaderboardInfoTitle = "Points System",
-    leaderboardInfoText = "Points are based on the reward value of the odds at the time of your prediction.\n" +
-            "\n" + "The 100-Point Rule: Each 1.00 unit of net profit in decimal odds equals 100 points.\n" +
-            "\n" + "High Odds: A 3.00 odd offers 2.00 units of profit, resulting in 200 points.\n" +
-            "\n" + "Low Odds: A 1.25 odd offers 0.25 units of profit, resulting in 25 points.\n" +
-            "\n" + "Lock-in: Your potential reward is fixed the moment you lock your prediction.\n" +
-            "\n" + "Result: Points are only awarded for correct predictions.",
+    leaderboardInfoText = "Your rank is determined by your Points Per Prediction average (Total Points / Number of Predictions).\n" +
+            "\n" + "High Odds (e.g., 3.00): Successfully predicting a less likely outcome awards +200 points.\n" +
+            "\n" + "Low Odds (e.g., 1.25): Successfully predicting a strong favorite awards +25 points.\n" +
+            "\n" + "Wrong predictions do not deduct points, but they lower your overall average by increasing your total prediction count.\n" +
+            "\n" + "The points you will earn are fixed the moment you lock your prediction.",
     leaderboardInfoClose = "Close",
     notificationChannelName = "Fight Results",
     notificationChannelDescription = "Get notified about fight results",

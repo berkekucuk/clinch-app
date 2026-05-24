@@ -17,4 +17,7 @@ sealed interface ProfileUiAction {
     data object OnBlockClicked : ProfileUiAction
     data object OnDismissBlockDialog : ProfileUiAction
     data object OnConfirmBlock : ProfileUiAction
+    
+    data object OnNextPage : ProfileUiAction
+    data object OnPreviousPage : ProfileUiAction
 }

@@ -3,7 +3,6 @@ package com.berkekucuk.mmaapp.presentation.screens.profile
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +22,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.MediumTopAppBar
@@ -47,18 +45,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.lazy.items
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.domain.model.toRankedFighter
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.domain.enums.ReportReason
-import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterTopBarTitle
-import com.berkekucuk.mmaapp.presentation.screens.rankings.WeightClassCard
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -113,17 +106,16 @@ fun ProfileScreen(
     val onInteractionListClicked = remember(onAction) { { type: String -> onAction(ProfileUiAction.OnInteractionListClicked(type)) } }
     val onPredictionClicked = remember(onAction) { { fightId: String -> onAction(ProfileUiAction.OnPredictionClicked(fightId)) } }
     val onErrorDismissed = remember(onAction) { { onAction(ProfileUiAction.OnErrorDismissed) } }
+    val onNextPage = remember(onAction) { { onAction(ProfileUiAction.OnNextPage) } }
+    val onPreviousPage = remember(onAction) { { onAction(ProfileUiAction.OnPreviousPage) } }
 
-    val isRetryableError = state.error == AppError.NETWORK
     val errorMessage = strings.mapError(state.error)
     val snackbarHostState = remember { SnackbarHostState() }
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        duration = if (isRetryableError) SnackbarDuration.Indefinite else SnackbarDuration.Short,
-        actionLabel = if (isRetryableError) strings.retry else null,
-        onAction = if (isRetryableError) onRefresh else null,
-        onDismiss = if (!isRetryableError) onErrorDismissed else null
+        duration = SnackbarDuration.Short,
+        onDismiss = onErrorDismissed
     )
 
     Scaffold(
@@ -169,7 +161,7 @@ fun ProfileScreen(
                         }
                     },
                     actions = {
-                        if (!state.isCurrentUser) {
+                        if (!state.isOwner) {
                             Box {
                                 IconButton(onClick = { showOverflowMenu = true }) {
                                     Icon(
@@ -248,72 +240,22 @@ fun ProfileScreen(
             ) { page ->
                 when (page) {
                     0 -> {
-                        ListContainer(
-                            isRefreshing = state.isRefreshing,
+                        ProfileOverviewTab(
+                            state = state,
                             onRefresh = onRefresh,
-                            contentPadding = PaddingValues(top = 16.dp),
-                            extraBottomPadding = navBarBottomPadding,
-                        ) {
-                            item {
-                                WeightClassCard(
-                                    weightClassName = strings.toUpperCase(strings.profileFavoriteFighters),
-                                    champion = state.profile?.topFavorite?.toRankedFighter(),
-                                    onWeightClassClicked = { onInteractionListClicked("favorite") },
-                                )
-                            }
-                            item {
-                                WeightClassCard(
-                                    weightClassName = strings.toUpperCase(strings.profileGoatFighters),
-                                    champion = state.profile?.topGoat?.toRankedFighter(),
-                                    onWeightClassClicked = { onInteractionListClicked("goat") },
-                                )
-                            }
-                            item {
-                                WeightClassCard(
-                                    weightClassName = strings.toUpperCase(strings.profileHatedFighters),
-                                    champion = state.profile?.topHated?.toRankedFighter(),
-                                    onWeightClassClicked = { onInteractionListClicked("hated") },
-                                )
-                            }
-                        }
+                            onInteractionListClicked = onInteractionListClicked,
+                            navBarBottomPadding = navBarBottomPadding
+                        )
                     }
                     1 -> {
-                        val predictions = state.profile?.predictions ?: emptyList()
-                        ListContainer(
-                            isRefreshing = state.isRefreshing,
+                        ProfilePredictionsTab(
+                            state = state,
                             onRefresh = onRefresh,
-                            contentPadding = PaddingValues(top = 16.dp),
-                            extraBottomPadding = navBarBottomPadding,
-                        ) {
-                            if (predictions.isEmpty()) {
-                                item(contentType = "EmptyState") {
-                                    Box(
-                                        modifier = Modifier.fillParentMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = strings.emptyPredictionList,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = colors.textSecondary
-                                        )
-                                    }
-                                }
-                            } else {
-                                items(
-                                    items = predictions,
-                                    key = { it.predictionId }
-                                ) { prediction ->
-                                    PredictionCard(
-                                        prediction = prediction,
-                                        onClick = {
-                                            prediction.fight?.let { fight ->
-                                                onPredictionClicked(fight.fightId)
-                                            }
-                                        },
-                                    )
-                                }
-                            }
-                        }
+                            onPredictionClicked = onPredictionClicked,
+                            onNextPage = onNextPage,
+                            onPreviousPage = onPreviousPage,
+                            navBarBottomPadding = navBarBottomPadding
+                        )
                     }
                 }
             }

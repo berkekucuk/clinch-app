@@ -9,11 +9,12 @@ class PredictionSupabaseAPI(
     private val client: SupabaseClient
 ) : PredictionRemoteDataSource {
 
-    override suspend fun fetchPredictions(userId: String): List<PredictionDto> {
-        return client.from("prediction_view").select {
+    override suspend fun fetchPredictions(userId: String, limit: Int, offset: Int): List<PredictionDto> {
+        return client.from("prediction_view_v2").select {
             filter {
                 eq("user_id", userId)
             }
+            range(offset.toLong(), (offset + limit - 1).toLong())
         }.decodeList<PredictionDto>()
     }
 

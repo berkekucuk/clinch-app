@@ -22,35 +22,39 @@ class PredictionRepositoryImpl(
     private val rateLimiter: RateLimiter
 ) : PredictionRepository {
 
-    private fun syncKey(userId: String) = "sync_predictions_$userId"
+    private fun syncKey(userId: String, limit: Int, offset: Int) = "sync_predictions_${userId}_limit_${limit}_offset_${offset}"
 
     override fun getPredictedWinnerId(fightId: String, userId: String): Flow<String?> {
         return predictionDao.getPredictedWinnerId(fightId, userId)
     }
 
-    override fun getPredictions(userId: String): Flow<List<Prediction>> {
-        return predictionDao.getPredictions(userId)
+    override fun getPredictions(userId: String, limit: Int, offset: Int): Flow<List<Prediction>> {
+        return predictionDao.getPredictions(userId, limit, offset)
             .map { entities ->
                 entities.map { it.toDomain() }
             }
     }
 
-    override suspend fun syncPredictions(userId: String): Result<Unit> {
+    override suspend fun syncPredictions(userId: String, limit: Int, offset: Int): Result<Unit> {
+        val key = syncKey(userId, limit, offset)
         return withContext(Dispatchers.IO) {
             runCatching {
-                if (!rateLimiter.shouldFetch(syncKey(userId))) {
+                if (!rateLimiter.shouldFetch(key)) {
                     return@runCatching
                 }
-                val remotePredictions = remoteDataSource.fetchPredictions(userId)
-                val remoteFights = remotePredictions.mapNotNull { it.fight }
 
-                if (remoteFights.isNotEmpty()) {
-                    fightDao.upsertFights(remoteFights.map { it.toEntity() })
+                val remotePredictions = remoteDataSource.fetchPredictions(userId, limit, offset)
+
+                if (remotePredictions.isNotEmpty()) {
+                    val remoteFights = remotePredictions.mapNotNull { it.fight }
+                    if (remoteFights.isNotEmpty()) {
+                        fightDao.upsertFights(remoteFights.map { it.toEntity() })
+                    }
+                    predictionDao.upsertPredictions(remotePredictions.map { it.toEntity() })
                 }
-                predictionDao.replacePredictions(userId, remotePredictions.map { it.toEntity() })
             }.onFailure {
                 if (it is CancellationException) throw it
-                rateLimiter.reset(syncKey(userId))
+                rateLimiter.reset(key)
             }
         }
     }

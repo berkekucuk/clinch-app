@@ -305,7 +305,6 @@ val appModule = module {
         ProfileViewModel(
             userRepository = get(),
             authRepository = get(),
-            notificationRepository = get(),
             predictionRepository = get(),
             interactionRepository = get(),
             savedStateHandle = get()

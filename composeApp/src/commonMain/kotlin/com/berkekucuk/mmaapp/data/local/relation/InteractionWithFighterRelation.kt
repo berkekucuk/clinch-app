@@ -7,6 +7,7 @@ import com.berkekucuk.mmaapp.data.local.entity.InteractionEntity
 
 data class InteractionWithFighterRelation(
     @Embedded val interaction: InteractionEntity,
+
     @Relation(
         parentColumn = "fighter_id",
         entityColumn = "fighter_id"

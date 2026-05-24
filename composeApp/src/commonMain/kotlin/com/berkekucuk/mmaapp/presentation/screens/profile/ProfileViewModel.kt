@@ -9,22 +9,22 @@ import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository
-import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
-    private val notificationRepository: NotificationRepository,
     private val predictionRepository: PredictionRepository,
     private val interactionRepository: InteractionRepository,
     private val savedStateHandle: SavedStateHandle,
@@ -32,26 +32,55 @@ class ProfileViewModel(
 
     private val route = savedStateHandle.toRoute<Route.Profile>()
     private val userId: String = route.userId
+
     private val _state = MutableStateFlow(ProfileUiState())
     val state: StateFlow<ProfileUiState> = _state.asStateFlow()
+
     private val _navigation = MutableSharedFlow<ProfileNavigationEvent>()
     val navigation = _navigation.asSharedFlow()
+
+    private val currentPageFlow = MutableStateFlow(0)
+
     private var syncJob: Job? = null
+    private var paginationJob: Job? = null
 
     init {
         observeProfile()
+        observePredictions()
         syncProfile()
     }
 
     private fun observeProfile() {
         viewModelScope.launch {
             val currentUserId = authRepository.getAuthenticatedUserId()
-            _state.update { it.copy(isCurrentUser = currentUserId == userId) }
-            
+            _state.update {
+                it.copy(isOwner = currentUserId == userId)
+            }
+
             userRepository.getUserProfile(userId)
                 .collect { profile ->
-                _state.update { it.copy(profile = profile, isLoading = false) }
-            }
+                    _state.update {
+                        it.copy(profile = profile, isLoading = false)
+                    }
+                }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observePredictions() {
+        viewModelScope.launch {
+            currentPageFlow
+                .flatMapLatest { page ->
+                    predictionRepository.getPredictions(userId, limit = 20, offset = page * 20)
+                }
+                .collect { predictions ->
+                    _state.update {
+                        it.copy(
+                            predictions = predictions,
+                            canGoNext = predictions.size == 20
+                        )
+                    }
+                }
         }
     }
 
@@ -61,19 +90,13 @@ class ProfileViewModel(
         syncJob = viewModelScope.launch {
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
+            val page = currentPageFlow.value
             val userResult = userRepository.syncUser(userId)
             val interactionResult = interactionRepository.syncInteractions(userId)
-            val predictionResult = predictionRepository.syncPredictions(userId)
+            val predictionResult = predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20)
 
-            val currentUserId = authRepository.getAuthenticatedUserId()
-            val notificationResult = if (currentUserId == userId) {
-                notificationRepository.syncFightNotifications(userId)
-            } else Result.success(Unit)
-
-            val firstError = userResult.exceptionOrNull()
-                ?: predictionResult.exceptionOrNull()
-                ?: interactionResult.exceptionOrNull()
-                ?: notificationResult.exceptionOrNull()
+            val firstError = listOf(userResult, predictionResult, interactionResult)
+                .firstNotNullOfOrNull { it.exceptionOrNull() }
 
             if (firstError != null) {
                 _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
@@ -99,7 +122,60 @@ class ProfileViewModel(
             is ProfileUiAction.OnBlockClicked -> _state.update { it.copy(showBlockDialog = true) }
             is ProfileUiAction.OnDismissBlockDialog -> _state.update { it.copy(showBlockDialog = false) }
             is ProfileUiAction.OnConfirmBlock -> blockUser()
+
+            is ProfileUiAction.OnNextPage -> nextPage()
+            is ProfileUiAction.OnPreviousPage -> previousPage()
         }
+    }
+
+    private fun nextPage() {
+        val currentState = _state.value
+        if (!currentState.canGoNext || currentState.isRefreshing || paginationJob?.isActive == true) return
+
+        val nextPage = currentPageFlow.value + 1
+
+        _state.update {
+            it.copy(
+                isRefreshing = true,
+                currentPage = nextPage,
+                canGoNext = false
+            )
+        }
+
+        currentPageFlow.value = nextPage
+
+        paginationJob = viewModelScope.launch {
+            predictionRepository.syncPredictions(userId, limit = 20, offset = nextPage * 20)
+                .onSuccess {
+                    _state.update {
+                        it.copy(isRefreshing = false)
+                    }
+                }
+                .onFailure { e ->
+                    _state.update {
+                        it.copy(
+                            isRefreshing = false,
+                            error = AppErrorMapper.map(e)
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun previousPage() {
+        val currentState = _state.value
+        if (currentPageFlow.value <= 0 || currentState.isRefreshing || paginationJob?.isActive == true) return
+
+        val prevPage = currentPageFlow.value - 1
+
+        _state.update {
+            it.copy(
+                currentPage = prevPage,
+                canGoNext = false
+            )
+        }
+
+        currentPageFlow.value = prevPage
     }
 
     private fun reportUser() {

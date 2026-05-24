@@ -12,4 +12,7 @@ data class Prediction(
     val lockedOdds: Int?,
     val createdAt: Instant,
     val fight: Fight?
-)
+) {
+    val isCancelledOrFizzled: Boolean
+        get() = fight?.isCancelledOrFizzled == true
+}

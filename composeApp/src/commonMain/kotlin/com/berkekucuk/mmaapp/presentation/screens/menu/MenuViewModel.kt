@@ -47,7 +47,7 @@ class MenuViewModel(
                     if (userId != null) {
                         // 2. If user exists, start the sync operations (run in background)
                         launch { userRepository.syncUser(userId) }
-                        launch { predictionRepository.syncPredictions(userId) }
+                        launch { predictionRepository.syncPredictions(userId, limit = 20, offset = 0) }
                         launch { notificationRepository.syncFightNotifications(userId) }
 
                         // 3. Return the User Flow (flatMapLatest will start collecting it)

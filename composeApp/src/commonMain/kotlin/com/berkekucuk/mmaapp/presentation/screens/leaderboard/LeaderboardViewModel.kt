@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 
 class LeaderboardViewModel(
@@ -33,7 +32,7 @@ class LeaderboardViewModel(
     private fun observeLeaderboard() {
         viewModelScope.launch {
             val currentUserId = authRepository.getAuthenticatedUserId() ?: ""
-            userRepository.getUsers(50, currentUserId)
+            userRepository.getUsers(100, currentUserId)
                 .collect { users ->
                 _state.update { it.copy(isLoading = false, leaderboard = users) }
             }
@@ -47,7 +46,7 @@ class LeaderboardViewModel(
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
             val currentUserId = authRepository.getAuthenticatedUserId()
-            userRepository.syncUsers(50, currentUserId)
+            userRepository.syncUsers(100, currentUserId)
                 .onSuccess {
                     _state.update { it.copy(isRefreshing = false) }
                 }

@@ -1,5 +1,6 @@
-package com.berkekucuk.mmaapp.data.remote.api
+package com.berkekucuk.mmaapp.data.remote.supabase
 
+import com.berkekucuk.mmaapp.data.remote.datasource.PredictionRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.PredictionDto
 import com.berkekucuk.mmaapp.data.remote.dto.PredictionInsertDto
 import io.github.jan.supabase.SupabaseClient

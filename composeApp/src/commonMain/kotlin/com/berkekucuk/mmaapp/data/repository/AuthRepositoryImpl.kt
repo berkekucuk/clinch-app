@@ -1,6 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
-import com.berkekucuk.mmaapp.data.remote.api.DeviceTokenRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.fcm.DeviceTokenProvider
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository

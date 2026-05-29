@@ -5,7 +5,7 @@ import com.berkekucuk.mmaapp.data.local.dao.FighterDao
 import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.InteractionRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.InteractionRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.model.Interaction
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository

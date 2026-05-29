@@ -5,7 +5,7 @@ import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.FighterDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.FighterRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.FighterRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.repository.FighterRepository
 import kotlinx.coroutines.Dispatchers

@@ -4,7 +4,7 @@ import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.NotificationDao
 import com.berkekucuk.mmaapp.data.local.entity.FightNotificationEntity
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.NotificationRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.NotificationRemoteDataSource
 import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

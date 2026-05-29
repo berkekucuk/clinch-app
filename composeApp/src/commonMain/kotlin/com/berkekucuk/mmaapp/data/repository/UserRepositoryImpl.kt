@@ -5,7 +5,7 @@ import com.berkekucuk.mmaapp.data.local.dao.UserDao
 import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.UserRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.UserRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.User
 import com.berkekucuk.mmaapp.domain.model.UserProfile
 import com.berkekucuk.mmaapp.domain.repository.UserRepository

@@ -1,5 +1,6 @@
-package com.berkekucuk.mmaapp.data.remote.api
+package com.berkekucuk.mmaapp.data.remote.supabase
 
+import com.berkekucuk.mmaapp.data.remote.datasource.InteractionRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.InteractionDto
 import com.berkekucuk.mmaapp.data.remote.dto.FighterInteractionInsertDto
 import io.github.jan.supabase.SupabaseClient

@@ -4,7 +4,7 @@ import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.RankingDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.WeightClassRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.WeightClassRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.WeightClass
 import com.berkekucuk.mmaapp.domain.repository.WeightClassRepository
 import kotlinx.coroutines.Dispatchers

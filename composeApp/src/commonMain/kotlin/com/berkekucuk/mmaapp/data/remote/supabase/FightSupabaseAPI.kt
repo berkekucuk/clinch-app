@@ -1,5 +1,6 @@
-package com.berkekucuk.mmaapp.data.remote.api
+package com.berkekucuk.mmaapp.data.remote.supabase
 
+import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.FightDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from

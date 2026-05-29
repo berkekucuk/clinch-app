@@ -4,7 +4,7 @@ import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.FightRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
 import kotlinx.coroutines.Dispatchers

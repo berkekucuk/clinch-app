@@ -1,6 +1,7 @@
-package com.berkekucuk.mmaapp.data.remote.api
+package com.berkekucuk.mmaapp.data.remote.supabase
 
 import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
+import com.berkekucuk.mmaapp.data.remote.datasource.UserRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.UserDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from

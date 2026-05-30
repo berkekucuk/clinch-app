@@ -4,7 +4,7 @@ import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
-import com.berkekucuk.mmaapp.data.remote.api.EventRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.EventRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.Event
 import com.berkekucuk.mmaapp.domain.repository.EventRepository
 import com.berkekucuk.mmaapp.data.local.entity.SyncedYearEntity

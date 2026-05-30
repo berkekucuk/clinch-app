@@ -4,7 +4,7 @@ import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
-import com.berkekucuk.mmaapp.data.remote.api.FightRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +39,9 @@ class FightRepositoryImpl(
                 if (!rateLimiter.shouldFetch(syncKey(fightId))) {
                     return@runCatching
                 }
+
                 val fightDto = remoteDataSource.fetchFight(fightId)
-                if (fightDto != null) {
-                    fightDao.upsertFights(listOf(fightDto.toEntity()))
-                }
+                fightDao.upsertFights(listOf(fightDto.toEntity()))
             }.onFailure {
                 if (it is CancellationException) throw it
                 rateLimiter.reset(syncKey(fightId))

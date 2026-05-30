@@ -3,7 +3,7 @@ package com.berkekucuk.mmaapp.data.repository
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
-import com.berkekucuk.mmaapp.data.remote.api.PredictionRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.PredictionRemoteDataSource
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers

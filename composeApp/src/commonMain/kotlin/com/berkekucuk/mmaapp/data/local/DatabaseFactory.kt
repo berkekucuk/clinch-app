@@ -14,6 +14,7 @@ import com.berkekucuk.mmaapp.data.local.dao.NotificationDao
 import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
+import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
 import com.berkekucuk.mmaapp.data.local.entity.EventEntity
 import com.berkekucuk.mmaapp.data.local.entity.FightNotificationEntity
 import com.berkekucuk.mmaapp.data.local.entity.PredictionEntity
@@ -25,6 +26,7 @@ import com.berkekucuk.mmaapp.data.local.entity.FighterFightCrossRef
 import com.berkekucuk.mmaapp.data.local.entity.FightEntity
 import com.berkekucuk.mmaapp.data.local.entity.InteractionEntity
 import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
+import com.berkekucuk.mmaapp.data.local.entity.AppConfigEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
@@ -40,9 +42,10 @@ import kotlinx.coroutines.IO
         FightEntity::class,
         FighterFightCrossRef::class,
         InteractionEntity::class,
-        BlockedUserEntity::class
+        BlockedUserEntity::class,
+        AppConfigEntity::class
     ],
-    version = 28
+    version = 29
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -55,6 +58,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun predictionDao(): PredictionDao
     abstract fun fightDao(): FightDao
     abstract fun interactionDao(): InteractionDao
+    abstract fun appConfigDao(): AppConfigDao
 }
 
 @Suppress("KotlinNoActualForExpect")

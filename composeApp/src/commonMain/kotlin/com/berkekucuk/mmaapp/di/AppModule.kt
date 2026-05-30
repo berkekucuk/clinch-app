@@ -59,6 +59,10 @@ import com.berkekucuk.mmaapp.presentation.screens.profile_edit.ProfileEditViewMo
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankingDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.fighter_search.FighterSearchViewModel
 import com.berkekucuk.mmaapp.presentation.screens.rankings.RankingViewModel
+import com.berkekucuk.mmaapp.data.remote.datasource.AppConfigRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.AppConfigSupabaseAPI
+import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
+import com.berkekucuk.mmaapp.data.repository.AppConfigRepositoryImpl
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardViewModel
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -130,6 +134,10 @@ val appModule = module {
         get<AppDatabase>().interactionDao()
     }
 
+    single {
+        get<AppDatabase>().appConfigDao()
+    }
+
     // remote data source
     single<EventRemoteDataSource> {
         EventSupabaseAPI(client = get())
@@ -165,6 +173,10 @@ val appModule = module {
 
     single<InteractionRemoteDataSource> {
         InteractionSupabaseAPI(client = get())
+    }
+
+    single<AppConfigRemoteDataSource> {
+        AppConfigSupabaseAPI(client = get())
     }
 
     // repository
@@ -242,6 +254,14 @@ val appModule = module {
             remoteDataSource = get(),
             interactionDao = get(),
             fighterDao = get(),
+            rateLimiter = get()
+        )
+    }
+
+    single<AppConfigRepository> {
+        AppConfigRepositoryImpl(
+            remoteDataSource = get(),
+            configDao = get(),
             rateLimiter = get()
         )
     }
@@ -338,7 +358,9 @@ val appModule = module {
     viewModel {
         LeaderboardViewModel(
             userRepository = get(),
-            authRepository = get()
+            authRepository = get(),
+            configRepository = get(),
+            languageStorage = get()
         )
     }
 

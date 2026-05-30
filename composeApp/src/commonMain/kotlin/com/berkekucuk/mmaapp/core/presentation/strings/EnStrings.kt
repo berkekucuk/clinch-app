@@ -169,12 +169,9 @@ val EnStrings = AppStrings(
     },
     toUpperCase = { it.uppercase() },
     predictionQuestionTitle = "Who will win?",
+    predictionConfirmTitle = "Lock in Prediction",
+    predictionConfirmMessage = { name -> "Are you sure you want to pick $name? This prediction cannot be changed once locked." },
     leaderboardInfoTitle = "Score System",
-    leaderboardInfoText = "Your score is determined by the points you earn from your predictions. Everyone joins the leaderboard with a starting score of 1000 points.\n" +
-            "\n" + "• The points you earn are calculated dynamically based on the fighter's odds.\n" +
-            "\n" + "• For example, correctly predicting a favorite with 1.25 odds awards +25 Points, while correctly predicting an underdog with 3.00 odds awards +200 Points.\n" +
-            "\n" + "• Every wrong prediction deducts a fixed 100 Points from your total score.\n" +
-            "\n" + "• The points you will earn are calculated and fixed based on the odds at the moment you lock your prediction.",
     leaderboardInfoClose = "Close",
     notificationChannelName = "Fight Results",
     notificationChannelDescription = "Get notified about fight results",

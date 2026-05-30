@@ -118,8 +118,6 @@ fun FightDetailScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val coroutineScope = rememberCoroutineScope()
-    
-    OnResumeEffect { onAction(FightDetailUiAction.OnResume) }
 
     val onErrorShown = remember(onAction) { { onAction(FightDetailUiAction.OnErrorShown) } }
     val onRefresh = remember(onAction) { { onAction(FightDetailUiAction.OnRefresh) } }
@@ -139,20 +137,38 @@ fun FightDetailScreen(
             }
         }
     }
-    val onPredict = remember(onAction) { { id: String -> onAction(FightDetailUiAction.OnSubmitPredictionClicked(id)) } }
     val onLeaderboardClick = remember(onAction) { { onAction(FightDetailUiAction.OnLeaderboardClicked) } }
 
-    val isRetryableError = state.error == AppError.NETWORK
-    val errorMessage = strings.mapError(state.error)
+    val showPredictionConfirmDialog = remember { mutableStateOf(false) }
+    val pendingPredictionFighterId = remember { mutableStateOf<String?>(null) }
+    val pendingPredictionFighterName = remember(pendingPredictionFighterId.value, fight) {
+        fight?.participants?.find { it.fighter.fighterId == pendingPredictionFighterId.value }?.fighter?.name ?: ""
+    }
 
-    SnackbarEffect(
-        message = errorMessage,
-        snackbarHostState = snackbarHostState,
-        duration = if (isRetryableError) SnackbarDuration.Indefinite else SnackbarDuration.Short,
-        actionLabel = if (isRetryableError) strings.retry else null,
-        onAction = if (isRetryableError) onRefresh else null,
-        onDismiss = if (!isRetryableError) onErrorShown else null,
-    )
+    val onPredict = remember {
+        { id: String ->
+            pendingPredictionFighterId.value = id
+            showPredictionConfirmDialog.value = true
+        }
+    }
+
+    val onPredictionDialogDismiss = remember {
+        {
+            showPredictionConfirmDialog.value = false
+            pendingPredictionFighterId.value = null
+        }
+    }
+
+    val onPredictionConfirmed = remember(onAction) {
+        {
+            showPredictionConfirmDialog.value = false
+            val id = pendingPredictionFighterId.value
+            if (id != null) {
+                onAction(FightDetailUiAction.OnSubmitPredictionClicked(id))
+            }
+            pendingPredictionFighterId.value = null
+        }
+    }
 
     val showNotificationDialog = remember { mutableStateOf(false) }
     val onNotificationDialogDismiss = remember { { showNotificationDialog.value = false } }
@@ -162,15 +178,20 @@ fun FightDetailScreen(
             onAction(FightDetailUiAction.OnNotificationClicked)
         }
     }
-    if (showNotificationDialog.value) {
-        AppAlertDialog(
-            onDismissRequest = onNotificationDialogDismiss,
-            onConfirmClick = onNotificationConfirmed,
-            text = if (state.isNotificationEnabled) strings.fightNotificationRemoveDialogMessage else strings.fightNotificationDialogMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
-        )
-    }
+
+    val isRetryableError = state.error == AppError.NETWORK
+    val errorMessage = strings.mapError(state.error)
+
+    OnResumeEffect { onAction(FightDetailUiAction.OnResume) }
+
+    SnackbarEffect(
+        message = errorMessage,
+        snackbarHostState = snackbarHostState,
+        duration = if (isRetryableError) SnackbarDuration.Indefinite else SnackbarDuration.Short,
+        actionLabel = if (isRetryableError) strings.retry else null,
+        onAction = if (isRetryableError) onRefresh else null,
+        onDismiss = if (!isRetryableError) onErrorShown else null,
+    )
 
     Scaffold(
         modifier = Modifier
@@ -304,5 +325,26 @@ fun FightDetailScreen(
                 }
             }
         }
+    }
+
+    if (showNotificationDialog.value) {
+        AppAlertDialog(
+            onDismissRequest = onNotificationDialogDismiss,
+            onConfirmClick = onNotificationConfirmed,
+            text = if (state.isNotificationEnabled) strings.fightNotificationRemoveDialogMessage else strings.fightNotificationDialogMessage,
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
+    }
+
+    if (showPredictionConfirmDialog.value) {
+        AppAlertDialog(
+            onDismissRequest = onPredictionDialogDismiss,
+            onConfirmClick = onPredictionConfirmed,
+            title = strings.predictionConfirmTitle,
+            text = strings.predictionConfirmMessage(pendingPredictionFighterName),
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
     }
 }

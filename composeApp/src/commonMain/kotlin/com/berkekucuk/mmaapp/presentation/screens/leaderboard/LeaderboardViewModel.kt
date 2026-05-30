@@ -2,7 +2,10 @@ package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.berkekucuk.mmaapp.core.storage.LanguageStorage
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
+import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -11,11 +14,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 
 class LeaderboardViewModel(
     private val userRepository: UserRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val configRepository: AppConfigRepository,
+    private val languageStorage: LanguageStorage
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LeaderboardUiState())
@@ -26,6 +30,7 @@ class LeaderboardViewModel(
 
     init {
         observeLeaderboard()
+        observeConfig()
         syncLeaderboard()
     }
 
@@ -39,11 +44,26 @@ class LeaderboardViewModel(
         }
     }
 
+    private fun observeConfig() {
+        viewModelScope.launch {
+            configRepository.getConfig("leaderboard_info_text")
+                .collect { config ->
+                    if (config != null) {
+                        val language = languageStorage.load()
+                        val text = if (language == "TR") config.valueTr else config.valueEn
+                        _state.update { it.copy(infoText = text) }
+                    }
+                }
+        }
+    }
+
     private fun syncLeaderboard(isRefreshing: Boolean = false) {
         if (syncJob?.isActive == true) return
 
         syncJob = viewModelScope.launch {
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
+
+            configRepository.syncConfig("leaderboard_info_text")
 
             val currentUserId = authRepository.getAuthenticatedUserId()
             userRepository.syncUsers(100, currentUserId)

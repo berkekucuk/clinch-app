@@ -72,7 +72,9 @@ fun FighterWithFightsRelation.toDomain(): Fighter {
         born = fighter.born,
         fightingOutOf = fighter.fightingOutOf,
         countryCode = fighter.countryCode ?: "",
-        fights = fights.map { it.toDomain() }.sortedByDescending { it.eventDate },
+        fights = fights.map { it.toDomain() }
+            .filterNot { it.isCancelledOrFizzled }
+            .sortedByDescending { it.eventDate },
     )
 }
 

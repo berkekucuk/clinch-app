@@ -6,6 +6,9 @@ import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import androidx.room.migration.Migration
+import androidx.sqlite.SQLiteConnection
+import androidx.sqlite.execSQL
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
 import com.berkekucuk.mmaapp.data.local.dao.FighterDao
 import com.berkekucuk.mmaapp.data.local.dao.UserDao
@@ -61,6 +64,21 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appConfigDao(): AppConfigDao
 }
 
+val MIGRATION_28_29 = object : Migration(28, 29) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `app_configs` (
+                `key` TEXT NOT NULL, 
+                `valueEn` TEXT, 
+                `valueTr` TEXT, 
+                PRIMARY KEY(`key`)
+            )
+            """.trimIndent()
+        )
+    }
+}
+
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
@@ -70,6 +88,7 @@ fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {
     return builder
+        .addMigrations(MIGRATION_28_29)
         .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)

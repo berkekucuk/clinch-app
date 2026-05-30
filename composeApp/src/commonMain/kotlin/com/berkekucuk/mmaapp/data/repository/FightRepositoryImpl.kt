@@ -39,10 +39,9 @@ class FightRepositoryImpl(
                 if (!rateLimiter.shouldFetch(syncKey(fightId))) {
                     return@runCatching
                 }
+
                 val fightDto = remoteDataSource.fetchFight(fightId)
-                if (fightDto != null) {
-                    fightDao.upsertFights(listOf(fightDto.toEntity()))
-                }
+                fightDao.upsertFights(listOf(fightDto.toEntity()))
             }.onFailure {
                 if (it is CancellationException) throw it
                 rateLimiter.reset(syncKey(fightId))

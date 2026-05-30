@@ -169,6 +169,8 @@ val EnStrings = AppStrings(
     },
     toUpperCase = { it.uppercase() },
     predictionQuestionTitle = "Who will win?",
+    predictionConfirmTitle = "Lock in Prediction",
+    predictionConfirmMessage = { name -> "Are you sure you want to pick $name? This prediction cannot be changed once locked." },
     leaderboardInfoTitle = "Score System",
     leaderboardInfoClose = "Close",
     notificationChannelName = "Fight Results",

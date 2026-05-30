@@ -148,6 +148,8 @@ data class AppStrings(
     val toUpperCase: (String) -> String,
     // Fight Prediction
     val predictionQuestionTitle: String,
+    val predictionConfirmTitle: String,
+    val predictionConfirmMessage: (String) -> String,
     // Leaderboard
     val leaderboardInfoTitle: String,
     val leaderboardInfoClose: String,

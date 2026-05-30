@@ -177,6 +177,8 @@ val TrStrings = AppStrings(
         }.joinToString("")
     },
     predictionQuestionTitle = "Kim kazanır?",
+    predictionConfirmTitle = "Tahmini Kilitle",
+    predictionConfirmMessage = { name -> "$name seçimini onaylıyor musunuz? Kilitlenen tahminler sonradan değiştirilemez." },
     leaderboardInfoTitle = "Skor Sistemi",
     leaderboardInfoClose = "Kapat",
     notificationChannelName = "Dövüş Sonuçları",

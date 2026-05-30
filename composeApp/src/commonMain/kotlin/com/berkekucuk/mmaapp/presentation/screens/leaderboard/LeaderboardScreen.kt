@@ -219,7 +219,7 @@ fun LeaderboardScreen(
             onDismissRequest = onInfoDialogDismiss,
             onConfirmClick = onInfoDialogConfirmed,
             title = strings.leaderboardInfoTitle,
-            text = strings.leaderboardInfoText,
+            text = state.infoText ?: "",
             confirmText = strings.leaderboardInfoClose
         )
     }

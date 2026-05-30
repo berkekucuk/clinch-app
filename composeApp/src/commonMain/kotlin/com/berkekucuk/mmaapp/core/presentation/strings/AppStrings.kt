@@ -150,7 +150,6 @@ data class AppStrings(
     val predictionQuestionTitle: String,
     // Leaderboard
     val leaderboardInfoTitle: String,
-    val leaderboardInfoText: String,
     val leaderboardInfoClose: String,
     // Notifications
     val notificationChannelName: String,

@@ -8,4 +8,5 @@ data class LeaderboardUiState(
     val isRefreshing: Boolean = false,
     val leaderboard: List<User> = emptyList(),
     val error: AppError? = null,
+    val infoText: String? = null,
 )

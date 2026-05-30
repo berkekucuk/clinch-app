@@ -178,11 +178,6 @@ val TrStrings = AppStrings(
     },
     predictionQuestionTitle = "Kim kazanır?",
     leaderboardInfoTitle = "Skor Sistemi",
-    leaderboardInfoText = "Skorunuz, tahminlerinizden elde ettiğiniz puanlara göre belirlenir. Herkes liderlik tablosuna 1000 başlangıç puanı ile katılır.\n" +
-            "\n" + "• Kazanacağınız puan, dövüşçünün oranına göre dinamik olarak hesaplanır.\n" +
-            "\n" + "• Örneğin 1.25 oranlı bir favoriyi doğru tahmin etmek +25 Puan kazandırırken, 3.00 oranlı favori olmayan bir dövüşçüyü doğru tahmin etmek +200 Puan kazandırır.\n" +
-            "\n" + "• Her yanlış tahmin toplam skorunuzdan sabit 100 Puan düşürür.\n" +
-            "\n" + "• Kazanacağınız puan, tahmininizi kilitlediğiniz andaki oran üzerinden hesaplanıp sabitlenir.",
     leaderboardInfoClose = "Kapat",
     notificationChannelName = "Dövüş Sonuçları",
     notificationChannelDescription = "Dövüş sonuçları hakkında bildirim al",

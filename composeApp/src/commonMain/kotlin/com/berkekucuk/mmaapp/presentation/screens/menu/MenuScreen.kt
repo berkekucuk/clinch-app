@@ -34,10 +34,22 @@ import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithApple
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
+import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
 import io.github.jan.supabase.compose.auth.composeAuth
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.ui.unit.dp
+import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.core.utils.AppError
+import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,23 +77,51 @@ fun MenuScreenRoot(
     val coroutineScope = rememberCoroutineScope()
 
     val signInWithGoogleAction = supabaseClient.composeAuth.rememberSignInWithGoogle(
-        onResult = {},
+        onResult = { result ->
+            when (result) {
+                is NativeSignInResult.Success -> {}
+                is NativeSignInResult.Error -> {
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppError.SERVER_ERROR))
+                }
+                is NativeSignInResult.NetworkError -> {
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppError.NETWORK))
+                }
+                is NativeSignInResult.ClosedByUser -> {}
+            }
+        },
         fallback = {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.IO) {
                 try {
                     supabaseClient.auth.signInWith(Google)
-                } catch (_: Exception) { }
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppErrorMapper.map(e)))
+                }
             }
         }
     )
 
     val signInWithAppleAction = supabaseClient.composeAuth.rememberSignInWithApple(
-        onResult = {},
+        onResult = { result ->
+            when (result) {
+                is NativeSignInResult.Success -> {}
+                is NativeSignInResult.Error -> {
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppError.SERVER_ERROR))
+                }
+                is NativeSignInResult.NetworkError -> {
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppError.NETWORK))
+                }
+                is NativeSignInResult.ClosedByUser -> {}
+            }
+        },
         fallback = {
-            coroutineScope.launch {
+            coroutineScope.launch(Dispatchers.IO) {
                 try {
                     supabaseClient.auth.signInWith(Apple)
-                } catch (_: Exception) { }
+                } catch (e: Exception) {
+                    if (e is CancellationException) throw e
+                    viewModel.onAction(MenuUiAction.OnErrorOccurred(AppErrorMapper.map(e)))
+                }
             }
         }
     )
@@ -90,7 +130,10 @@ fun MenuScreenRoot(
         {
             try {
                 signInWithGoogleAction.startFlow()
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                viewModel.onAction(MenuUiAction.OnErrorOccurred(AppErrorMapper.map(e)))
+            }
         }
     }
 
@@ -98,7 +141,10 @@ fun MenuScreenRoot(
         {
             try {
                 signInWithAppleAction.startFlow()
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                viewModel.onAction(MenuUiAction.OnErrorOccurred(AppErrorMapper.map(e)))
+            }
         }
     }
 
@@ -145,10 +191,32 @@ fun MenuScreen(
     val onLeaderboardClick = remember(onAction) { { onAction(MenuUiAction.OnLeaderboardClicked) } }
     val onSignOutClick = remember(onAction) { { onAction(MenuUiAction.OnSignOutClicked) } }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val errorMessage = strings.mapError(state.error)
+    val onErrorShown = remember(onAction) { { onAction(MenuUiAction.OnErrorShown) } }
+
+    SnackbarEffect(
+        message = errorMessage,
+        snackbarHostState = snackbarHostState,
+        duration = SnackbarDuration.Short,
+        onDismiss = onErrorShown,
+    )
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = colors.pagerBackground,
         contentWindowInsets = WindowInsets(0),
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackbarData ->
+                    ErrorSnackbar(
+                        snackbarData = snackbarData,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
+            )
+        },
         topBar = {
             TopAppBar(
                 title = {

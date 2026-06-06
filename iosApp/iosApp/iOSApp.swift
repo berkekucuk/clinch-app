@@ -29,6 +29,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 print("Permission error: \(error.localizedDescription)")
             }
         }
+        UserDefaults.standard.set(true, forKey: "has_requested_permission")
         application.registerForRemoteNotifications()
         return true
     }

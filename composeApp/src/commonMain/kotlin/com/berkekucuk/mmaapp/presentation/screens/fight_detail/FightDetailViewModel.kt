@@ -143,6 +143,9 @@ class FightDetailViewModel(
             }
             is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId)
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
+            is FightDetailUiAction.OnOpenSettingsClicked -> {
+                notificationStorage.openNotificationSettings()
+            }
         }
     }
 
@@ -200,7 +203,7 @@ class FightDetailViewModel(
     private fun handleMissingPermission() {
         isPendingNotificationRequest = true
         if (notificationStorage.hasRequestedPermission()) {
-            notificationStorage.openNotificationSettings()
+            navigateTo(FightDetailNavigationEvent.ShowSettingsDialog)
         } else {
             notificationStorage.setRequestedPermission(true)
             navigateTo(FightDetailNavigationEvent.RequestNotificationPermission)

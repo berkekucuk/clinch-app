@@ -52,6 +52,10 @@ object DeepLinkManager {
     fun navigateToFight(fightId: String) {
         _route.trySend(Route.FightDetail(fightId))
     }
+
+    fun navigateToEvent(eventId: String) {
+        _route.trySend(Route.EventDetail(eventId))
+    }
 }
 
 @Composable

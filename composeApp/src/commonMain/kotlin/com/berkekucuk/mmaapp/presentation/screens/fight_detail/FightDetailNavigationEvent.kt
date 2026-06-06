@@ -5,5 +5,6 @@ sealed interface FightDetailNavigationEvent {
     data object Back : FightDetailNavigationEvent
     data class ToEventDetail(val eventId: String) : FightDetailNavigationEvent
     data object RequestNotificationPermission : FightDetailNavigationEvent
+    data object ShowSettingsDialog : FightDetailNavigationEvent
     data object ToLeaderboard : FightDetailNavigationEvent
 }

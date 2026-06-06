@@ -60,6 +60,8 @@ fun FightDetailScreenRoot(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val showPermissionRequest = remember { mutableStateOf(false) }
+    val showSettingsDialog = remember { mutableStateOf(false) }
+    val strings = LocalAppStrings.current
 
     NotificationPermissionHandler(
         trigger = showPermissionRequest.value,
@@ -82,8 +84,25 @@ fun FightDetailScreenRoot(
                 is FightDetailNavigationEvent.RequestNotificationPermission -> {
                     showPermissionRequest.value = true
                 }
+                is FightDetailNavigationEvent.ShowSettingsDialog -> {
+                    showSettingsDialog.value = true
+                }
             }
         }
+    }
+
+    if (showSettingsDialog.value) {
+        AppAlertDialog(
+            onDismissRequest = { showSettingsDialog.value = false },
+            onConfirmClick = {
+                showSettingsDialog.value = false
+                viewModel.onAction(FightDetailUiAction.OnOpenSettingsClicked)
+            },
+            title = strings.notificationPermissionSettingsTitle,
+            text = strings.notificationPermissionSettingsMessage,
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
     }
 
     FightDetailScreen(

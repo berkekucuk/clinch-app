@@ -38,6 +38,11 @@ class MainActivity : ComponentActivity() {
         val fightId = intent.getStringExtra("fight_id")
         if (fightId != null) {
             DeepLinkManager.navigateToFight(fightId)
+            return
+        }
+        val eventId = intent.getStringExtra("event_id")
+        if (eventId != null) {
+            DeepLinkManager.navigateToEvent(eventId)
         }
     }
 }

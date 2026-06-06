@@ -95,6 +95,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         let userInfo = response.notification.request.content.userInfo
         if let fightId = userInfo["fight_id"] as? String {
             DeepLinkManager.shared.navigateToFight(fightId: fightId)
+        } else if let eventId = userInfo["event_id"] as? String {
+            DeepLinkManager.shared.navigateToEvent(eventId: eventId)
         }
         
         completionHandler()

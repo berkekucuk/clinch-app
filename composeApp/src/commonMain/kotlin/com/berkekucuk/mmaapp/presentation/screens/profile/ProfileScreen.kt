@@ -1,6 +1,10 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -161,6 +165,31 @@ fun ProfileScreen(
                         }
                     },
                     actions = {
+                        state.profile?.user?.let { user ->
+                            Row(
+                                modifier = Modifier
+                                    .padding(end = 8.dp)
+                                    .background(
+                                        color = colors.winnerFrame.copy(alpha = 0.15f),
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = colors.winnerFrame,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = strings.pointsFormat(user.totalPoints),
+                                    color = colors.winnerFrame,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+
                         if (!state.isOwner) {
                             Box {
                                 IconButton(onClick = { showOverflowMenu = true }) {

@@ -48,8 +48,8 @@ import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +90,7 @@ fun MenuScreenRoot(
             }
         },
         fallback = {
-            coroutineScope.launch(Dispatchers.IO) {
+            coroutineScope.launch(Dispatchers.Main) {
                 try {
                     supabaseClient.auth.signInWith(Google)
                 } catch (e: Exception) {
@@ -115,7 +115,7 @@ fun MenuScreenRoot(
             }
         },
         fallback = {
-            coroutineScope.launch(Dispatchers.IO) {
+            coroutineScope.launch(Dispatchers.Main) {
                 try {
                     supabaseClient.auth.signInWith(Apple)
                 } catch (e: Exception) {
@@ -166,18 +166,23 @@ fun MenuScreen(
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+    val coroutineScope = rememberCoroutineScope()
 
     val (showSignInSheet, setShowSignInSheet) = remember { mutableStateOf(false) }
 
     val onSignInClick = remember(setShowSignInSheet) { { setShowSignInSheet(true) } }
     val onDismissSignIn = remember(setShowSignInSheet) { { setShowSignInSheet(false) } }
-    val onStartGoogleSignInClick = remember(setShowSignInSheet, onStartGoogleSignIn) {
+    val onStartGoogleSignInClick = remember(coroutineScope, setShowSignInSheet, onStartGoogleSignIn) {
         {
             setShowSignInSheet(false)
-            onStartGoogleSignIn()
+            coroutineScope.launch {
+                kotlinx.coroutines.delay(300.milliseconds)
+                onStartGoogleSignIn()
+            }
+            Unit
         }
     }
-    
+
     val onStartAppleSignInClick = remember(setShowSignInSheet, onStartAppleSignIn) {
         {
             setShowSignInSheet(false)

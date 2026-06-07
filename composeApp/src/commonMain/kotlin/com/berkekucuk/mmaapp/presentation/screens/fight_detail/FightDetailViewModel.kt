@@ -220,18 +220,36 @@ class FightDetailViewModel(
         viewModelScope.launch {
             val userId = getAuthenticatedUserId()
             if (userId == null) {
-                _state.update { it.copy(error = AppError.UNAUTHENTICATED) }
+                _state.update { 
+                    it.copy(
+                        error = AppError.UNAUTHENTICATED,
+                        showPredictionConfirmDialog = false,
+                        pendingPredictionFighterId = null
+                    ) 
+                }
                 return@launch
             }
 
             val fight = _state.value.fight ?: return@launch
             if (isFightCompleted(fight)) {
-                _state.update { it.copy(error = AppError.FIGHT_OVER) }
+                _state.update { 
+                    it.copy(
+                        error = AppError.FIGHT_OVER,
+                        showPredictionConfirmDialog = false,
+                        pendingPredictionFighterId = null
+                    ) 
+                }
                 return@launch
             }
 
             if(!areOddsPublished(fight)){
-                _state.update { it.copy(error = AppError.ODDS_NOT_PUBLISHED) }
+                _state.update { 
+                    it.copy(
+                        error = AppError.ODDS_NOT_PUBLISHED,
+                        showPredictionConfirmDialog = false,
+                        pendingPredictionFighterId = null
+                    ) 
+                }
                 return@launch
             }
 

@@ -141,7 +141,7 @@ class FightDetailViewModel(
                     }
                 }
             }
-            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId)
+            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId, action.selectedRisk)
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
             is FightDetailUiAction.OnOpenSettingsClicked -> {
                 notificationStorage.openNotificationSettings()
@@ -210,7 +210,7 @@ class FightDetailViewModel(
         }
     }
 
-    private fun submitPrediction(predictedWinnerId: String) {
+    private fun submitPrediction(predictedWinnerId: String, selectedRisk: Int) {
         viewModelScope.launch {
             val userId = getAuthenticatedUserId()
             if (userId == null) {
@@ -233,7 +233,7 @@ class FightDetailViewModel(
 
             _state.update { it.copy(isSubmittingPrediction = true, error = null) }
             
-            predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds)
+            predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds, selectedRisk)
                 .onSuccess {
                     _state.update { it.copy(isSubmittingPrediction = false) }
                 }

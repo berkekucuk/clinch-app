@@ -114,6 +114,10 @@ data class AppStrings(
     val fightNotificationRemoveDialogMessage: String,
     val notificationPermissionSettingsTitle: String,
     val notificationPermissionSettingsMessage: String,
+    val riskUnsure: String,
+    val riskNormal: String,
+    val riskConfident: String,
+    val riskAllIn: String,
     // Settings Screen
     val settingsTitle: String,
     val settingsSectionLanguage: String,

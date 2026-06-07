@@ -1,17 +1,28 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
@@ -164,8 +175,11 @@ fun FightDetailScreen(
         fight?.participants?.find { it.fighter.fighterId == pendingPredictionFighterId.value }?.fighter?.name ?: ""
     }
 
+    val selectedRisk = remember { mutableStateOf(50) }
+
     val onPredict = remember {
         { id: String ->
+            selectedRisk.value = 50
             pendingPredictionFighterId.value = id
             showPredictionConfirmDialog.value = true
         }
@@ -183,7 +197,7 @@ fun FightDetailScreen(
             showPredictionConfirmDialog.value = false
             val id = pendingPredictionFighterId.value
             if (id != null) {
-                onAction(FightDetailUiAction.OnSubmitPredictionClicked(id))
+                onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
             }
             pendingPredictionFighterId.value = null
         }
@@ -361,9 +375,62 @@ fun FightDetailScreen(
             onDismissRequest = onPredictionDialogDismiss,
             onConfirmClick = onPredictionConfirmed,
             title = strings.predictionConfirmTitle,
-            text = strings.predictionConfirmMessage(pendingPredictionFighterName),
             confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
+            dismissText = strings.dialogCancel,
+            isConfirmLoading = state.isSubmittingPrediction,
+            content = {
+                Column(modifier = Modifier.selectableGroup()) {
+                    Text(
+                        text = strings.predictionConfirmMessage(pendingPredictionFighterName),
+                        color = colors.textSecondary,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    val options = listOf(
+                        25 to strings.riskUnsure,
+                        50 to strings.riskNormal,
+                        75 to strings.riskConfident,
+                        100 to strings.riskAllIn
+                    )
+                    options.forEach { (value, label) ->
+                        val selected = (selectedRisk.value == value)
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(
+                                    color = if (selected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = if (selected) colors.winnerFrame else Color.Transparent,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .selectable(
+                                    selected = selected,
+                                    onClick = { selectedRisk.value = value },
+                                    role = Role.RadioButton
+                                )
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selected,
+                                onClick = null,
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = colors.winnerFrame,
+                                    unselectedColor = colors.textSecondary
+                                )
+                            )
+                            Text(
+                                text = label,
+                                color = colors.textPrimary,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
         )
     }
 }

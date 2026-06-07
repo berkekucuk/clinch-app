@@ -23,9 +23,10 @@ class PredictionSupabaseAPI(
         userId: String,
         fightId: String,
         predictedWinnerId: String,
-        lockedOdds: Int
+        lockedOdds: Int,
+        selectedRisk: Int
     ): PredictionDto {
-        val request = PredictionInsertDto(userId, fightId, predictedWinnerId, lockedOdds)
+        val request = PredictionInsertDto(userId, fightId, predictedWinnerId, lockedOdds, selectedRisk)
         return client.from("user_predictions").insert(request) {
             select()
         }.decodeSingle<PredictionDto>()

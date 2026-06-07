@@ -146,6 +146,12 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnOpenSettingsClicked -> {
                 notificationStorage.openNotificationSettings()
             }
+            is FightDetailUiAction.OnPredictClicked -> {
+                _state.update { it.copy(showPredictionConfirmDialog = true, pendingPredictionFighterId = action.predictedWinnerId) }
+            }
+            is FightDetailUiAction.OnDismissPredictionDialog -> {
+                _state.update { it.copy(showPredictionConfirmDialog = false, pendingPredictionFighterId = null) }
+            }
         }
     }
 
@@ -235,10 +241,23 @@ class FightDetailViewModel(
             
             predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds, selectedRisk)
                 .onSuccess {
-                    _state.update { it.copy(isSubmittingPrediction = false) }
+                    _state.update { 
+                        it.copy(
+                            isSubmittingPrediction = false,
+                            showPredictionConfirmDialog = false,
+                            pendingPredictionFighterId = null
+                        ) 
+                    }
                 }
                 .onFailure { e ->
-                    _state.update { it.copy(isSubmittingPrediction = false, error = AppErrorMapper.map(e)) }
+                    _state.update { 
+                        it.copy(
+                            isSubmittingPrediction = false,
+                            showPredictionConfirmDialog = false,
+                            pendingPredictionFighterId = null,
+                            error = AppErrorMapper.map(e)
+                        ) 
+                    }
                 }
         }
     }

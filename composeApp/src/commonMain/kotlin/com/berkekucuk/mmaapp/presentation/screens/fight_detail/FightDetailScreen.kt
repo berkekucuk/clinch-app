@@ -169,37 +169,30 @@ fun FightDetailScreen(
     }
     val onLeaderboardClick = remember(onAction) { { onAction(FightDetailUiAction.OnLeaderboardClicked) } }
 
-    val showPredictionConfirmDialog = remember { mutableStateOf(false) }
-    val pendingPredictionFighterId = remember { mutableStateOf<String?>(null) }
-    val pendingPredictionFighterName = remember(pendingPredictionFighterId.value, fight) {
-        fight?.participants?.find { it.fighter.fighterId == pendingPredictionFighterId.value }?.fighter?.name ?: ""
+    val selectedRisk = remember { mutableStateOf(50) }
+    val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
+        fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
     }
 
-    val selectedRisk = remember { mutableStateOf(50) }
-
-    val onPredict = remember {
+    val onPredict = remember(onAction) {
         { id: String ->
             selectedRisk.value = 50
-            pendingPredictionFighterId.value = id
-            showPredictionConfirmDialog.value = true
+            onAction(FightDetailUiAction.OnPredictClicked(id))
         }
     }
 
-    val onPredictionDialogDismiss = remember {
+    val onPredictionDialogDismiss = remember(onAction) {
         {
-            showPredictionConfirmDialog.value = false
-            pendingPredictionFighterId.value = null
+            onAction(FightDetailUiAction.OnDismissPredictionDialog)
         }
     }
 
-    val onPredictionConfirmed = remember(onAction) {
+    val onPredictionConfirmed = remember(onAction, selectedRisk, state.pendingPredictionFighterId) {
         {
-            showPredictionConfirmDialog.value = false
-            val id = pendingPredictionFighterId.value
+            val id = state.pendingPredictionFighterId
             if (id != null) {
                 onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
             }
-            pendingPredictionFighterId.value = null
         }
     }
 
@@ -370,7 +363,7 @@ fun FightDetailScreen(
         )
     }
 
-    if (showPredictionConfirmDialog.value) {
+    if (state.showPredictionConfirmDialog) {
         AppAlertDialog(
             onDismissRequest = onPredictionDialogDismiss,
             onConfirmClick = onPredictionConfirmed,

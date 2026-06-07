@@ -14,4 +14,6 @@ data class FightDetailUiState(
     val isSubmittingPrediction: Boolean = false,
     val predictedWinnerId: String? = null,
     val showPredictionBoard: Boolean = false,
+    val showPredictionConfirmDialog: Boolean = false,
+    val pendingPredictionFighterId: String? = null,
 )

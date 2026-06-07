@@ -7,7 +7,6 @@ import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import com.berkekucuk.mmaapp.core.utils.AppError
-import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.FighterRepository
 import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
@@ -69,7 +68,7 @@ class FightDetailViewModel(
 
     private fun observeFightNotificationStatus() {
         viewModelScope.launch {
-            val userId = getAuthenticatedUserId()
+            val userId = authRepository.getAuthenticatedUserId()
             if (userId != null) {
                 notificationRepository.getFightNotificationStatus(fightId, userId)
                     .collect { isEnabled ->
@@ -81,7 +80,7 @@ class FightDetailViewModel(
 
     private fun observePredictionStatus() {
         viewModelScope.launch {
-            val userId = getAuthenticatedUserId()
+            val userId = authRepository.getAuthenticatedUserId()
             if (userId != null) {
                 predictionRepository.getPredictedWinnerId(fightId, userId)
                     .collect { predictedId ->
@@ -157,7 +156,7 @@ class FightDetailViewModel(
 
     private fun onNotificationClicked() {
         viewModelScope.launch {
-            val userId = getAuthenticatedUserId()
+            val userId = authRepository.getAuthenticatedUserId()
             if (userId == null) {
                 _state.update { it.copy(error = AppError.UNAUTHENTICATED) }
                 return@launch
@@ -218,7 +217,7 @@ class FightDetailViewModel(
 
     private fun submitPrediction(predictedWinnerId: String, selectedRisk: Int) {
         viewModelScope.launch {
-            val userId = getAuthenticatedUserId()
+            val userId = authRepository.getAuthenticatedUserId()
             if (userId == null) {
                 _state.update { 
                     it.copy(
@@ -286,11 +285,6 @@ class FightDetailViewModel(
 
     private fun getLockedOdds(fight: Fight, predictedWinnerId: String): Int {
         return fight.participants.find { it.fighter.fighterId == predictedWinnerId }?.oddsValue ?: 0
-    }
-
-    private suspend fun getAuthenticatedUserId(): String? {
-        val authState = authRepository.authState.first { it !is AuthState.Loading }
-        return if (authState is AuthState.Authenticated) authState.userId else null
     }
 
     private fun onRefresh() {

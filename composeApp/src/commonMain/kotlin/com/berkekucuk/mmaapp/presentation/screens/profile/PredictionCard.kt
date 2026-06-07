@@ -1,7 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -101,21 +100,31 @@ fun PredictionCard(
                 color = colors.dividerColor.copy(alpha = 0.5f)
             )
 
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Text(
                     text = strings.predictionQuestionTitle,
                     color = colors.textPrimary,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.align(Alignment.CenterStart)
                 )
 
+                if (prediction.isCorrect != null) {
+                    Text(
+                        text = strings.pointsFormat(prediction.pointsEarned),
+                        color = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
                 Row(
+                    modifier = Modifier.align(Alignment.CenterEnd),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(

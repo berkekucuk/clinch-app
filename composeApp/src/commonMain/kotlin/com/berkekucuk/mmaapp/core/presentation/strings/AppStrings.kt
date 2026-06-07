@@ -118,6 +118,7 @@ data class AppStrings(
     val riskNormal: String,
     val riskConfident: String,
     val riskAllIn: String,
+    val pointsFormat: (Int) -> String,
     // Settings Screen
     val settingsTitle: String,
     val settingsSectionLanguage: String,

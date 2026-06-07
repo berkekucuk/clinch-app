@@ -129,6 +129,8 @@ data class AppStrings(
     val settingsThemeDark: String,
     val settingsSectionBlockedUsers: String,
     val settingsSectionBlockedUsersSub: String,
+    val settingsSectionSupport: String,
+    val settingsSectionSupportSub: String,
     val unblockUser: String,
     val blockedUsersEmpty: String,
     // Menu Screen

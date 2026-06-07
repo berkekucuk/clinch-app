@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -89,6 +90,7 @@ fun SettingsScreen(
     val currentMeasurementUnit = LocalMeasurementUnit.current
     val currentOddsFormat = LocalOddsFormat.current
     val currentThemeMode = LocalThemeMode.current
+    val uriHandler = LocalUriHandler.current
 
     var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -180,6 +182,19 @@ fun SettingsScreen(
                 title = strings.menuItemNotifications,
                 subtitle = if (notificationsEnabled) strings.menuNotificationsEnabled else strings.menuNotificationsDisabled,
                 onClick = { notificationStorage.openNotificationSettings() }
+            )
+
+            SettingsCard(
+                icon = Icons.Default.Email,
+                title = strings.settingsSectionSupport,
+                subtitle = strings.settingsSectionSupportSub,
+                onClick = {
+                    try {
+                        uriHandler.openUri("mailto:clinchapp0@gmail.com")
+                    } catch (e: Exception) {
+                        // ignore
+                    }
+                }
             )
 
             if (state.authState is AuthState.Authenticated) {

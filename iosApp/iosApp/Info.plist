@@ -10,5 +10,10 @@
 	</array>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Clinch needs access to your photo library so you can update and set your profile picture.</string>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+	</dict>
 </dict>
 </plist>

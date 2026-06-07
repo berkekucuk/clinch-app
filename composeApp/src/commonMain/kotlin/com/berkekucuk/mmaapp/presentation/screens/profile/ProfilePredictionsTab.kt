@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
@@ -48,7 +49,7 @@ fun ProfilePredictionsTab(
         predictions.filterNot { it.isCancelledOrFizzled }
     }
     val listState = rememberLazyListState()
-    var lastScrolledPage by remember { mutableStateOf(-1) }
+    var lastScrolledPage by rememberSaveable { mutableStateOf(-1) }
 
     LaunchedEffect(predictions) {
         if (lastScrolledPage != state.currentPage) {

@@ -14,7 +14,13 @@ interface PredictionDao {
     fun getPredictedWinnerId(fightId: String, userId: String): Flow<String?>
 
     @Transaction
-    @Query("SELECT * FROM predictions WHERE user_id = :userId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    @Query("""
+        SELECT p.* FROM predictions p
+        INNER JOIN fights f ON p.fight_id = f.fight_id
+        WHERE p.user_id = :userId
+        ORDER BY f.event_date DESC, f.fight_order DESC
+        LIMIT :limit OFFSET :offset
+    """)
     fun getPredictions(userId: String, limit: Int, offset: Int): Flow<List<PredictionWithFightRelation>>
 
     @Upsert

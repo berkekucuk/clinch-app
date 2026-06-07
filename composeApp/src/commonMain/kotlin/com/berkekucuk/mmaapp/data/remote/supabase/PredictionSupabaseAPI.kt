@@ -11,7 +11,7 @@ class PredictionSupabaseAPI(
 ) : PredictionRemoteDataSource {
 
     override suspend fun fetchPredictions(userId: String, limit: Int, offset: Int): List<PredictionDto> {
-        return client.from("prediction_view_v2").select {
+        return client.from("prediction_view_v3").select {
             filter {
                 eq("user_id", userId)
             }

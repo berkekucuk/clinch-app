@@ -141,10 +141,16 @@ class FightDetailViewModel(
                     }
                 }
             }
-            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId)
+            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId, action.selectedRisk)
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
             is FightDetailUiAction.OnOpenSettingsClicked -> {
                 notificationStorage.openNotificationSettings()
+            }
+            is FightDetailUiAction.OnPredictClicked -> {
+                _state.update { it.copy(showPredictionConfirmDialog = true, pendingPredictionFighterId = action.predictedWinnerId) }
+            }
+            is FightDetailUiAction.OnDismissPredictionDialog -> {
+                _state.update { it.copy(showPredictionConfirmDialog = false, pendingPredictionFighterId = null) }
             }
         }
     }
@@ -210,7 +216,7 @@ class FightDetailViewModel(
         }
     }
 
-    private fun submitPrediction(predictedWinnerId: String) {
+    private fun submitPrediction(predictedWinnerId: String, selectedRisk: Int) {
         viewModelScope.launch {
             val userId = getAuthenticatedUserId()
             if (userId == null) {
@@ -233,12 +239,25 @@ class FightDetailViewModel(
 
             _state.update { it.copy(isSubmittingPrediction = true, error = null) }
             
-            predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds)
+            predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds, selectedRisk)
                 .onSuccess {
-                    _state.update { it.copy(isSubmittingPrediction = false) }
+                    _state.update { 
+                        it.copy(
+                            isSubmittingPrediction = false,
+                            showPredictionConfirmDialog = false,
+                            pendingPredictionFighterId = null
+                        ) 
+                    }
                 }
                 .onFailure { e ->
-                    _state.update { it.copy(isSubmittingPrediction = false, error = AppErrorMapper.map(e)) }
+                    _state.update { 
+                        it.copy(
+                            isSubmittingPrediction = false,
+                            showPredictionConfirmDialog = false,
+                            pendingPredictionFighterId = null,
+                            error = AppErrorMapper.map(e)
+                        ) 
+                    }
                 }
         }
     }

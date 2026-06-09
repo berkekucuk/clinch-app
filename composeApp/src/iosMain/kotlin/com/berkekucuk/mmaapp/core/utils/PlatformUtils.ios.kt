@@ -13,8 +13,12 @@ actual fun getAppVersionCode(): Int {
 }
 
 actual fun openStore(androidPackage: String, iosAppId: String) {
-    val urlString = "https://apps.apple.com/app/id$iosAppId"
-    NSURL.URLWithString(urlString)?.let { url ->
-        UIApplication.sharedApplication.openURL(url)
-    }
+    val urlString = "https://apps.apple.com/tr/app/clinch-mobile/id$iosAppId"
+    val url = NSURL.URLWithString(urlString) ?: return
+
+    UIApplication.sharedApplication.openURL(
+        url,
+        emptyMap<Any?, Any>(),
+        null
+    )
 }

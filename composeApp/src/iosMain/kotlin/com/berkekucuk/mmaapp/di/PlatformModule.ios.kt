@@ -1,6 +1,8 @@
 package com.berkekucuk.mmaapp.di
 
 import androidx.room.RoomDatabase
+import com.berkekucuk.mmaapp.core.storage.AppVersionStorage
+import com.berkekucuk.mmaapp.core.storage.IosAppVersionStorage
 import com.berkekucuk.mmaapp.core.storage.IosLanguageStorage
 import com.berkekucuk.mmaapp.core.storage.IosMeasurementUnitStorage
 import com.berkekucuk.mmaapp.core.storage.IosNotificationStorage
@@ -23,6 +25,9 @@ actual val platformModule = module {
     }
     single<LanguageStorage> {
         IosLanguageStorage()
+    }
+    single<AppVersionStorage> {
+        IosAppVersionStorage()
     }
     single<MeasurementUnitStorage> {
         IosMeasurementUnitStorage()

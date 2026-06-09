@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
+import com.berkekucuk.mmaapp.domain.model.AppUpdateStatus
 import com.berkekucuk.mmaapp.domain.repository.EventRepository
+import com.berkekucuk.mmaapp.domain.repository.AppVersionRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,10 +19,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeViewModel(
     private val eventRepository: EventRepository,
-    private val dateTimeProvider: DateTimeProvider
+    private val dateTimeProvider: DateTimeProvider,
+    private val appVersionRepository: AppVersionRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -40,7 +44,7 @@ class HomeViewModel(
         }
 
         viewModelScope.launch {
-            delay(800)
+            delay(800.milliseconds)
             isMinSplashTimePassed = true
             checkLoadingState()
         }
@@ -48,6 +52,7 @@ class HomeViewModel(
         observeUpcomingEvents()
         observeCompletedEvents()
         syncEvents()
+        checkForUpdate()
     }
 
     private fun checkLoadingState() {
@@ -97,6 +102,18 @@ class HomeViewModel(
         }
     }
 
+    private fun checkForUpdate() {
+        viewModelScope.launch {
+            appVersionRepository.checkForUpdate()
+                .onSuccess { status ->
+                    _state.update { it.copy(updateStatus = status) }
+                }
+                .onFailure {
+                    _state.update { it.copy(updateStatus = AppUpdateStatus.UpToDate) }
+                }
+        }
+    }
+
     fun onAction(action: HomeUiAction) {
         when (action) {
             is HomeUiAction.OnEventClicked -> navigateTo(HomeNavigationEvent.ToEventDetail(action.eventId))
@@ -104,6 +121,7 @@ class HomeViewModel(
             is HomeUiAction.OnRefreshUpcomingTab -> onRefreshUpcomingTab()
             is HomeUiAction.OnRefreshCompletedTab -> onRefreshCompletedTab()
             is HomeUiAction.OnSearchClicked -> navigateTo(HomeNavigationEvent.ToFighterSearch)
+            HomeUiAction.OnDismissFlexibleUpdate -> _state.update { it.copy(updateStatus = AppUpdateStatus.UpToDate) }
         }
     }
 

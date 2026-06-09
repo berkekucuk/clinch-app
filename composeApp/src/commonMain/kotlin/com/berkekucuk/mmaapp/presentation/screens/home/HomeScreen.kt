@@ -49,6 +49,9 @@ import mmaapp.composeapp.generated.resources.app_logo
 import mmaapp.composeapp.generated.resources.app_logo_light
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
+import com.berkekucuk.mmaapp.core.utils.openStore
+import com.berkekucuk.mmaapp.domain.model.AppUpdateStatus
+import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 
 @Composable
 fun HomeScreenRoot(
@@ -97,6 +100,10 @@ fun HomeScreen(
     val onYearSelected = remember(onAction) { { year: Int -> onAction(HomeUiAction.OnYearSelected(year)) } }
 
     val errorMessage = strings.mapError(state.error)
+
+    val updateStatus = state.updateStatus
+    val isForceUpdate = updateStatus is AppUpdateStatus.ForceUpdate
+    val onDismissFlexibleUpdate = remember(onAction) { { onAction(HomeUiAction.OnDismissFlexibleUpdate) } }
 
     SnackbarEffect(
         message = errorMessage,
@@ -206,5 +213,17 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (updateStatus != null && updateStatus != AppUpdateStatus.UpToDate) {
+        AppAlertDialog(
+            onDismissRequest = { if (!isForceUpdate) onDismissFlexibleUpdate() },
+            onConfirmClick = { openStore() },
+            onDismissClick = if (!isForceUpdate) onDismissFlexibleUpdate else null,
+            title = if (isForceUpdate) strings.updateForceTitle else strings.updateFlexibleTitle,
+            text = if (isForceUpdate) strings.updateForceMessage else strings.updateFlexibleMessage,
+            confirmText = strings.updateButton,
+            dismissText = if (!isForceUpdate) strings.updateLaterButton else null
+        )
     }
 }

@@ -6,4 +6,5 @@ sealed interface HomeUiAction {
     data object OnRefreshUpcomingTab : HomeUiAction
     data object OnRefreshCompletedTab : HomeUiAction
     data object OnSearchClicked : HomeUiAction
+    data object OnDismissFlexibleUpdate : HomeUiAction
 }

@@ -174,4 +174,11 @@ data class AppStrings(
     val interactionLimitReachedText: String,
     val dialogOkay: String,
     val mapError: (AppError?) -> String?,
+    // App Update
+    val updateForceTitle: String,
+    val updateForceMessage: String,
+    val updateFlexibleTitle: String,
+    val updateFlexibleMessage: String,
+    val updateButton: String,
+    val updateLaterButton: String,
 )

@@ -221,5 +221,11 @@ val TrStrings = AppStrings(
             AppError.UNKNOWN -> "Bir hata oluştu."
             else -> null
         }
-    }
+    },
+    updateForceTitle = "Güncelleme Gerekli",
+    updateForceMessage = "Clinch'i kullanmaya devam edebilmek için lütfen uygulamayı son sürüme güncelleyin.",
+    updateFlexibleTitle = "Güncelleme Mevcut",
+    updateFlexibleMessage = "Clinch için yeni özellikler ve performans iyileştirmeleri içeren bir güncelleme mevcut.",
+    updateButton = "Güncelle",
+    updateLaterButton = "Sonra",
 )

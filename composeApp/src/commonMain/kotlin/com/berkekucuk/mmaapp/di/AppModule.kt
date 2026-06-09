@@ -63,6 +63,10 @@ import com.berkekucuk.mmaapp.data.remote.datasource.AppConfigRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.supabase.AppConfigSupabaseAPI
 import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
 import com.berkekucuk.mmaapp.data.repository.AppConfigRepositoryImpl
+import com.berkekucuk.mmaapp.data.remote.datasource.AppVersionRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.AppVersionSupabaseAPI
+import com.berkekucuk.mmaapp.data.repository.AppVersionRepositoryImpl
+import com.berkekucuk.mmaapp.domain.repository.AppVersionRepository
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardViewModel
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsViewModel
 import org.koin.core.module.dsl.viewModel
@@ -179,6 +183,17 @@ val appModule = module {
         AppConfigSupabaseAPI(client = get())
     }
 
+    single<AppVersionRemoteDataSource> {
+        AppVersionSupabaseAPI(client = get())
+    }
+
+    single<AppVersionRepository> {
+        AppVersionRepositoryImpl(
+            remoteDataSource = get(),
+            appVersionStorage = get()
+        )
+    }
+
     // repository
     single<FightRepository> {
         FightRepositoryImpl(
@@ -270,7 +285,8 @@ val appModule = module {
     viewModel {
         HomeViewModel(
             eventRepository = get(),
-            dateTimeProvider = get()
+            dateTimeProvider = get(),
+            appVersionRepository = get()
         )
     }
 

@@ -213,5 +213,11 @@ val EnStrings = AppStrings(
             AppError.UNKNOWN -> "Something went wrong."
             else -> null
         }
-    }
+    },
+    updateForceTitle = "Update Required",
+    updateForceMessage = "To continue using Clinch, please update to the latest version.",
+    updateFlexibleTitle = "Update Available",
+    updateFlexibleMessage = "An update for Clinch is available with new features and improvements.",
+    updateButton = "Update",
+    updateLaterButton = "Later",
 )

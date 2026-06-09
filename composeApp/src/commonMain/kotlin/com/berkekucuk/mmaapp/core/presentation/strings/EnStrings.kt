@@ -79,6 +79,7 @@ val EnStrings = AppStrings(
     profileFavoriteFighters = "Favorite Fighters",
     profileGoatFighters = "Goat List",
     profileHatedFighters = "Hated Fighters",
+    profileJoinedDate = { date -> "Joined $date" },
     profileEditTitle = "Edit Profile",
     profileEditPersonalInfo = "Personal Information",
     profileEditEmail = "Email",

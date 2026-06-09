@@ -29,6 +29,11 @@ fun Instant.toShortDate(months: List<String>): String {
     return "${months[ldt.month.number - 1]} ${ldt.day}"
 }
 
+fun Instant.toJoinedDate(months: List<String>): String {
+    val ldt = localDateTime
+    return "${ldt.day} ${months[ldt.month.number - 1]} ${ldt.year}"
+}
+
 fun calculateAgeAtDate(dateOfBirth: String?, referenceDate: Instant?): String? {
     if (dateOfBirth.isNullOrBlank() || referenceDate == null) return null
     return try {

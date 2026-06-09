@@ -79,6 +79,7 @@ val TrStrings = AppStrings(
     profileFavoriteFighters = "Favori Dövüşçüler",
     profileGoatFighters = "Goat Listesi",
     profileHatedFighters = "Sevilmeyen Dövüşçüler",
+    profileJoinedDate = { date -> "$date tarihinde katıldı" },
     profileEditTitle = "Profili Düzenle",
     profileEditPersonalInfo = "Kişisel Bilgiler",
     profileEditEmail = "E-posta",

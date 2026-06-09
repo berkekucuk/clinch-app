@@ -88,6 +88,7 @@ data class AppStrings(
     val profileFavoriteFighters: String,
     val profileGoatFighters: String,
     val profileHatedFighters: String,
+    val profileJoinedDate: (String) -> String,
     // Profile Edit Screen
     val profileEditTitle: String,
     val profileEditPersonalInfo: String,

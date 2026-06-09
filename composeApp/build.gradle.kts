@@ -84,6 +84,8 @@ kotlin {
                 implementation(libs.androidx.room.sqlite.wrapper)
                 implementation(project.dependencies.platform(libs.firebase.bom))
                 implementation(libs.firebase.messaging)
+                implementation(libs.androidx.credentials)
+                implementation(libs.androidx.credentials.play.services.auth)
             }
         }
 
@@ -131,7 +133,7 @@ android {
         applicationId = "com.berkekucuk.mmaapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
+        versionCode = 13
         versionName = "1.3.8"
     }
     packaging {

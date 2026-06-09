@@ -13,7 +13,7 @@ actual fun getAppVersionCode(): Int {
 }
 
 actual fun openStore(androidPackage: String, iosAppId: String) {
-    val urlString = "itms-apps://apps.apple.com/app/id$iosAppId"
+    val urlString = "https://apps.apple.com/app/id$iosAppId"
     NSURL.URLWithString(urlString)?.let { url ->
         UIApplication.sharedApplication.openURL(url)
     }

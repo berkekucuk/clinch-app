@@ -23,6 +23,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +41,7 @@ import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import com.berkekucuk.mmaapp.presentation.components.PaginationControls
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankedFighterRow
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -74,6 +78,9 @@ fun LeaderboardScreen(
     val onUserClicked = remember(onAction) { { userId: String -> onAction(LeaderboardUiAction.OnUserClicked(userId)) } }
     val onRefresh = remember(onAction) { { onAction(LeaderboardUiAction.OnRefresh) } }
     val onErrorShown = remember(onAction) { { onAction(LeaderboardUiAction.OnErrorShown) } }
+    val onNextPage = remember(onAction) { { onAction(LeaderboardUiAction.OnNextPage) } }
+    val onPreviousPage = remember(onAction) { { onAction(LeaderboardUiAction.OnPreviousPage) } }
+    
     val showInfoDialog = remember { mutableStateOf(false) }
     val onInfoDialogDismiss = remember { { showInfoDialog.value = false } }
     val onInfoDialogConfirmed = remember { { showInfoDialog.value = false} }
@@ -83,6 +90,16 @@ fun LeaderboardScreen(
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     val errorMessage = strings.mapError(state.error)
+
+    val listState = rememberLazyListState()
+    var lastScrolledPage by rememberSaveable { mutableStateOf(-1) }
+
+    LaunchedEffect(state.leaderboard) {
+        if (lastScrolledPage != state.currentPage) {
+            listState.scrollToItem(0)
+            lastScrolledPage = state.currentPage
+        }
+    }
 
     SnackbarEffect(
         message = errorMessage,
@@ -153,6 +170,7 @@ fun LeaderboardScreen(
             ListContainer(
                 isRefreshing = state.isRefreshing,
                 onRefresh = onRefresh,
+                listState = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 8.dp),
                 verticalSpacing = 0.dp,
@@ -209,6 +227,16 @@ fun LeaderboardScreen(
                             }
                         }
                     }
+                }
+
+                item(key = "pagination_controls") {
+                    PaginationControls(
+                        currentPage = state.currentPage,
+                        canGoNext = state.canGoNext,
+                        isRefreshing = state.isRefreshing,
+                        onNextPage = onNextPage,
+                        onPreviousPage = onPreviousPage
+                    )
                 }
             }
         }

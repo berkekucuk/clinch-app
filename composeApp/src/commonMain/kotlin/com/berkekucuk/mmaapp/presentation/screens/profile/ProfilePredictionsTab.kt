@@ -1,18 +1,9 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
+import com.berkekucuk.mmaapp.presentation.components.PaginationControls
 
 @Composable
 fun ProfilePredictionsTab(
@@ -80,7 +72,9 @@ fun ProfilePredictionsTab(
 
                     if (state.currentPage > 0 || state.canGoNext) {
                         PaginationControls(
-                            state = state,
+                            currentPage = state.currentPage,
+                            canGoNext = state.canGoNext,
+                            isRefreshing = state.isRefreshing,
                             onNextPage = onNextPage,
                             onPreviousPage = onPreviousPage,
                             modifier = Modifier
@@ -106,7 +100,9 @@ fun ProfilePredictionsTab(
 
             item(key = "pagination_controls") {
                 PaginationControls(
-                    state = state,
+                    currentPage = state.currentPage,
+                    canGoNext = state.canGoNext,
+                    isRefreshing = state.isRefreshing,
                     onNextPage = onNextPage,
                     onPreviousPage = onPreviousPage
                 )
@@ -115,53 +111,4 @@ fun ProfilePredictionsTab(
     }
 }
 
-@Composable
-private fun PaginationControls(
-    state: ProfileUiState,
-    onNextPage: () -> Unit,
-    onPreviousPage: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = LocalAppColors.current
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onPreviousPage,
-            enabled = state.currentPage > 0 && !state.isRefreshing
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous Page",
-                tint = if (state.currentPage > 0 && !state.isRefreshing) colors.textPrimary else colors.textSecondary
-            )
-        }
 
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "${state.currentPage + 1}",
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
-            )
-        }
-
-        IconButton(
-            onClick = onNextPage,
-            enabled = state.canGoNext && !state.isRefreshing
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next Page",
-                tint = if (state.canGoNext && !state.isRefreshing) colors.textPrimary else colors.textSecondary
-            )
-        }
-    }
-}

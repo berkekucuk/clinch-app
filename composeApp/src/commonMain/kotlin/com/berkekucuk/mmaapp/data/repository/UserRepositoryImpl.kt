@@ -25,7 +25,7 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     private fun syncUserKey(userId: String) = "sync_user_$userId"
-    private val syncUsersKey = "sync_users"
+    private fun syncUsersKey(limit: Int, offset: Int) = "sync_users_limit_${limit}_offset_${offset}"
 
     override fun getUser(userId: String): Flow<User?> {
         return dao.getUser(userId)
@@ -34,8 +34,8 @@ class UserRepositoryImpl(
             .flowOn(Dispatchers.IO)
     }
 
-    override fun getUsers(limit: Int, currentUserId: String): Flow<List<User>> {
-        return dao.getUsers(limit, currentUserId)
+    override fun getUsers(limit: Int, offset: Int, currentUserId: String): Flow<List<User>> {
+        return dao.getUsers(limit, offset, currentUserId)
             .map { entities -> entities.map { it.toDomain() } }
             .distinctUntilChanged()
             .flowOn(Dispatchers.IO)
@@ -63,21 +63,23 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun syncUsers(limit: Int, currentUserId: String?): Result<Unit> {
+    override suspend fun syncUsers(limit: Int, offset: Int, currentUserId: String?): Result<Unit> {
+        val key = syncUsersKey(limit, offset)
         return withContext(Dispatchers.IO) {
             runCatching {
-                if (!rateLimiter.shouldFetch(syncUsersKey)) {
+                if (!rateLimiter.shouldFetch(key)) {
                     return@runCatching
                 }
-                val remoteUsers = remoteDataSource.fetchUsers(limit)
+                val remoteUsers = remoteDataSource.fetchUsers(limit, offset)
                 
-                dao.replaceUsers(
-                    users = remoteUsers.map { it.toEntity() },
-                    currentUserId = currentUserId ?: ""
-                )
+                if (offset == 0 && currentUserId != null) {
+                    dao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId)
+                } else {
+                    dao.upsertUsers(users = remoteUsers.map { it.toEntity() })
+                }
             }.onFailure {
                 if (it is CancellationException) throw it
-                rateLimiter.reset(syncUsersKey)
+                rateLimiter.reset(key)
             }
         }
     }

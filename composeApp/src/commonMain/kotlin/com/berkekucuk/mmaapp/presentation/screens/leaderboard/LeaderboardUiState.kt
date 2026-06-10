@@ -9,4 +9,6 @@ data class LeaderboardUiState(
     val leaderboard: List<User> = emptyList(),
     val error: AppError? = null,
     val infoText: String? = null,
+    val currentPage: Int = 0,
+    val canGoNext: Boolean = false,
 )

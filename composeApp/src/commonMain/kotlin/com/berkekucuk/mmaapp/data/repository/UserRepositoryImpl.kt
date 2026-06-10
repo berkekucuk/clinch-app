@@ -72,8 +72,8 @@ class UserRepositoryImpl(
                 }
                 val remoteUsers = remoteDataSource.fetchUsers(limit, offset)
                 
-                if (offset == 0 && currentUserId != null) {
-                    dao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId)
+                if (offset == 0) {
+                    dao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId ?: "")
                 } else {
                     dao.upsertUsers(users = remoteUsers.map { it.toEntity() })
                 }

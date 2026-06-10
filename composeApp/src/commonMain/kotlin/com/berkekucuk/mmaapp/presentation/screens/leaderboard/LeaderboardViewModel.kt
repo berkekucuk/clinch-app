@@ -24,6 +24,10 @@ class LeaderboardViewModel(
     private val languageStorage: LanguageStorage
 ) : ViewModel() {
 
+    companion object {
+        const val PAGE_SIZE = 100
+    }
+
     private val _state = MutableStateFlow(LeaderboardUiState())
     val state = _state.asStateFlow()
     private val _navigation = MutableSharedFlow<LeaderboardNavigationEvent>()
@@ -45,14 +49,14 @@ class LeaderboardViewModel(
             val currentUserId = authRepository.getAuthenticatedUserId() ?: ""
             currentPageFlow
                 .flatMapLatest { page ->
-                    userRepository.getUsers(100, page * 100, currentUserId)
+                    userRepository.getUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
                 }
                 .collect { users ->
                     _state.update {
                         it.copy(
                             isLoading = false,
                             leaderboard = users,
-                            canGoNext = users.size == 100
+                            canGoNext = users.size == PAGE_SIZE
                         )
                     }
                 }
@@ -80,7 +84,7 @@ class LeaderboardViewModel(
 
             val currentUserId = authRepository.getAuthenticatedUserId()
             val page = currentPageFlow.value
-            userRepository.syncUsers(100, page * 100, currentUserId)
+            userRepository.syncUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
                 .onSuccess {
                     _state.update { it.copy(isRefreshing = false) }
                 }

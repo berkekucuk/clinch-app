@@ -6,6 +6,7 @@ import com.berkekucuk.mmaapp.data.remote.dto.UserDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
 
 class UserSupabaseAPI(
@@ -14,16 +15,19 @@ class UserSupabaseAPI(
 ) : UserRemoteDataSource {
 
     override suspend fun fetchUser(userId: String): UserDto {
-        return client.from("profile_view_v4").select {
+        return client.from("profile_view_v5").select {
             filter {
                 eq("id", userId)
             }
         }.decodeSingle<UserDto>()
     }
 
-    override suspend fun fetchUsers(limit: Int): List<UserDto> {
-        return client.from("profile_view_v4").select {
-            limit(limit.toLong())
+    override suspend fun fetchUsers(limit: Int, offset: Int): List<UserDto> {
+        return client.from("profile_view_v5").select {
+            order("total_points", Order.DESCENDING)
+            order("created_at", Order.ASCENDING)
+
+            range(offset.toLong(), (offset + limit - 1).toLong())
         }.decodeList<UserDto>()
     }
 

@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class LeaderboardViewModel(
     private val userRepository: UserRepository,
@@ -22,10 +24,17 @@ class LeaderboardViewModel(
     private val languageStorage: LanguageStorage
 ) : ViewModel() {
 
+    companion object {
+        const val PAGE_SIZE = 100
+    }
+
     private val _state = MutableStateFlow(LeaderboardUiState())
     val state = _state.asStateFlow()
     private val _navigation = MutableSharedFlow<LeaderboardNavigationEvent>()
     val navigation = _navigation.asSharedFlow()
+
+    private val currentPageFlow = MutableStateFlow(0)
+    
     private var syncJob: Job? = null
 
     init {
@@ -34,13 +43,23 @@ class LeaderboardViewModel(
         syncLeaderboard()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeLeaderboard() {
         viewModelScope.launch {
             val currentUserId = authRepository.getAuthenticatedUserId() ?: ""
-            userRepository.getUsers(100, currentUserId)
+            currentPageFlow
+                .flatMapLatest { page ->
+                    userRepository.getUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
+                }
                 .collect { users ->
-                _state.update { it.copy(isLoading = false, leaderboard = users) }
-            }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            leaderboard = users,
+                            canGoNext = users.size == PAGE_SIZE
+                        )
+                    }
+                }
         }
     }
 
@@ -63,10 +82,9 @@ class LeaderboardViewModel(
         syncJob = viewModelScope.launch {
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
-            configRepository.syncConfig("leaderboard_info_text")
-
             val currentUserId = authRepository.getAuthenticatedUserId()
-            userRepository.syncUsers(100, currentUserId)
+            val page = currentPageFlow.value
+            userRepository.syncUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
                 .onSuccess {
                     _state.update { it.copy(isRefreshing = false) }
                 }
@@ -75,6 +93,8 @@ class LeaderboardViewModel(
                         it.copy(isRefreshing = false, error = AppErrorMapper.map(e))
                     }
                 }
+                
+            configRepository.syncConfig("leaderboard_info_text")
         }
     }
 
@@ -84,10 +104,45 @@ class LeaderboardViewModel(
             is LeaderboardUiAction.OnUserClicked -> navigateTo(LeaderboardNavigationEvent.ToUserProfile(action.userId))
             LeaderboardUiAction.OnRefresh -> syncLeaderboard(isRefreshing = true)
             LeaderboardUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
+            LeaderboardUiAction.OnNextPage -> nextPage()
+            LeaderboardUiAction.OnPreviousPage -> previousPage()
         }
     }
 
     private fun navigateTo(event: LeaderboardNavigationEvent) {
         viewModelScope.launch { _navigation.emit(event) }
+    }
+
+    private fun nextPage() {
+        val currentState = _state.value
+        if (!currentState.canGoNext || currentState.isRefreshing || syncJob?.isActive == true) return
+
+        val nextPage = currentPageFlow.value + 1
+
+        _state.update {
+            it.copy(
+                currentPage = nextPage,
+                canGoNext = false
+            )
+        }
+
+        currentPageFlow.value = nextPage
+        syncLeaderboard(isRefreshing = true)
+    }
+
+    private fun previousPage() {
+        val currentState = _state.value
+        if (currentPageFlow.value <= 0 || currentState.isRefreshing || syncJob?.isActive == true) return
+
+        val prevPage = currentPageFlow.value - 1
+
+        _state.update {
+            it.copy(
+                currentPage = prevPage,
+                canGoNext = false
+            )
+        }
+
+        currentPageFlow.value = prevPage
     }
 }

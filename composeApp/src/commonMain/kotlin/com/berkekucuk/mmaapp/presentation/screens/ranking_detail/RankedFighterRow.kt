@@ -45,33 +45,35 @@ fun RankedFighterRow(
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (isChampion) {
-            Box(
-                modifier = Modifier
-                    .size(26.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(colors.rankingChampionBadge),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = rankLabel,
-                    color = colors.pagerBackground,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
-        } else {
-            Box(
-                modifier = Modifier.size(26.dp),
-                contentAlignment = Alignment.Center
-            ) {
+        Box(
+            modifier = Modifier.width(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isChampion) {
+                Box(
+                    modifier = Modifier
+                        .size(26.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(colors.rankingChampionBadge),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = rankLabel,
+                        color = colors.pagerBackground,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
+                    )
+                }
+            } else {
                 Text(
                     text = rankLabel,
                     color = colors.textSecondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
                 )
             }
         }

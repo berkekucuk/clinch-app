@@ -19,6 +19,6 @@ fun WeightClassEntity.toDomain(): WeightClass {
         sortOrder = sortOrder,
         rankings = rankings
             .sortedBy { it.rankNumber }
-            .map { RankedFighter(rankNumber = it.rankNumber, fighter = it.fighter?.toDomain()) }
+            .map { RankedFighter(rankNumber = it.rankNumber, rankChange = it.rankChange, fighter = it.fighter?.toDomain()) }
     )
 }

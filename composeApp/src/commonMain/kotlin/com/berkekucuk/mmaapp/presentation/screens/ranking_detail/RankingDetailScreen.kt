@@ -16,6 +16,11 @@ import androidx.compose.ui.graphics.Color
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -36,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.math.abs
 
 @Composable
 fun RankingDetailScreenRoot(
@@ -137,7 +143,29 @@ fun RankingDetailScreen(
                                     record = fighter.record.toString(),
                                     imageUrl = fighter.imageUrl,
                                     countryCode = fighter.countryCode,
-                                    onFighterClicked = { onFighterClicked(fighter.fighterId) }
+                                    onFighterClicked = { onFighterClicked(fighter.fighterId) },
+                                    trailingContent = {
+                                        val rankChange = ranking.rankChange ?: 0
+                                        if (rankChange != 0) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(end = 16.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = if (rankChange > 0) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
+                                                    contentDescription = null,
+                                                    tint = if (rankChange > 0) colors.winnerFrame else colors.loseColor,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                                Text(
+                                                    text = abs(rankChange).toString(),
+                                                    color = if (rankChange > 0) colors.winnerFrame else colors.loseColor,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
                                 )
 
                                 if (index < state.rankedFighters.lastIndex) {

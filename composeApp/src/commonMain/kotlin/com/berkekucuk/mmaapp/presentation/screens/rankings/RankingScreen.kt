@@ -104,7 +104,7 @@ fun RankingScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.rankingTopBar)
+                modifier = Modifier.background(colors.eventsTopBar)
             ) {
                 TopAppBar(
                     title = {

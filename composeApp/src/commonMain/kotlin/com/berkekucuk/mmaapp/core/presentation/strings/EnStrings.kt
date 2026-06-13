@@ -194,7 +194,7 @@ val EnStrings = AppStrings(
     mapError = { error ->
         when (error) {
             AppError.NETWORK -> "No internet connection."
-            AppError.SERVER_ERROR -> "Something went wrong."
+            AppError.SERVER_ERROR -> "A server error occurred."
             AppError.UNAUTHENTICATED -> "Please sign in to use this feature."
             AppError.ALREADY_EXISTS -> "This fighter is already in your list."
             AppError.USERNAME_TAKEN -> "This username is already taken."

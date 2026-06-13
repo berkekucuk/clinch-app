@@ -111,7 +111,7 @@ val TrStrings = AppStrings(
     fightNotificationRemoveDialogMessage = "Bu dövüş için bildirimleri kapat.",
     notificationPermissionSettingsTitle = "Bildirimleri Etkinleştir",
     notificationPermissionSettingsMessage = "Lütfen cihaz ayarlarınızdan bildirimleri etkinleştirin.",
-    riskUnsure = "25 (Kararsızım)",
+    riskUnsure = "25 (Emin Değilim)",
     riskNormal = "50 (Normal)",
     riskConfident = "75 (Güveniyorum)",
     riskAllIn = "100 (Eminim)",
@@ -119,7 +119,7 @@ val TrStrings = AppStrings(
     settingsTitle = "Ayarlar",
     settingsSectionLanguage = "Dil",
     settingsSectionMeasurements = "Ölçüm Birimi",
-    settingsSectionOdds = "Bahis Formatı",
+    settingsSectionOdds = "Oran Formatı",
     settingsSectionTheme = "Tema",
     settingsThemeLight = "Açık Tema",
     settingsThemeDark = "Koyu Tema",
@@ -135,7 +135,7 @@ val TrStrings = AppStrings(
     menuItemNotifications = "Bildirimler",
     menuItemSettings = "Ayarlar",
     menuSignInButton = "Giriş yap",
-    menuSignInTerms = "Giriş yaparak Gizlilik Politikası'nı kabul etmiş olursunuz",
+    menuSignInTerms = "Giriş yaparak Gizlilik Politikası'nı kabul etmiş olursunuz.",
     menuSignInPrivacyPolicy = "Gizlilik Politikası",
     menuProfileSettings = "Profil Ayarları",
     menuSignInWithGoogle = "Google ile giriş yap",
@@ -202,7 +202,7 @@ val TrStrings = AppStrings(
     mapError = { error ->
         when (error) {
             AppError.NETWORK -> "İnternet bağlantısı yok."
-            AppError.SERVER_ERROR -> "Bir hata oluştu."
+            AppError.SERVER_ERROR -> "Sunucu kaynaklı bir hata oluştu."
             AppError.UNAUTHENTICATED -> "Bu özelliği kullanmak için lütfen giriş yapın."
             AppError.ALREADY_EXISTS -> "Bu dövüşçü zaten listenizde."
             AppError.USERNAME_TAKEN -> "Bu kullanıcı adı zaten alınmış."
@@ -218,7 +218,7 @@ val TrStrings = AppStrings(
             AppError.FIGHT_OVER -> "Bu dövüş zaten tamamlandı."
             AppError.FIGHT_PENDING -> "Sonuç bekleniyor. Tahminler kapandı."
             AppError.ALREADY_REPORTED -> "Bu kullanıcıyı zaten şikayet ettiniz."
-            AppError.UNKNOWN -> "Bir hata oluştu."
+            AppError.UNKNOWN -> "Bir şeyler ters gitti."
             else -> null
         }
     },

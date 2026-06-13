@@ -180,6 +180,7 @@ fun FighterSearchScreen(
                 state.results.isNotEmpty() -> {
                     FighterSearchListContainer(
                         fighters = state.results,
+                        addingInteractionFighterId = state.addingInteractionFighterId,
                         onFighterClicked = onFighterClicked,
                     )
                 }

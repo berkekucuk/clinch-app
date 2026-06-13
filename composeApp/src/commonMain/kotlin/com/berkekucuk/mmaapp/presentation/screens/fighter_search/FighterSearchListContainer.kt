@@ -24,12 +24,14 @@ import com.berkekucuk.mmaapp.presentation.components.ListContainer
 @Composable
 fun FighterSearchListContainer(
     fighters: List<Fighter>,
+    addingInteractionFighterId: String? = null,
     onFighterClicked: (String) -> Unit,
 ) {
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
     val colors = LocalAppColors.current
+    val isAnyLoading = addingInteractionFighterId != null
 
     LaunchedEffect(listState.isScrollInProgress) {
         if (listState.isScrollInProgress) {
@@ -63,6 +65,8 @@ fun FighterSearchListContainer(
                             imageUrl = fighter.imageUrl,
                             record = fighter.record.toString(),
                             countryCode = fighter.countryCode,
+                            isLoading = fighter.fighterId == addingInteractionFighterId,
+                            isClickable = !isAnyLoading,
                             onClick = { onFighterClicked(fighter.fighterId) }
                         )
                         if (index < fighters.lastIndex) {

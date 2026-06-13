@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 class FighterSearchViewModel(
@@ -70,7 +71,7 @@ class FighterSearchViewModel(
             _state
                 .map { it.query }
                 .distinctUntilChanged()
-                .debounce(500)
+                .debounce(500.milliseconds)
                 .collectLatest { query ->
                     if (query.length >= 2) {
                         search(query)
@@ -101,6 +102,7 @@ class FighterSearchViewModel(
                 it.copy(query = "", results = p4pFighters, error = null)
             }
             is FighterSearchUiAction.OnFighterClicked -> {
+                if (_state.value.addingInteractionFighterId != null) return
                 if (interactionType != null) {
                     val fighter = _state.value.results.find { it.fighterId == action.fighterId }
                     if (fighter != null) {
@@ -117,11 +119,11 @@ class FighterSearchViewModel(
     private fun addInteraction(fighter: Fighter) {
         val type = interactionType ?: return
         viewModelScope.launch {
-            _state.update { it.copy(error = null) }
-            
+            _state.update { it.copy(error = null, addingInteractionFighterId = fighter.fighterId) }
+
             val userId = authRepository.getAuthenticatedUserId()
             if (userId == null) {
-                _state.update { it.copy(error = AppError.UNAUTHENTICATED) }
+                _state.update { it.copy(error = AppError.UNAUTHENTICATED, addingInteractionFighterId = null) }
                 return@launch
             }
 
@@ -130,9 +132,10 @@ class FighterSearchViewModel(
                 interactionType = type,
                 fighter = fighter,
             ).onSuccess {
+                _state.update { it.copy(addingInteractionFighterId = null) }
                 navigateTo(FighterSearchNavigationEvent.Back)
             }.onFailure { e ->
-                _state.update { it.copy(error = AppErrorMapper.map(e)) }
+                _state.update { it.copy(error = AppErrorMapper.map(e), addingInteractionFighterId = null) }
             }
         }
     }

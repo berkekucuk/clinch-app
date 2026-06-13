@@ -7,4 +7,5 @@ data class FighterSearchUiState(
     val query: String = "",
     val results: List<Fighter> = emptyList(),
     val error: AppError? = null,
+    val addingInteractionFighterId: String? = null,
 )

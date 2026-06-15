@@ -11,4 +11,5 @@ data class LeaderboardUiState(
     val infoText: String? = null,
     val currentPage: Int = 0,
     val canGoNext: Boolean = false,
+    val currentUserId: String? = null,
 )

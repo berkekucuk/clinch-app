@@ -53,5 +53,6 @@ val DarkColors = AppColors(
     radarRedFill = Color(0x40E53935),
     radarBlue = Color(0xFF1E88E5),
     radarBlueFill = Color(0x401E88E5),
-    cardShadowElevation = 0.dp
+    cardShadowElevation = 0.dp,
+    leaderboardCurrentUserHighlight = Color(0xFF2A3038)
 )

@@ -43,5 +43,6 @@ data class AppColors(
     val radarRedFill: Color,
     val radarBlue: Color,
     val radarBlueFill: Color,
-    val cardShadowElevation: Dp
+    val cardShadowElevation: Dp,
+    val leaderboardCurrentUserHighlight: Color
 )

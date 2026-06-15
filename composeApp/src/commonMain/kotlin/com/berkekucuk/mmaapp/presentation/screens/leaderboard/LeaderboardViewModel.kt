@@ -54,12 +54,13 @@ class LeaderboardViewModel(
                 .collect { users ->
                     val isMaxPage = currentPageFlow.value >= 9
                     val limitedUsers = if (isMaxPage) users.take(99) else users
-                    
+
                     _state.update {
                         it.copy(
                             isLoading = false,
                             leaderboard = limitedUsers,
-                            canGoNext = users.size == PAGE_SIZE && !isMaxPage
+                            canGoNext = users.size == PAGE_SIZE && !isMaxPage,
+                            currentUserId = currentUserId
                         )
                     }
                 }

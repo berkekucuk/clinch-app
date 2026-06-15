@@ -52,11 +52,14 @@ class LeaderboardViewModel(
                     userRepository.getUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
                 }
                 .collect { users ->
+                    val isMaxPage = currentPageFlow.value >= 9
+                    val limitedUsers = if (isMaxPage) users.take(99) else users
+                    
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            leaderboard = users,
-                            canGoNext = users.size == PAGE_SIZE
+                            leaderboard = limitedUsers,
+                            canGoNext = users.size == PAGE_SIZE && !isMaxPage
                         )
                     }
                 }
@@ -118,6 +121,7 @@ class LeaderboardViewModel(
         if (!currentState.canGoNext || currentState.isRefreshing || syncJob?.isActive == true) return
 
         val nextPage = currentPageFlow.value + 1
+        if (nextPage > 9) return
 
         _state.update {
             it.copy(

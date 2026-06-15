@@ -56,7 +56,8 @@ class LeaderboardViewModel(
                         it.copy(
                             isLoading = false,
                             leaderboard = users,
-                            canGoNext = users.size == PAGE_SIZE
+                            canGoNext = users.size == PAGE_SIZE,
+                            currentUserId = currentUserId
                         )
                     }
                 }

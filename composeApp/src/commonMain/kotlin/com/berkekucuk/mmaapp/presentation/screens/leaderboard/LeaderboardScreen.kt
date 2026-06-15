@@ -200,9 +200,11 @@ fun LeaderboardScreen(
                                 .background(colors.fightItemBackground)
                         ) {
                             state.leaderboard.forEachIndexed { index, user ->
+                            val isCurrentUser = user.id == state.currentUserId
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .then(if (isCurrentUser) Modifier.background(colors.leaderboardCurrentUserHighlight) else Modifier)
                                         .padding(horizontal = 12.dp)
                                 ) {
                                     RankedFighterRow(

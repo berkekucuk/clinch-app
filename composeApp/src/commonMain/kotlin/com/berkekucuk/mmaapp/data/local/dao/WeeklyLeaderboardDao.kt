@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WeeklyLeaderboardDao {
 
-    @Query("SELECT * FROM weekly_leaderboard WHERE user_id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY weekly_points DESC, created_at ASC LIMIT 50")
+    @Query("SELECT * FROM weekly_leaderboard WHERE user_id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY weekly_points DESC, created_at ASC")
     fun getWeeklyLeaderboard(currentUserId: String): Flow<List<WeeklyLeaderboardEntity>>
 
     @Upsert

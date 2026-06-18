@@ -234,7 +234,7 @@ fun LeaderboardScreen(
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .then(if (isCurrentUser) Modifier.background(colors.leaderboardCurrentUserHighlight) else Modifier)
+                                            .then(if (isCurrentUser) Modifier.background(colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
                                             .padding(horizontal = 12.dp)
                                     ) {
                                         RankedFighterRow(

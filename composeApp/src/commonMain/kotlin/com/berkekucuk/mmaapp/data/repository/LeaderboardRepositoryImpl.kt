@@ -25,8 +25,11 @@ class LeaderboardRepositoryImpl(
     private val rateLimiter: RateLimiter
 ) : LeaderboardRepository {
 
+    companion object {
+        private const val SYNC_WEEKLY_KEY = "sync_weekly"
+    }
+
     private fun syncUsersKey(limit: Int, offset: Int) = "sync_users_limit_${limit}_offset_${offset}"
-    private fun syncWeeklyLeaderboardKey(eventId: String) = "sync_weekly_${eventId}"
 
     override fun getLeaderboard(limit: Int, offset: Int, currentUserId: String): Flow<List<User>> {
         return userDao.getLeaderboard(limit, offset, currentUserId)
@@ -35,8 +38,8 @@ class LeaderboardRepositoryImpl(
             .flowOn(Dispatchers.IO)
     }
 
-    override fun getWeeklyLeaderboard(eventId: String, currentUserId: String): Flow<List<User>> {
-        return weeklyLeaderboardDao.getWeeklyLeaderboard(eventId, currentUserId)
+    override fun getWeeklyLeaderboard(currentUserId: String): Flow<List<User>> {
+        return weeklyLeaderboardDao.getWeeklyLeaderboard(currentUserId)
             .map { entities -> entities.map { it.toDomainUser() } }
             .distinctUntilChanged()
             .flowOn(Dispatchers.IO)
@@ -63,21 +66,19 @@ class LeaderboardRepositoryImpl(
         }
     }
 
-    override suspend fun syncWeeklyLeaderboard(eventId: String): Result<Unit> {
-        val key = syncWeeklyLeaderboardKey(eventId)
+    override suspend fun syncWeeklyLeaderboard(): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                if (!rateLimiter.shouldFetch(key)) {
+                if (!rateLimiter.shouldFetch(SYNC_WEEKLY_KEY)) {
                     return@runCatching
                 }
-                val remoteUsers = remoteDataSource.fetchWeeklyLeaderboard(eventId)
+                val remoteUsers = remoteDataSource.fetchWeeklyLeaderboard()
                 weeklyLeaderboardDao.replaceWeeklyLeaderboard(
-                    eventId = eventId,
                     users = remoteUsers.map { it.toEntity() }
                 )
             }.onFailure {
                 if (it is CancellationException) throw it
-                rateLimiter.reset(key)
+                rateLimiter.reset(SYNC_WEEKLY_KEY)
             }
         }
     }

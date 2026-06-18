@@ -5,6 +5,7 @@ import com.berkekucuk.mmaapp.data.remote.dto.UserDto
 import com.berkekucuk.mmaapp.data.remote.dto.WeeklyLeaderboardDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 
 class LeaderboardSupabaseAPI(
@@ -19,12 +20,7 @@ class LeaderboardSupabaseAPI(
         }.decodeList<UserDto>()
     }
 
-    override suspend fun fetchWeeklyLeaderboard(eventId: String): List<WeeklyLeaderboardDto> {
-        return client.from("weekly_leaderboard_view").select {
-            filter {
-                eq("event_id", eventId)
-            }
-            limit(50)
-        }.decodeList<WeeklyLeaderboardDto>()
+    override suspend fun fetchWeeklyLeaderboard(): List<WeeklyLeaderboardDto> {
+        return client.postgrest.rpc("get_weekly_leaderboard").decodeList<WeeklyLeaderboardDto>()
     }
 }

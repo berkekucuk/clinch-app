@@ -10,21 +10,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WeeklyLeaderboardDao {
 
-    @Query("SELECT * FROM weekly_leaderboard WHERE event_id = :eventId AND user_id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY weekly_points DESC, created_at ASC LIMIT 50")
-    fun getWeeklyLeaderboard(eventId: String, currentUserId: String): Flow<List<WeeklyLeaderboardEntity>>
+    @Query("SELECT * FROM weekly_leaderboard WHERE user_id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY weekly_points DESC, created_at ASC LIMIT 50")
+    fun getWeeklyLeaderboard(currentUserId: String): Flow<List<WeeklyLeaderboardEntity>>
 
     @Upsert
     suspend fun upsertWeeklyLeaderboard(users: List<WeeklyLeaderboardEntity>)
 
-    @Query("DELETE FROM weekly_leaderboard WHERE event_id = :eventId AND user_id NOT IN (:retainedIds)")
-    suspend fun deleteWeeklyLeaderboardExcept(eventId: String, retainedIds: List<String>)
+    @Query("DELETE FROM weekly_leaderboard")
+    suspend fun clearWeeklyLeaderboard()
 
     @Transaction
-    suspend fun replaceWeeklyLeaderboard(eventId: String, users: List<WeeklyLeaderboardEntity>) {
-        val newIds = users.map { it.userId }
-        upsertWeeklyLeaderboard(users)
-        if (newIds.isNotEmpty()) {
-            deleteWeeklyLeaderboardExcept(eventId, newIds)
+    suspend fun replaceWeeklyLeaderboard(users: List<WeeklyLeaderboardEntity>) {
+        clearWeeklyLeaderboard()
+        if (users.isNotEmpty()) {
+            upsertWeeklyLeaderboard(users)
         }
     }
 }

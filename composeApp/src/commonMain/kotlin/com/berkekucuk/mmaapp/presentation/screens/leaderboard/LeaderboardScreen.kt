@@ -249,7 +249,7 @@ fun LeaderboardScreen(
                                                     modifier = Modifier.padding(end = 4.dp)
                                                 ) {
                                                     Text(
-                                                        text = user.totalPoints.toString(),
+                                                        text = user.points.toString(),
                                                         color = colors.winnerFrame,
                                                         fontWeight = FontWeight.Bold,
                                                         fontSize = 16.sp

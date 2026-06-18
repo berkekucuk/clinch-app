@@ -96,7 +96,7 @@ class LeaderboardViewModel(
         }
     }
 
-    private fun syncLeaderboard(isRefreshing: Boolean = false) {
+    private fun syncLeaderboard(isRefreshing: Boolean = false, onlyOverall: Boolean = false) {
         if (syncJob?.isActive == true) return
 
         syncJob = viewModelScope.launch {
@@ -105,15 +105,15 @@ class LeaderboardViewModel(
             val currentUserId = authRepository.getAuthenticatedUserId()
             val page = currentPageFlow.value
 
-            val configDeferred = async { configRepository.syncConfig("leaderboard_info_text") }
             val overallDeferred = async { leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId) }
-            val weeklyDeferred = async { leaderboardRepository.syncWeeklyLeaderboard() }
+            val weeklyDeferred = if (!onlyOverall) async { leaderboardRepository.syncWeeklyLeaderboard() } else null
+            val configDeferred = if (!onlyOverall) async { configRepository.syncConfig("leaderboard_info_text") } else null
 
             val overallResult = overallDeferred.await()
-            val weeklyResult = weeklyDeferred.await()
-            configDeferred.await()
+            val weeklyResult = weeklyDeferred?.await()
+            configDeferred?.await()
 
-            val firstError = listOf(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
+            val firstError = listOfNotNull(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
             if (firstError != null) {
                 _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
             }
@@ -152,7 +152,7 @@ class LeaderboardViewModel(
         }
 
         currentPageFlow.value = nextPage
-        syncLeaderboard(isRefreshing = true)
+        syncLeaderboard(isRefreshing = true, onlyOverall = true)
     }
 
     private fun previousPage() {

@@ -23,7 +23,7 @@ fun WeeklyLeaderboardEntity.toDomainUser(): User {
         username = username,
         fullName = fullName,
         avatarUrl = avatarUrl,
-        totalPoints = weeklyPoints,
+        points = weeklyPoints,
         createdAt = createdAt
     )
 }

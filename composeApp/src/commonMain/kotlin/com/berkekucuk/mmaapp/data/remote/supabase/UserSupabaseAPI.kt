@@ -14,7 +14,7 @@ class UserSupabaseAPI(
 ) : UserRemoteDataSource {
 
     override suspend fun fetchUser(userId: String): UserDto {
-        return client.from("profile_view_v5").select {
+        return client.from("profile_view_v6").select {
             filter {
                 eq("id", userId)
             }

@@ -13,8 +13,8 @@ class LeaderboardSupabaseAPI(
 ) : LeaderboardRemoteDataSource {
 
     override suspend fun fetchLeaderboard(limit: Int, offset: Int): List<UserDto> {
-        return client.from("profile_view_v5").select {
-            order("total_points", Order.DESCENDING)
+        return client.from("profile_view_v6").select {
+            order("points", Order.DESCENDING)
             order("created_at", Order.ASCENDING)
             range(offset.toLong(), (offset + limit - 1).toLong())
         }.decodeList<UserDto>()

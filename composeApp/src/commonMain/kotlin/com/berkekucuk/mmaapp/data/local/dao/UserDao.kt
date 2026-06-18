@@ -15,7 +15,7 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :userId")
     fun getUser(userId: String): Flow<UserEntity?>
 
-    @Query("SELECT * FROM users WHERE id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY total_points DESC, created_at ASC LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM users WHERE id NOT IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY points DESC, created_at ASC LIMIT :limit OFFSET :offset")
     fun getLeaderboard(limit: Int, offset: Int, currentUserId: String): Flow<List<UserEntity>>
 
     @Transaction

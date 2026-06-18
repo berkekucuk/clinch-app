@@ -10,6 +10,6 @@ data class UserDto(
     val username: String? = null,
     @SerialName("full_name") val fullName: String? = null,
     @SerialName("avatar_url") val avatarUrl: String? = null,
-    @SerialName("total_points") val totalPoints: Int? = 0,
+    @SerialName("points") val points: Int? = 0,
     @SerialName("created_at") val createdAt: Instant? = null,
 )

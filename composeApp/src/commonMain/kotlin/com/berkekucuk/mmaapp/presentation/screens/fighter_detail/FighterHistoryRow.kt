@@ -1,7 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -76,7 +76,7 @@ fun FightHistoryRow(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
-            .clickable { onClick() },
+            .appClickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(

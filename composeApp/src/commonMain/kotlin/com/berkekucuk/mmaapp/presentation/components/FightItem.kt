@@ -1,7 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +67,7 @@ fun FightItem(
         modifier = modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .then(if (onClick != null) Modifier.appClickable { onClick() } else Modifier)
             .padding(10.dp)
     ) {
         Column(

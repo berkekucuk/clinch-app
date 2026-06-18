@@ -1,6 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.settings
 
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +27,7 @@ fun SettingsBottomSheetOption(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
+            .appClickable { onClick() }
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

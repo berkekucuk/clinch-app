@@ -7,7 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -72,7 +72,7 @@ fun EventItem(
                 shape = cardShape,
                 clip = false
             )
-            .clickable { onClick(event.eventId) },
+            .appClickable { onClick(event.eventId) },
         shape = cardShape,
         border = BorderStroke(0.5.dp, colors.cardBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),

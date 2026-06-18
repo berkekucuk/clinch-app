@@ -1,7 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +36,7 @@ fun SettingsCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(colors.fightItemBackground)
-            .clickable { onClick() }
+            .appClickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -1,7 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.ranking_detail
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +41,7 @@ fun RankedFighterRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onFighterClicked() }
+            .appClickable { onFighterClicked() }
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

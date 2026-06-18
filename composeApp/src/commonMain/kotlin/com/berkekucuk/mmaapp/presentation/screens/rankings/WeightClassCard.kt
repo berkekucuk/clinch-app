@@ -1,7 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.rankings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ fun WeightClassCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .background(colors.fightItemBackground)
-            .clickable { onWeightClassClicked() }
+            .appClickable { onWeightClassClicked() }
             .padding(16.dp)
     ) {
         Box(

@@ -1,6 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
-import androidx.compose.foundation.clickable
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,7 +33,7 @@ fun FighterPortrait(
     Row(
         horizontalArrangement = if (alignment == Alignment.Start) Arrangement.Start else Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.then(if (onClick != null) Modifier.clickable { onClick() } else Modifier),
+        modifier = modifier.then(if (onClick != null) Modifier.appClickable { onClick() } else Modifier),
     ) {
         if (alignment == Alignment.End) {
             NameColumn(

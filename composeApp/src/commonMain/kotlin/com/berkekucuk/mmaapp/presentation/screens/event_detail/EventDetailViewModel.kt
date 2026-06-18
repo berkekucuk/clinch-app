@@ -21,7 +21,7 @@ class EventDetailViewModel(
 
     private val route = savedStateHandle.toRoute<Route.EventDetail>()
     private val eventId: String = route.eventId
-    private val _state = MutableStateFlow(EventDetailUiState())
+    private val _state = MutableStateFlow(EventDetailUiState(isLoading = route.fromFightDetail))
     val state = _state.asStateFlow()
     private val _navigation = MutableSharedFlow<EventDetailNavigationEvent>()
     val navigation = _navigation.asSharedFlow()

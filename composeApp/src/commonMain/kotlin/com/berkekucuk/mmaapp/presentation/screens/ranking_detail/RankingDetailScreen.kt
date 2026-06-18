@@ -1,6 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.ranking_detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -34,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -145,8 +147,8 @@ fun RankingDetailScreen(
                                     countryCode = fighter.countryCode,
                                     onFighterClicked = { onFighterClicked(fighter.fighterId) },
                                     trailingContent = {
-                                        val rankChange = ranking.rankChange ?: 0
-                                        if (rankChange != 0) {
+                                        val rankChange = ranking.rankChange
+                                        if (rankChange != null && rankChange != 0) {
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 modifier = Modifier.padding(end = 16.dp)
@@ -162,6 +164,20 @@ fun RankingDetailScreen(
                                                     color = if (rankChange > 0) colors.winnerFrame else colors.loseColor,
                                                     fontSize = 13.sp,
                                                     fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        } else if (rankChange == null && ranking.rankNumber > 0) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(end = 18.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "NR",
+                                                    color = colors.textSecondary,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    fontStyle = FontStyle.Italic
                                                 )
                                             }
                                         }

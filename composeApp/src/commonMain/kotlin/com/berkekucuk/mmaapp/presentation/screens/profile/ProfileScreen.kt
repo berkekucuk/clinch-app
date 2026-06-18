@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,9 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
@@ -168,7 +172,7 @@ fun ProfileScreen(
                         state.profile?.user?.let { user ->
                             Row(
                                 modifier = Modifier
-                                    .padding(end = 8.dp)
+                                    .padding(end = if (state.isOwner) 8.dp else 0.dp)
                                     .background(
                                         color = colors.winnerFrame.copy(alpha = 0.15f),
                                         shape = RoundedCornerShape(12.dp)
@@ -182,10 +186,17 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = strings.pointsFormat(user.points),
+                                    text = user.points.toString(),
                                     color = colors.winnerFrame,
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = Icons.Default.EmojiEvents,
+                                    contentDescription = null,
+                                    tint = colors.winnerFrame,
+                                    modifier = Modifier.size(16.dp)
                                 )
                             }
                         }

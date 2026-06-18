@@ -25,18 +25,10 @@ class UserRepositoryImpl(
 ) : UserRepository {
 
     private fun syncUserKey(userId: String) = "sync_user_$userId"
-    private fun syncUsersKey(limit: Int, offset: Int) = "sync_users_limit_${limit}_offset_${offset}"
 
     override fun getUser(userId: String): Flow<User?> {
         return dao.getUser(userId)
             .map { entity -> entity?.toDomain() }
-            .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
-    }
-
-    override fun getUsers(limit: Int, offset: Int, currentUserId: String): Flow<List<User>> {
-        return dao.getUsers(limit, offset, currentUserId)
-            .map { entities -> entities.map { it.toDomain() } }
             .distinctUntilChanged()
             .flowOn(Dispatchers.IO)
     }
@@ -59,27 +51,6 @@ class UserRepositoryImpl(
             }.onFailure {
                 if (it is CancellationException) throw it
                 rateLimiter.reset(syncUserKey(userId))
-            }
-        }
-    }
-
-    override suspend fun syncUsers(limit: Int, offset: Int, currentUserId: String?): Result<Unit> {
-        val key = syncUsersKey(limit, offset)
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                if (!rateLimiter.shouldFetch(key)) {
-                    return@runCatching
-                }
-                val remoteUsers = remoteDataSource.fetchUsers(limit, offset)
-                
-                if (offset == 0) {
-                    dao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId ?: "")
-                } else {
-                    dao.upsertUsers(users = remoteUsers.map { it.toEntity() })
-                }
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(key)
             }
         }
     }

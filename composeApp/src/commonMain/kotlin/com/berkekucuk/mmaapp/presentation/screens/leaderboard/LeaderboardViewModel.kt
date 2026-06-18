@@ -6,7 +6,7 @@ import com.berkekucuk.mmaapp.core.storage.LanguageStorage
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
-import com.berkekucuk.mmaapp.domain.repository.UserRepository
+import com.berkekucuk.mmaapp.domain.repository.LeaderboardRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +15,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class LeaderboardViewModel(
-    private val userRepository: UserRepository,
+    private val leaderboardRepository: LeaderboardRepository,
     private val authRepository: AuthRepository,
     private val configRepository: AppConfigRepository,
     private val languageStorage: LanguageStorage
@@ -38,18 +39,19 @@ class LeaderboardViewModel(
     private var syncJob: Job? = null
 
     init {
-        observeLeaderboard()
+        observeOverallLeaderboard()
+        observeWeeklyLeaderboard()
         observeConfig()
         syncLeaderboard()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun observeLeaderboard() {
+    private fun observeOverallLeaderboard() {
         viewModelScope.launch {
             val currentUserId = authRepository.getAuthenticatedUserId() ?: ""
             currentPageFlow
                 .flatMapLatest { page ->
-                    userRepository.getUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
+                    leaderboardRepository.getLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
                 }
                 .collect { users ->
                     val isMaxPage = currentPageFlow.value >= 9
@@ -57,9 +59,23 @@ class LeaderboardViewModel(
 
                     _state.update {
                         it.copy(
-                            isLoading = false,
-                            leaderboard = limitedUsers,
-                            canGoNext = users.size == PAGE_SIZE && !isMaxPage,
+                            overallLeaderboard = limitedUsers,
+                            canGoNext = limitedUsers.size == PAGE_SIZE && !isMaxPage,
+                            currentUserId = currentUserId
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun observeWeeklyLeaderboard() {
+        viewModelScope.launch {
+            val currentUserId = authRepository.getAuthenticatedUserId() ?: ""
+            leaderboardRepository.getWeeklyLeaderboard(currentUserId)
+                .collect { users ->
+                    _state.update {
+                        it.copy(
+                            weeklyLeaderboard = users,
                             currentUserId = currentUserId
                         )
                     }
@@ -88,17 +104,21 @@ class LeaderboardViewModel(
 
             val currentUserId = authRepository.getAuthenticatedUserId()
             val page = currentPageFlow.value
-            userRepository.syncUsers(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
-                .onSuccess {
-                    _state.update { it.copy(isRefreshing = false) }
-                }
-                .onFailure { e ->
-                    _state.update { 
-                        it.copy(isRefreshing = false, error = AppErrorMapper.map(e))
-                    }
-                }
-                
-            configRepository.syncConfig("leaderboard_info_text")
+
+            val configDeferred = async { configRepository.syncConfig("leaderboard_info_text") }
+            val overallDeferred = async { leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId) }
+            val weeklyDeferred = async { leaderboardRepository.syncWeeklyLeaderboard() }
+
+            val overallResult = overallDeferred.await()
+            val weeklyResult = weeklyDeferred.await()
+            configDeferred.await()
+
+            val firstError = listOf(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
+            if (firstError != null) {
+                _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
+            }
+
+            _state.update { it.copy(isRefreshing = false) }
         }
     }
 

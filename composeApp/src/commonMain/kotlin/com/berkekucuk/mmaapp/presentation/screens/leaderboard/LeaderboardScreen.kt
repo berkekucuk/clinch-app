@@ -23,13 +23,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,8 +43,8 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
-import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.PaginationControls
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankedFighterRow
@@ -91,15 +96,14 @@ fun LeaderboardScreen(
 
     val errorMessage = strings.mapError(state.error)
 
-    val listState = rememberLazyListState()
-    var lastScrolledPage by rememberSaveable { mutableStateOf(-1) }
+    val tabs = listOf(strings.tabWeekly, strings.tabOverall)
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { tabs.size }
+    )
+    val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(state.leaderboard) {
-        if (lastScrolledPage != state.currentPage) {
-            listState.scrollToItem(0)
-            lastScrolledPage = state.currentPage
-        }
-    }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
     SnackbarEffect(
         message = errorMessage,
@@ -109,7 +113,9 @@ fun LeaderboardScreen(
     )
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
@@ -158,105 +164,131 @@ fun LeaderboardScreen(
                         navigationIconContentColor = colors.textPrimary,
                         titleContentColor = colors.textPrimary,
                         actionIconContentColor = colors.textPrimary,
-                    )
+                    ),
+                    scrollBehavior = scrollBehavior
+                )
+                AppTabRow(
+                    tabs = tabs,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    containerColor = Color.Transparent
                 )
             }
         }
     ) { innerPadding ->
-        LoadingContent(
-            isLoading = state.isLoading && state.leaderboard.isEmpty(),
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
-        ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(colors.pagerBackground),
+            beyondViewportPageCount = 1
+        ) { page ->
+            val listState = rememberLazyListState()
+            var lastScrolledPage by rememberSaveable { mutableStateOf(-1) }
+            val isOverall = page == 1
+            val currentLeaderboard = if (isOverall) state.overallLeaderboard else state.weeklyLeaderboard
+            
+            LaunchedEffect(currentLeaderboard) {
+                if (isOverall && lastScrolledPage != state.currentPage) {
+                    listState.scrollToItem(0)
+                    lastScrolledPage = state.currentPage
+                }
+            }
+            
             ListContainer(
-                isRefreshing = state.isRefreshing,
-                onRefresh = onRefresh,
-                listState = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 8.dp),
-                verticalSpacing = 0.dp,
-                extraBottomPadding = navBarBottomPadding,
-            ) {
-                if (state.leaderboard.isEmpty()) {
-                    item {
-                        Box(modifier = Modifier.fillParentMaxSize()) {
-                            if (state.currentPage > 0 || state.canGoNext) {
+                    isRefreshing = state.isRefreshing,
+                    onRefresh = onRefresh,
+                    listState = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(top = 8.dp),
+                    verticalSpacing = 0.dp,
+                    extraBottomPadding = navBarBottomPadding,
+                ) {
+                    if (currentLeaderboard.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillParentMaxSize()) {
+                                if (isOverall && (state.currentPage > 0 || state.canGoNext)) {
+                                    PaginationControls(
+                                        currentPage = state.currentPage,
+                                        canGoNext = state.canGoNext,
+                                        isRefreshing = state.isRefreshing,
+                                        onNextPage = onNextPage,
+                                        onPreviousPage = onPreviousPage,
+                                        modifier = Modifier.align(Alignment.BottomCenter)
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(colors.fightItemBackground)
+                            ) {
+                                currentLeaderboard.forEachIndexed { index, user ->
+                                    val isCurrentUser = user.id == state.currentUserId
+                                    val pageMultiplier = if (isOverall) state.currentPage else 0
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .then(if (isCurrentUser) Modifier.background(colors.leaderboardCurrentUserHighlight) else Modifier)
+                                            .padding(horizontal = 12.dp)
+                                    ) {
+                                        RankedFighterRow(
+                                            rankNumber = (pageMultiplier * LeaderboardViewModel.PAGE_SIZE) + index + 1,
+                                            name = user.fullName ?: user.username ?: "Unknown",
+                                            record = user.username?.let { "@$it" } ?: "",
+                                            imageUrl = user.avatarUrl ?: "",
+                                            countryCode = null,
+                                            trailingContent = {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    modifier = Modifier.padding(end = 4.dp)
+                                                ) {
+                                                    Text(
+                                                        text = user.totalPoints.toString(),
+                                                        color = colors.winnerFrame,
+                                                        fontWeight = FontWeight.Bold,
+                                                        fontSize = 16.sp
+                                                    )
+                                                    Spacer(Modifier.width(4.dp))
+                                                    Icon(
+                                                        imageVector = Icons.Default.EmojiEvents,
+                                                        contentDescription = null,
+                                                        tint = colors.winnerFrame,
+                                                        modifier = Modifier.size(18.dp)
+                                                    )
+                                                }
+                                            },
+                                            onFighterClicked = { onUserClicked(user.id) }
+                                        )
+    
+                                        if (index < currentLeaderboard.lastIndex) {
+                                            HorizontalDivider(
+                                                color = colors.dividerColor,
+                                                thickness = 0.8.dp,
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+    
+                        if (isOverall) {
+                            item(key = "pagination_controls") {
                                 PaginationControls(
                                     currentPage = state.currentPage,
                                     canGoNext = state.canGoNext,
                                     isRefreshing = state.isRefreshing,
                                     onNextPage = onNextPage,
-                                    onPreviousPage = onPreviousPage,
-                                    modifier = Modifier.align(Alignment.BottomCenter)
+                                    onPreviousPage = onPreviousPage
                                 )
                             }
                         }
                     }
-                } else {
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(colors.fightItemBackground)
-                        ) {
-                            state.leaderboard.forEachIndexed { index, user ->
-                            val isCurrentUser = user.id == state.currentUserId
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .then(if (isCurrentUser) Modifier.background(colors.leaderboardCurrentUserHighlight) else Modifier)
-                                        .padding(horizontal = 12.dp)
-                                ) {
-                                    RankedFighterRow(
-                                        rankNumber = (state.currentPage * LeaderboardViewModel.PAGE_SIZE) + index + 1,
-                                        name = user.fullName ?: user.username ?: "Unknown",
-                                        record = user.username?.let { "@$it" } ?: "",
-                                        imageUrl = user.avatarUrl ?: "",
-                                        countryCode = null,
-                                        trailingContent = {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                modifier = Modifier.padding(end = 4.dp)
-                                            ) {
-                                                Text(
-                                                    text = user.totalPoints.toString(),
-                                                    color = colors.winnerFrame,
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 16.sp
-                                                )
-                                                Spacer(Modifier.width(4.dp))
-                                                Icon(
-                                                    imageVector = Icons.Default.EmojiEvents,
-                                                    contentDescription = null,
-                                                    tint = colors.winnerFrame,
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                            }
-                                        },
-                                        onFighterClicked = { onUserClicked(user.id) }
-                                    )
-    
-                                    if (index < state.leaderboard.lastIndex) {
-                                        HorizontalDivider(
-                                            color = colors.dividerColor,
-                                            thickness = 0.8.dp,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-    
-                    item(key = "pagination_controls") {
-                        PaginationControls(
-                            currentPage = state.currentPage,
-                            canGoNext = state.canGoNext,
-                            isRefreshing = state.isRefreshing,
-                            onNextPage = onNextPage,
-                            onPreviousPage = onPreviousPage
-                        )
-                    }
-                }
             }
         }
     }

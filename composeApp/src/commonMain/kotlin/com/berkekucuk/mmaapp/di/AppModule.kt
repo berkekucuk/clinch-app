@@ -25,6 +25,8 @@ import com.berkekucuk.mmaapp.data.remote.datasource.WeightClassRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.supabase.WeightClassSupabaseAPI
 import com.berkekucuk.mmaapp.data.remote.datasource.UserRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.supabase.UserSupabaseAPI
+import com.berkekucuk.mmaapp.data.remote.datasource.LeaderboardRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.LeaderboardSupabaseAPI
 import com.berkekucuk.mmaapp.data.repository.EventRepositoryImpl
 import com.berkekucuk.mmaapp.data.repository.FighterRepositoryImpl
 import com.berkekucuk.mmaapp.data.repository.WeightClassRepositoryImpl
@@ -47,6 +49,8 @@ import com.berkekucuk.mmaapp.domain.repository.FighterRepository
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository
 import com.berkekucuk.mmaapp.domain.repository.WeightClassRepository
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
+import com.berkekucuk.mmaapp.domain.repository.LeaderboardRepository
+import com.berkekucuk.mmaapp.data.repository.LeaderboardRepositoryImpl
 import com.berkekucuk.mmaapp.presentation.screens.blocked_users.BlockedUsersViewModel
 import com.berkekucuk.mmaapp.presentation.screens.event_detail.EventDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterDetailViewModel
@@ -142,6 +146,10 @@ val appModule = module {
         get<AppDatabase>().appConfigDao()
     }
 
+    single {
+        get<AppDatabase>().weeklyLeaderboardDao()
+    }
+
     // remote data source
     single<EventRemoteDataSource> {
         EventSupabaseAPI(client = get())
@@ -157,6 +165,10 @@ val appModule = module {
 
     single<UserRemoteDataSource> {
         UserSupabaseAPI(client = get(), dateTimeProvider = get())
+    }
+
+    single<LeaderboardRemoteDataSource> {
+        LeaderboardSupabaseAPI(client = get())
     }
 
     single<DeviceTokenRemoteDataSource> {
@@ -243,6 +255,15 @@ val appModule = module {
         UserRepositoryImpl(
             remoteDataSource = get(),
             dao = get(),
+            rateLimiter = get()
+        )
+    }
+
+    single<LeaderboardRepository> {
+        LeaderboardRepositoryImpl(
+            remoteDataSource = get(),
+            userDao = get(),
+            weeklyLeaderboardDao = get(),
             rateLimiter = get()
         )
     }
@@ -373,7 +394,7 @@ val appModule = module {
 
     viewModel {
         LeaderboardViewModel(
-            userRepository = get(),
+            leaderboardRepository = get(),
             authRepository = get(),
             configRepository = get(),
             languageStorage = get()

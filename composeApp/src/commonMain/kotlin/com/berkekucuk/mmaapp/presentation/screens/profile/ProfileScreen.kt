@@ -182,7 +182,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = strings.pointsFormat(user.totalPoints),
+                                    text = strings.pointsFormat(user.points),
                                     color = colors.winnerFrame,
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold

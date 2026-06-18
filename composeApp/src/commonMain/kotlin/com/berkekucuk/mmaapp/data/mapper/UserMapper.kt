@@ -12,7 +12,7 @@ fun UserDto.toEntity(): UserEntity {
         username = username,
         fullName = fullName,
         avatarUrl = avatarUrl,
-        totalPoints = totalPoints ?: 0,
+        points = points ?: 0,
         createdAt = createdAt,
     )
 }
@@ -23,7 +23,7 @@ fun UserEntity.toDomain(): User {
         username = username,
         fullName = fullName,
         avatarUrl = avatarUrl,
-        totalPoints = totalPoints,
+        points = points,
         createdAt = createdAt,
     )
 }

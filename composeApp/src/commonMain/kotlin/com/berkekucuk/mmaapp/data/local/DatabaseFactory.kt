@@ -18,6 +18,7 @@ import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
 import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
+import com.berkekucuk.mmaapp.data.local.dao.WeeklyLeaderboardDao
 import com.berkekucuk.mmaapp.data.local.entity.EventEntity
 import com.berkekucuk.mmaapp.data.local.entity.FightNotificationEntity
 import com.berkekucuk.mmaapp.data.local.entity.PredictionEntity
@@ -30,6 +31,7 @@ import com.berkekucuk.mmaapp.data.local.entity.FightEntity
 import com.berkekucuk.mmaapp.data.local.entity.InteractionEntity
 import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
 import com.berkekucuk.mmaapp.data.local.entity.AppConfigEntity
+import com.berkekucuk.mmaapp.data.local.entity.WeeklyLeaderboardEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 
@@ -46,9 +48,10 @@ import kotlinx.coroutines.IO
         FighterFightCrossRef::class,
         InteractionEntity::class,
         BlockedUserEntity::class,
-        AppConfigEntity::class
+        AppConfigEntity::class,
+        WeeklyLeaderboardEntity::class
     ],
-    version = 30
+    version = 32
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -62,6 +65,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun fightDao(): FightDao
     abstract fun interactionDao(): InteractionDao
     abstract fun appConfigDao(): AppConfigDao
+    abstract fun weeklyLeaderboardDao(): WeeklyLeaderboardDao
 }
 
 val MIGRATION_28_29 = object : Migration(28, 29) {
@@ -85,6 +89,31 @@ val MIGRATION_29_30 = object : Migration(29, 30) {
     }
 }
 
+val MIGRATION_30_31 = object : Migration(30, 31) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `weekly_leaderboard` (
+                `event_id` TEXT NOT NULL, 
+                `user_id` TEXT NOT NULL, 
+                `username` TEXT, 
+                `full_name` TEXT, 
+                `avatar_url` TEXT, 
+                `weekly_points` INTEGER NOT NULL, 
+                `created_at` INTEGER, 
+                PRIMARY KEY(`event_id`, `user_id`)
+            )
+            """.trimIndent()
+        )
+    }
+}
+
+val MIGRATION_31_32 = object : Migration(31, 32) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL("ALTER TABLE `users` RENAME COLUMN `total_points` TO `points`")
+    }
+}
+
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
@@ -94,7 +123,7 @@ fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {
     return builder
-        .addMigrations(MIGRATION_28_29, MIGRATION_29_30)
+        .addMigrations(MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32)
         .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)

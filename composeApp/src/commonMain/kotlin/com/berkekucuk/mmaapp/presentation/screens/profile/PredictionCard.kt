@@ -16,6 +16,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -114,13 +117,25 @@ fun PredictionCard(
                 )
 
                 if (prediction.isCorrect != null) {
-                    Text(
-                        text = strings.pointsFormat(prediction.pointsEarned),
-                        color = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Row(
+                        modifier = Modifier.align(Alignment.Center),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val sign = if (prediction.pointsEarned > 0) "+" else ""
+                        Text(
+                            text = "$sign${prediction.pointsEarned}",
+                            color = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.EmojiEvents,
+                            contentDescription = null,
+                            tint = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
                 }
 
                 Row(

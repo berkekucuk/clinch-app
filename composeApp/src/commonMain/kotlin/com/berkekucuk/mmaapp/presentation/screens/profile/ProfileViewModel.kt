@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 
 class ProfileViewModel(
     private val userRepository: UserRepository,
@@ -42,7 +43,6 @@ class ProfileViewModel(
     private val currentPageFlow = MutableStateFlow(0)
 
     private var syncJob: Job? = null
-    private var paginationJob: Job? = null
 
     init {
         observeProfile()
@@ -84,18 +84,23 @@ class ProfileViewModel(
         }
     }
 
-    private fun syncProfile(isRefreshing: Boolean = false) {
+    private fun syncProfile(isRefreshing: Boolean = false, onlyPredictions: Boolean = false) {
         if (syncJob?.isActive == true) return
 
         syncJob = viewModelScope.launch {
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
             val page = currentPageFlow.value
-            val userResult = userRepository.syncUser(userId)
-            val interactionResult = interactionRepository.syncInteractions(userId)
-            val predictionResult = predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20)
+            
+            val userDeferred = if (!onlyPredictions) async { userRepository.syncUser(userId) } else null
+            val interactionDeferred = if (!onlyPredictions) async { interactionRepository.syncInteractions(userId) } else null
+            val predictionDeferred = async { predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20) }
 
-            val firstError = listOf(userResult, predictionResult, interactionResult)
+            val userResult = userDeferred?.await()
+            val interactionResult = interactionDeferred?.await()
+            val predictionResult = predictionDeferred.await()
+
+            val firstError = listOfNotNull(userResult, predictionResult, interactionResult)
                 .firstNotNullOfOrNull { it.exceptionOrNull() }
 
             if (firstError != null) {
@@ -130,41 +135,24 @@ class ProfileViewModel(
 
     private fun nextPage() {
         val currentState = _state.value
-        if (!currentState.canGoNext || currentState.isRefreshing || paginationJob?.isActive == true) return
+        if (!currentState.canGoNext || currentState.isRefreshing || syncJob?.isActive == true) return
 
         val nextPage = currentPageFlow.value + 1
 
         _state.update {
             it.copy(
-                isRefreshing = true,
                 currentPage = nextPage,
                 canGoNext = false
             )
         }
 
         currentPageFlow.value = nextPage
-
-        paginationJob = viewModelScope.launch {
-            predictionRepository.syncPredictions(userId, limit = 20, offset = nextPage * 20)
-                .onSuccess {
-                    _state.update {
-                        it.copy(isRefreshing = false)
-                    }
-                }
-                .onFailure { e ->
-                    _state.update {
-                        it.copy(
-                            isRefreshing = false,
-                            error = AppErrorMapper.map(e)
-                        )
-                    }
-                }
-        }
+        syncProfile(isRefreshing = true, onlyPredictions = true)
     }
 
     private fun previousPage() {
         val currentState = _state.value
-        if (currentPageFlow.value <= 0 || currentState.isRefreshing || paginationJob?.isActive == true) return
+        if (currentPageFlow.value <= 0 || currentState.isRefreshing || syncJob?.isActive == true) return
 
         val prevPage = currentPageFlow.value - 1
 

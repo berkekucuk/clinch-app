@@ -115,7 +115,6 @@ val EnStrings = AppStrings(
     riskNormal = "50 (Normal)",
     riskConfident = "75 (Confident)",
     riskAllIn = "100 (Sure)",
-    pointsFormat = { points -> if (points > 0) "+$points pts" else "$points pts" },
     settingsTitle = "Settings",
     settingsSectionLanguage = "Language",
     settingsSectionMeasurements = "Measurements",

@@ -115,7 +115,6 @@ val TrStrings = AppStrings(
     riskNormal = "50 (Normal)",
     riskConfident = "75 (Güveniyorum)",
     riskAllIn = "100 (Eminim)",
-    pointsFormat = { points -> if (points > 0) "+$points puan" else "$points puan" },
     settingsTitle = "Ayarlar",
     settingsSectionLanguage = "Dil",
     settingsSectionMeasurements = "Ölçüm Birimi",

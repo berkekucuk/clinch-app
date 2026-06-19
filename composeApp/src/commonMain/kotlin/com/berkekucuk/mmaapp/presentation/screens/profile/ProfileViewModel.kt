@@ -91,16 +91,22 @@ class ProfileViewModel(
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
             val page = currentPageFlow.value
-            
-            val userDeferred = if (!onlyPredictions) async { userRepository.syncUser(userId) } else null
+
+            if (!onlyPredictions) {
+                userRepository.syncUser(userId)
+                    .onFailure { e ->
+                    _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
+                    return@launch
+                }
+            }
+
             val interactionDeferred = if (!onlyPredictions) async { interactionRepository.syncInteractions(userId) } else null
             val predictionDeferred = async { predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20) }
 
-            val userResult = userDeferred?.await()
             val interactionResult = interactionDeferred?.await()
             val predictionResult = predictionDeferred.await()
 
-            val firstError = listOfNotNull(userResult, predictionResult, interactionResult)
+            val firstError = listOfNotNull(predictionResult, interactionResult)
                 .firstNotNullOfOrNull { it.exceptionOrNull() }
 
             if (firstError != null) {

@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import com.berkekucuk.mmaapp.MainActivity
 import com.berkekucuk.mmaapp.R
@@ -79,5 +80,50 @@ class NotificationService(
             .build()
 
         notificationManager.notify(Random.nextInt(), notification)
+    }
+
+    fun showAlarmNotification(matchup: String?, fightId: String?) {
+        val isScreenOn = (context.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+
+        if (isScreenOn) {
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                if (fightId != null) putExtra("fight_id", fightId)
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context, 1, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(strings.alarmFightTime)
+                .setContentText(matchup ?: "")
+                .setAutoCancel(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setContentIntent(pendingIntent)
+                .build()
+            notificationManager.notify(1001, notification)
+        } else {
+            val intent = Intent(context, Class.forName("com.berkekucuk.mmaapp.presentation.alarm.AlarmActivity")).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra("matchup", matchup)
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context, 2, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(strings.alarmFightTime)
+                .setContentText(matchup ?: "")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setFullScreenIntent(pendingIntent, true)
+                .setAutoCancel(true)
+                .build()
+            notificationManager.notify(1001, notification)
+        }
     }
 }

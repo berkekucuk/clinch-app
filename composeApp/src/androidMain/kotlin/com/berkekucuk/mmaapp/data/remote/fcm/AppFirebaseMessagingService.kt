@@ -12,6 +12,13 @@ class AppFirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
+        if (message.data["type"] == "ALARM") {
+            val matchup = message.data["matchup"]
+            val fightId = message.data["fight_id"]
+            notificationManager.showAlarmNotification(matchup, fightId)
+            return
+        }
+
         val title = message.notification?.title ?: message.data["title"]
         val body = message.notification?.body ?: message.data["body"]
 

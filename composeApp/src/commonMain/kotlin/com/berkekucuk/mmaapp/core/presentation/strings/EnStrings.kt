@@ -221,4 +221,6 @@ val EnStrings = AppStrings(
     updateFlexibleMessage = "An update for Clinch is available with new features and improvements.",
     updateButton = "Update",
     updateLaterButton = "Later",
+    alarmFightTime = "FIGHT IS STARTING!",
+    alarmDismiss = "DISMISS",
 )

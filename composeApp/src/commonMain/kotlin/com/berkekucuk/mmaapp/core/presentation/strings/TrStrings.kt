@@ -229,4 +229,6 @@ val TrStrings = AppStrings(
     updateFlexibleMessage = "Clinch için yeni özellikler ve performans iyileştirmeleri içeren bir güncelleme mevcut.",
     updateButton = "Güncelle",
     updateLaterButton = "Sonra",
+    alarmFightTime = "MAÇ BAŞLIYOR!",
+    alarmDismiss = "SUSTUR",
 )

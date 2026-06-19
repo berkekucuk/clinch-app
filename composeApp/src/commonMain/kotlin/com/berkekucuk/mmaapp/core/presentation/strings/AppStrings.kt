@@ -182,4 +182,7 @@ data class AppStrings(
     val updateFlexibleMessage: String,
     val updateButton: String,
     val updateLaterButton: String,
+    // Alarm Screen
+    val alarmFightTime: String,
+    val alarmDismiss: String,
 )

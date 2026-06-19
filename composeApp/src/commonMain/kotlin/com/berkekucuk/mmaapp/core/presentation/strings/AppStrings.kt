@@ -113,6 +113,7 @@ data class AppStrings(
     val dialogCancel: String,
     val fightNotificationDialogMessage: String,
     val fightNotificationRemoveDialogMessage: String,
+    val fightReminderRemoveDialogMessage: String,
     val notificationPermissionSettingsTitle: String,
     val notificationPermissionSettingsMessage: String,
     val riskUnsure: String,
@@ -185,4 +186,9 @@ data class AppStrings(
     // Alarm Screen
     val alarmFightTime: String,
     val alarmDismiss: String,
+    // Notification Type
+    val notificationTypeTitle: String,
+    val notificationTypeMessage: String,
+    val notificationTypeRegular: String,
+    val notificationTypeAlarm: String,
 )

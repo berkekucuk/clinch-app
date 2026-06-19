@@ -17,9 +17,9 @@ class NotificationSupabaseAPI(
         }.decodeList<FightNotificationDto>()
     }
 
-    override suspend fun upsertFightNotification(fightId: String, userId: String) {
+    override suspend fun upsertFightNotification(fightId: String, userId: String, isAlarm: Boolean) {
         client.from("user_fight_notifications").upsert(
-            FightNotificationDto(userId = userId, fightId = fightId)
+            FightNotificationDto(userId = userId, fightId = fightId, isAlarm = isAlarm)
         )
     }
 

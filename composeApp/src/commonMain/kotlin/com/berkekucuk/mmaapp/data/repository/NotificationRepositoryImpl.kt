@@ -43,10 +43,10 @@ class NotificationRepositoryImpl(
         }
     }
 
-    override suspend fun addFightNotification(fightId: String, userId: String): Result<Unit> {
+    override suspend fun addFightNotification(fightId: String, userId: String, isAlarm: Boolean): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                remoteDataSource.upsertFightNotification(fightId, userId)
+                remoteDataSource.upsertFightNotification(fightId, userId, isAlarm)
                 dao.upsertFightNotification(FightNotificationEntity(fightId = fightId, userId = userId))
             }.onFailure {
                 if (it is CancellationException) throw it

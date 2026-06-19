@@ -52,12 +52,12 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
-import com.berkekucuk.mmaapp.core.utils.OnResumeEffect
 import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.FightItem
+import com.berkekucuk.mmaapp.core.utils.isIos
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -79,7 +79,7 @@ fun FightDetailScreenRoot(
         onResult = { isGranted ->
             showPermissionRequest.value = false
             if (isGranted) {
-                viewModel.onAction(FightDetailUiAction.OnNotificationClicked)
+                viewModel.onAction(FightDetailUiAction.OnNotificationClicked(false))
             }
         },
         onDismiss = { showPermissionRequest.value = false }
@@ -196,19 +196,21 @@ fun FightDetailScreen(
         }
     }
 
-    val showNotificationDialog = remember { mutableStateOf(false) }
-    val onNotificationDialogDismiss = remember { { showNotificationDialog.value = false } }
-    val onNotificationConfirmed = remember(onAction) {
+    val selectedNotificationIsAlarm = remember { mutableStateOf(false) }
+    val onNotificationDialogDismiss = remember(onAction) { 
+        { onAction(FightDetailUiAction.OnDismissNotificationDialog) } 
+    }
+    val onNotificationIconClicked = remember(onAction) {
+        { onAction(FightDetailUiAction.OnNotificationIconClicked) }
+    }
+    val onNotificationConfirmed = remember(onAction, selectedNotificationIsAlarm) {
         {
-            showNotificationDialog.value = false
-            onAction(FightDetailUiAction.OnNotificationClicked)
+            onAction(FightDetailUiAction.OnNotificationClicked(selectedNotificationIsAlarm.value))
         }
     }
 
     val isRetryableError = state.error == AppError.NETWORK
     val errorMessage = strings.mapError(state.error)
-
-    OnResumeEffect { onAction(FightDetailUiAction.OnResume) }
 
     SnackbarEffect(
         message = errorMessage,
@@ -250,7 +252,7 @@ fun FightDetailScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { showNotificationDialog.value = true }) {
+                        IconButton(onClick = onNotificationIconClicked) {
                             Icon(
                                 imageVector = if (state.isNotificationEnabled) Icons.Filled.Notifications else Icons.Outlined.Notifications,
                                 contentDescription = null,
@@ -353,14 +355,81 @@ fun FightDetailScreen(
         }
     }
 
-    if (showNotificationDialog.value) {
-        AppAlertDialog(
-            onDismissRequest = onNotificationDialogDismiss,
-            onConfirmClick = onNotificationConfirmed,
-            text = if (state.isNotificationEnabled) strings.fightNotificationRemoveDialogMessage else strings.fightNotificationDialogMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
-        )
+    if (state.showNotificationDialog) {
+        if (!state.isNotificationEnabled && !isIos) {
+            AppAlertDialog(
+                onDismissRequest = onNotificationDialogDismiss,
+                onConfirmClick = onNotificationConfirmed,
+                title = strings.notificationTypeTitle,
+                confirmText = strings.dialogAccept,
+                dismissText = strings.dialogCancel,
+                isConfirmLoading = state.isSubmittingNotification,
+                content = {
+                    Column(modifier = Modifier.selectableGroup()) {
+                        Text(
+                            text = strings.notificationTypeMessage,
+                            color = colors.textSecondary,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        val options = listOf(
+                            false to strings.notificationTypeRegular,
+                            true to strings.notificationTypeAlarm
+                        )
+                        options.forEach { (isAlarm, label) ->
+                            val selected = (selectedNotificationIsAlarm.value == isAlarm)
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .background(
+                                        color = if (selected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (selected) colors.winnerFrame else Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .selectable(
+                                        selected = selected,
+                                        onClick = { selectedNotificationIsAlarm.value = isAlarm },
+                                        role = Role.RadioButton
+                                    )
+                                    .padding(horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = selected,
+                                    onClick = null,
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = colors.winnerFrame,
+                                        unselectedColor = colors.textSecondary
+                                    )
+                                )
+                                Text(
+                                    text = label,
+                                    color = colors.textPrimary,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        } else {
+            AppAlertDialog(
+                onDismissRequest = onNotificationDialogDismiss,
+                onConfirmClick = onNotificationConfirmed,
+                text = if (state.isNotificationEnabled) {
+                    if (!isIos) strings.fightReminderRemoveDialogMessage else strings.fightNotificationRemoveDialogMessage
+                } else {
+                    strings.fightNotificationDialogMessage
+                },
+                confirmText = strings.dialogAccept,
+                dismissText = strings.dialogCancel,
+                isConfirmLoading = state.isSubmittingNotification
+            )
+        }
     }
 
     if (state.showPredictionConfirmDialog) {

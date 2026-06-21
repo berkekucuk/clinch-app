@@ -7,6 +7,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.postgrest.rpc
 
 class UserSupabaseAPI(
     private val client: SupabaseClient,
@@ -54,5 +55,12 @@ class UserSupabaseAPI(
                 "reason" to reason
             )
         )
+    }
+
+    override suspend fun searchUsers(query: String): List<UserDto> {
+        return client.postgrest.rpc(
+            function = "search_profiles",
+            parameters = mapOf("search_query" to query)
+        ).decodeList<UserDto>()
     }
 }

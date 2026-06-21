@@ -123,4 +123,15 @@ class UserRepositoryImpl(
             }
         }
     }
+
+    override suspend fun searchUsers(query: String): Result<List<User>> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                remoteDataSource.searchUsers(query)
+                    .map { it.toDomain() }
+            }.onFailure {
+                if (it is CancellationException) throw it
+            }
+        }
+    }
 }

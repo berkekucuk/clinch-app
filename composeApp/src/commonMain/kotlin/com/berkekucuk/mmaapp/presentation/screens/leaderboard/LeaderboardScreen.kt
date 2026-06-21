@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,7 +55,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun LeaderboardScreenRoot(
     viewModel: LeaderboardViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToProfile: (String) -> Unit
+    onNavigateToProfile: (String) -> Unit,
+    onNavigateToUserSearch: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -63,6 +65,7 @@ fun LeaderboardScreenRoot(
             when (event) {
                 is LeaderboardNavigationEvent.Back -> onNavigateBack()
                 is LeaderboardNavigationEvent.ToUserProfile -> onNavigateToProfile(event.userId)
+                LeaderboardNavigationEvent.ToUserSearch -> onNavigateToUserSearch()
             }
         }
     }
@@ -80,6 +83,7 @@ fun LeaderboardScreen(
     onAction: (LeaderboardUiAction) -> Unit
 ) {
     val onBackClicked = remember(onAction) { { onAction(LeaderboardUiAction.OnBackClicked) } }
+    val onSearchClicked = remember(onAction) { { onAction(LeaderboardUiAction.OnSearchClicked) } }
     val onUserClicked = remember(onAction) { { userId: String -> onAction(LeaderboardUiAction.OnUserClicked(userId)) } }
     val onRefresh = remember(onAction) { { onAction(LeaderboardUiAction.OnRefresh) } }
     val onErrorShown = remember(onAction) { { onAction(LeaderboardUiAction.OnErrorShown) } }
@@ -151,6 +155,12 @@ fun LeaderboardScreen(
                         }
                     },
                     actions = {
+                        IconButton(onClick = onSearchClicked) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = null,
+                            )
+                        }
                         IconButton(onClick = { showInfoDialog.value = true }) {
                             Icon(
                                 imageVector = Icons.Default.Info,

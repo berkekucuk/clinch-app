@@ -54,8 +54,8 @@ class LeaderboardRepositoryImpl(
                 }
                 val remoteUsers = remoteDataSource.fetchLeaderboard(limit, offset)
                 
-                if (currentUserId != null && offset == 0) {
-                    userDao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId)
+                if (offset == 0) {
+                    userDao.replaceUsers(users = remoteUsers.map { it.toEntity() }, currentUserId = currentUserId ?: "")
                 } else {
                     userDao.upsertUsers(users = remoteUsers.map { it.toEntity() })
                 }

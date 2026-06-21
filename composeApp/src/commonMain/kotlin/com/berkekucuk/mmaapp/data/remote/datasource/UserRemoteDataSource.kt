@@ -9,4 +9,5 @@ interface UserRemoteDataSource {
     suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): String
     suspend fun deleteUser(userId: String)
     suspend fun reportUser(reporterId: String, reportedId: String, reason: String)
+    suspend fun searchUsers(query: String): List<UserDto>
 }

@@ -17,6 +17,17 @@ fun UserDto.toEntity(): UserEntity {
     )
 }
 
+fun UserDto.toDomain(): User {
+    return User(
+        id = id,
+        username = username,
+        fullName = fullName,
+        avatarUrl = avatarUrl,
+        points = points ?: 0,
+        createdAt = createdAt,
+    )
+}
+
 fun UserEntity.toDomain(): User {
     return User(
         id = id,

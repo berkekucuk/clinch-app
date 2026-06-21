@@ -130,6 +130,7 @@ class LeaderboardViewModel(
             LeaderboardUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
             LeaderboardUiAction.OnNextPage -> nextPage()
             LeaderboardUiAction.OnPreviousPage -> previousPage()
+            LeaderboardUiAction.OnSearchClicked -> navigateTo(LeaderboardNavigationEvent.ToUserSearch)
         }
     }
 

@@ -73,6 +73,7 @@ import com.berkekucuk.mmaapp.data.repository.AppVersionRepositoryImpl
 import com.berkekucuk.mmaapp.domain.repository.AppVersionRepository
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardViewModel
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsViewModel
+import com.berkekucuk.mmaapp.presentation.screens.user_search.UserSearchViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 
@@ -355,6 +356,12 @@ val appModule = module {
             interactionRepository = get(),
             authRepository = get(),
             savedStateHandle = get()
+        )
+    }
+
+    viewModel {
+        UserSearchViewModel(
+            userRepository = get()
         )
     }
 

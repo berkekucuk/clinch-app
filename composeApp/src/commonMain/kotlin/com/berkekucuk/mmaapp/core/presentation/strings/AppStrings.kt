@@ -107,6 +107,8 @@ data class AppStrings(
     // Fighter Search Screen
     val fighterSearchPlaceholder: String,
     val fighterSearchEmpty: String,
+    val userSearchPlaceholder: String,
+    val userSearchEmpty: String,
     // Common Errors
     val retry: String,
     val dialogAccept: String,

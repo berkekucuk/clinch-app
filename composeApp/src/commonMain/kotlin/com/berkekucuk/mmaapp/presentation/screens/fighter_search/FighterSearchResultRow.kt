@@ -1,6 +1,5 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_search
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
+import com.berkekucuk.mmaapp.presentation.components.appClickable
 
 @Composable
 fun FighterSearchResultRow(
@@ -29,7 +29,7 @@ fun FighterSearchResultRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(enabled = isClickable) { onClick() }
+            .appClickable(enabled = isClickable) { onClick() }
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

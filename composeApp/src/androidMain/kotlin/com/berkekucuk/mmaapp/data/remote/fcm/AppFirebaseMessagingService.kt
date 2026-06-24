@@ -12,15 +12,48 @@ class AppFirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val title = message.notification?.title ?: message.data["title"]
-        val body = message.notification?.body ?: message.data["body"]
+        val type = message.data["type"]
 
-        if (title != null && body != null) {
-            notificationManager.showNotification(
-                title = title,
-                body = body,
-                data = message.data
-            )
+        when (type) {
+            "MANUAL" -> {
+                val title = message.notification?.title ?: message.data["title"]
+                val body = message.notification?.body ?: message.data["body"]
+                val eventId = message.data["event_id"]
+
+                if (title != null && body != null) {
+                    notificationManager.showManualNotification(
+                        title = title,
+                        body = body,
+                        eventId = eventId
+                    )
+                }
+            }
+
+            "START" -> {
+                val matchup = message.data["matchup"]
+                val fightId = message.data["fight_id"]
+                notificationManager.showStartNotification(matchup, fightId)
+            }
+
+            "ALARM" -> {
+                val matchup = message.data["matchup"]
+                val fightId = message.data["fight_id"]
+                notificationManager.showAlarmNotification(matchup, fightId)
+            }
+
+            else -> {
+                val title = message.notification?.title ?: message.data["title"]
+                val body = message.notification?.body ?: message.data["body"]
+                val eventId = message.data["event_id"]
+
+                if (title != null && body != null) {
+                    notificationManager.showManualNotification(
+                        title = title,
+                        body = body,
+                        eventId = eventId
+                    )
+                }
+            }
         }
     }
 

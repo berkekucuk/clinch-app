@@ -11,9 +11,11 @@ data class FightDetailUiState(
     val blueFighter: Fighter? = null,
     val error: AppError? = null,
     val isNotificationEnabled: Boolean = false,
-    val isSubmittingPrediction: Boolean = false,
-    val predictedWinnerId: String? = null,
+    val showNotificationDialog: Boolean = false,
+    val isSubmittingNotification: Boolean = false,
     val showPredictionBoard: Boolean = false,
     val showPredictionConfirmDialog: Boolean = false,
     val pendingPredictionFighterId: String? = null,
+    val predictedWinnerId: String? = null,
+    val isSubmittingPrediction: Boolean = false,
 )

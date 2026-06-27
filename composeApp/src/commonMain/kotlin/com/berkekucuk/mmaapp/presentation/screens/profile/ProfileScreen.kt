@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -68,6 +67,7 @@ import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 
 @Composable
 fun ProfileScreenRoot(
@@ -100,30 +100,27 @@ fun ProfileScreen(
     state: ProfileUiState,
     onAction: (ProfileUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    var showOverflowMenu by rememberSaveable { mutableStateOf(false) }
-    val tabs = listOf(strings.profileTabOverview, strings.profileTabPredictions)
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+
+    // 2. Compose Core States
+    var showOverflowMenu by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val onBackClicked = remember(onAction) { { onAction(ProfileUiAction.OnBackClicked) } }
-    val onRefresh = remember(onAction) { { onAction(ProfileUiAction.OnRefresh) } }
-    val onInteractionListClicked = remember(onAction) { { type: String -> onAction(ProfileUiAction.OnInteractionListClicked(type)) } }
-    val onPredictionClicked = remember(onAction) { { fightId: String -> onAction(ProfileUiAction.OnPredictionClicked(fightId)) } }
-    val onErrorDismissed = remember(onAction) { { onAction(ProfileUiAction.OnErrorDismissed) } }
-    val onNextPage = remember(onAction) { { onAction(ProfileUiAction.OnNextPage) } }
-    val onPreviousPage = remember(onAction) { { onAction(ProfileUiAction.OnPreviousPage) } }
-
+    // 3. UI Data & Definitions
+    val tabs = listOf(strings.profileTabOverview, strings.profileTabPredictions)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
     val errorMessage = strings.mapError(state.error)
-    val snackbarHostState = remember { SnackbarHostState() }
+
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = onErrorDismissed
+        onDismiss = { onAction(ProfileUiAction.OnErrorDismissed) }
     )
 
     Scaffold(
@@ -150,7 +147,7 @@ fun ProfileScreen(
             ) {
                 MediumTopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(ProfileUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack
@@ -258,8 +255,8 @@ fun ProfileScreen(
                 )
                 AppTabRow(
                     tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     containerColor = Color.Transparent
                 )
             }
@@ -282,18 +279,18 @@ fun ProfileScreen(
                     0 -> {
                         ProfileOverviewTab(
                             state = state,
-                            onRefresh = onRefresh,
-                            onInteractionListClicked = onInteractionListClicked,
+                            onRefresh = { onAction(ProfileUiAction.OnRefresh) },
+                            onInteractionListClicked = { type -> onAction(ProfileUiAction.OnInteractionListClicked(type)) },
                             navBarBottomPadding = navBarBottomPadding
                         )
                     }
                     1 -> {
                         ProfilePredictionsTab(
                             state = state,
-                            onRefresh = onRefresh,
-                            onPredictionClicked = onPredictionClicked,
-                            onNextPage = onNextPage,
-                            onPreviousPage = onPreviousPage,
+                            onRefresh = { onAction(ProfileUiAction.OnRefresh) },
+                            onPredictionClicked = { fightId -> onAction(ProfileUiAction.OnPredictionClicked(fightId)) },
+                            onNextPage = { onAction(ProfileUiAction.OnNextPage) },
+                            onPreviousPage = { onAction(ProfileUiAction.OnPreviousPage) },
                             navBarBottomPadding = navBarBottomPadding
                         )
                     }

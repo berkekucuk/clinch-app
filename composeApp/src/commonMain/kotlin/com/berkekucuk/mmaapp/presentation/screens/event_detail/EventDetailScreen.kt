@@ -47,6 +47,7 @@ import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun EventDetailScreenRoot(
@@ -77,9 +78,23 @@ fun EventDetailScreen(
     state: EventDetailUiState,
     onAction: (EventDetailUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
     val dateStrings = rememberLocalizedDateStrings()
+
+    // 2. Compose Core States
+    val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
+    val mainCardListState = rememberLazyListState()
+    val prelimsListState = rememberLazyListState()
+    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
+    // 3. UI Data & Definitions
+    val tabs = listOf(strings.tabMainCard, strings.tabPrelims)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val errorMessage = strings.mapError(state.error)
     val eventTitleLine = remember(state.event?.name) {
         (state.event?.name ?: "").split(":", limit = 2)[0].trim()
     }
@@ -87,27 +102,11 @@ fun EventDetailScreen(
         (state.event?.name ?: "").split(":", limit = 2).getOrNull(1)?.trim()
     }
 
-    val tabs = listOf(strings.tabMainCard, strings.tabPrelims)
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val coroutineScope = rememberCoroutineScope()
-    val mainCardListState = rememberLazyListState()
-    val prelimsListState = rememberLazyListState()
-
-    val onFightClick = remember(onAction) { { fightId: String -> onAction(EventDetailUiAction.OnFightClicked(fightId)) } }
-    val onRefresh = remember(onAction) { { onAction(EventDetailUiAction.OnRefresh) } }
-    val onBackClick = remember(onAction) { { onAction(EventDetailUiAction.OnBackClicked) } }
-
-    val errorMessage = strings.mapError(state.error)
-
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
-        onAction = onRefresh,
+        onAction = { onAction(EventDetailUiAction.OnRefresh) },
     )
 
     Scaffold(
@@ -154,7 +153,7 @@ fun EventDetailScreen(
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { onAction(EventDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -172,8 +171,8 @@ fun EventDetailScreen(
 
                 AppTabRow(
                     tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     containerColor = Color.Transparent
                 )
             }
@@ -196,8 +195,8 @@ fun EventDetailScreen(
                     0 -> FightsContainer(
                         fights = state.event?.mainCardFights ?: emptyList(),
                         isRefreshing = state.isRefreshing,
-                        onRefresh = onRefresh,
-                        onFightClick = onFightClick,
+                        onRefresh = { onAction(EventDetailUiAction.OnRefresh) },
+                        onFightClick = { fightId -> onAction(EventDetailUiAction.OnFightClicked(fightId)) },
                         emptyMessage = strings.emptyMainCardFights,
                         listState = mainCardListState,
                         eventDate = state.event?.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
@@ -208,8 +207,8 @@ fun EventDetailScreen(
                     1 -> FightsContainer(
                         fights = state.event?.prelimFights ?: emptyList(),
                         isRefreshing = state.isRefreshing,
-                        onRefresh = onRefresh,
-                        onFightClick = onFightClick,
+                        onRefresh = { onAction(EventDetailUiAction.OnRefresh) },
+                        onFightClick = { fightId -> onAction(EventDetailUiAction.OnFightClicked(fightId)) },
                         emptyMessage = strings.emptyPrelimFights,
                         listState = prelimsListState,
                         eventDate = state.event?.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),

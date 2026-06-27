@@ -16,8 +16,6 @@ sealed interface Route {
     @Serializable
     data object UserSearch : Route
 
-    @Serializable
-    data class PredictionQuestion(val fightId: String, val redCornerId: String, val blueCornerId: String) : Route
     @Serializable data class InteractionList(val userId: String, val interactionType: String) : Route
     @Serializable data class FighterSearch(val interactionType: String? = null) : Route
     @Serializable data object Settings : Route

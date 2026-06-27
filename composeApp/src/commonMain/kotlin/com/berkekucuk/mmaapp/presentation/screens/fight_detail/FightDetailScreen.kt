@@ -60,6 +60,7 @@ import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FightDetailScreenRoot(
@@ -130,83 +131,61 @@ fun FightDetailScreen(
     fromEventDetail: Boolean,
     onAction: (FightDetailUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
+    val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 3. UI Data & Definitions
     val eventId = state.fight?.eventId
     val displayTitle = state.fight?.eventName
     val fight = state.fight
     val hasMetaInfo = fight != null && (
             fight.roundsFormat.isNotBlank() ||
             fight.roundSummary.isNotBlank() ||
-                    fight.weightClassLbs != null
-            )
-
+            fight.weightClassLbs != null
+    )
     val tabs = listOf(strings.tabFightDetails, strings.tabFightComparison)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val coroutineScope = rememberCoroutineScope()
-
-    val onErrorShown = remember(onAction) { { onAction(FightDetailUiAction.OnErrorShown) } }
-    val onRefresh = remember(onAction) { { onAction(FightDetailUiAction.OnRefresh) } }
-    val onBackClick = remember(onAction) { { onAction(FightDetailUiAction.OnBackClicked) } }
-    val onRedCornerClick = remember(onAction, fight) {
-        fight?.redCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
-    }
-    val onBlueCornerClick = remember(onAction, fight) {
-        fight?.blueCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
-    }
-    val onEventLinkClick = remember(onAction, eventId, fromEventDetail) {
-        {
-            if (fromEventDetail) {
-                onAction(FightDetailUiAction.OnBackClicked)
-            } else if (!eventId.isNullOrBlank()) {
-                onAction(FightDetailUiAction.OnEventClicked(eventId))
-            }
-        }
-    }
-    val onLeaderboardClick = remember(onAction) { { onAction(FightDetailUiAction.OnLeaderboardClicked) } }
-
     val selectedRisk = remember { mutableStateOf(50) }
     val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
         fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
     }
-
-    val onPredict = remember(onAction) {
-        { id: String ->
-            selectedRisk.value = 50
-            onAction(FightDetailUiAction.OnPredictClicked(id))
-        }
-    }
-
-    val onPredictionDialogDismiss = remember(onAction) {
-        {
-            onAction(FightDetailUiAction.OnDismissPredictionDialog)
-        }
-    }
-
-    val onPredictionConfirmed = remember(onAction, selectedRisk, state.pendingPredictionFighterId) {
-        {
-            val id = state.pendingPredictionFighterId
-            if (id != null) {
-                onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
-            }
-        }
-    }
-
     val showNotificationDialog = remember { mutableStateOf(false) }
-    val onNotificationDialogDismiss = remember { { showNotificationDialog.value = false } }
-    val onNotificationConfirmed = remember(onAction) {
-        {
-            showNotificationDialog.value = false
-            onAction(FightDetailUiAction.OnNotificationClicked)
-        }
-    }
-
     val isRetryableError = state.error == AppError.NETWORK
     val errorMessage = strings.mapError(state.error)
+
+    // 4. UI Actions
+    val onRedCornerClick = fight?.redCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
+    val onBlueCornerClick = fight?.blueCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
+    val onEventLinkClick = {
+        if (fromEventDetail) {
+            onAction(FightDetailUiAction.OnBackClicked)
+        } else if (!eventId.isNullOrBlank()) {
+            onAction(FightDetailUiAction.OnEventClicked(eventId))
+        }
+    }
+    val onPredict = { id: String ->
+        selectedRisk.value = 50
+        onAction(FightDetailUiAction.OnPredictClicked(id))
+    }
+    val onPredictionDialogDismiss = { onAction(FightDetailUiAction.OnDismissPredictionDialog) }
+    val onPredictionConfirmed = {
+        val id = state.pendingPredictionFighterId
+        if (id != null) {
+            onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
+        }
+    }
+    val onNotificationDialogDismiss = { showNotificationDialog.value = false }
+    val onNotificationConfirmed = {
+        showNotificationDialog.value = false
+        onAction(FightDetailUiAction.OnNotificationClicked)
+    }
 
     OnResumeEffect { onAction(FightDetailUiAction.OnResume) }
 
@@ -215,8 +194,8 @@ fun FightDetailScreen(
         snackbarHostState = snackbarHostState,
         duration = if (isRetryableError) SnackbarDuration.Indefinite else SnackbarDuration.Short,
         actionLabel = if (isRetryableError) strings.retry else null,
-        onAction = if (isRetryableError) onRefresh else null,
-        onDismiss = if (!isRetryableError) onErrorShown else null,
+        onAction = if (isRetryableError) { { onAction(FightDetailUiAction.OnRefresh) } } else null,
+        onDismiss = if (isRetryableError) { { onAction(FightDetailUiAction.OnErrorShown) } } else { { onAction(FightDetailUiAction.OnErrorShown) } },
     )
 
     Scaffold(
@@ -242,7 +221,7 @@ fun FightDetailScreen(
                 TopAppBar(
                     title = {},
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { onAction(FightDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -277,8 +256,8 @@ fun FightDetailScreen(
                 }
                 AppTabRow(
                     tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     containerColor = Color.Transparent,
                 )
             }
@@ -295,7 +274,7 @@ fun FightDetailScreen(
             when (page) {
                 0 -> ListContainer(
                     isRefreshing = state.isRefreshing,
-                    onRefresh = onRefresh,
+                    onRefresh = { onAction(FightDetailUiAction.OnRefresh) },
                     contentPadding = PaddingValues(top = 8.dp),
                     verticalSpacing = 8.dp,
                     extraBottomPadding = navBarBottomPadding,
@@ -305,7 +284,7 @@ fun FightDetailScreen(
                             PredictionBoard(
                                 state = state,
                                 onPredict = onPredict,
-                                onLeaderboardClick = onLeaderboardClick
+                                onLeaderboardClick = { onAction(FightDetailUiAction.OnLeaderboardClicked) }
                             )
                         }
                     }
@@ -333,7 +312,7 @@ fun FightDetailScreen(
                 }
                 1 -> ListContainer(
                     isRefreshing = state.isRefreshing,
-                    onRefresh = onRefresh,
+                    onRefresh = { onAction(FightDetailUiAction.OnRefresh) },
                     contentPadding = PaddingValues(top = 8.dp),
                     verticalSpacing = 8.dp,
                     extraBottomPadding = navBarBottomPadding,

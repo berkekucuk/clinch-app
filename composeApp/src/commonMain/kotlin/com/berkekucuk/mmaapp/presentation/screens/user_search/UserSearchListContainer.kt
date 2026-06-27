@@ -46,7 +46,7 @@ fun UserSearchListContainer(
         isRefreshing = false,
         onRefresh = {},
         listState = listState,
-        contentPadding = PaddingValues(top = 16.dp),
+        contentPadding = PaddingValues(top = 8.dp),
         verticalSpacing = 0.dp,
         extraBottomPadding = navBarBottomPadding,
     ) {

@@ -7,4 +7,5 @@ data class UserSearchUiState(
     val query: String = "",
     val results: List<User> = emptyList(),
     val error: AppError? = null,
+    val isLoading: Boolean = false,
 )

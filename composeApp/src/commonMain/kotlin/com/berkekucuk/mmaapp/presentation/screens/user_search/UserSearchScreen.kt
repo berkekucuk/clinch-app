@@ -183,6 +183,9 @@ fun UserSearchScreen(
                         onUserClicked = { userId -> onAction(UserSearchUiAction.OnUserClicked(userId)) }
                     )
                 }
+                state.isLoading -> {
+                    // Do nothing, just wait.
+                }
                 state.query.length >= 2 -> {
                     ErrorBox(
                         message = strings.userSearchEmpty,

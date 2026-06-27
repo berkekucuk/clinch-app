@@ -8,25 +8,21 @@ import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
-import com.berkekucuk.mmaapp.domain.repository.FighterRepository
 import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
 import com.berkekucuk.mmaapp.domain.model.Fight
-import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FightDetailViewModel(
     private val fightRepository: FightRepository,
-    private val fighterRepository: FighterRepository,
     private val authRepository: AuthRepository,
     private val notificationRepository: NotificationRepository,
     private val predictionRepository: PredictionRepository,
@@ -61,7 +57,6 @@ class FightDetailViewModel(
                             showPredictionBoard = !isFightCompleted(fight)
                         )
                     }
-                    syncFighters(fight, knownFighterId = fighterId)
                 }
         }
     }
@@ -90,31 +85,6 @@ class FightDetailViewModel(
         }
     }
 
-    private fun syncFighters(fight: Fight, knownFighterId: String? = null) {
-        val redId = fight.redCorner?.fighter?.fighterId ?: return
-        val blueId = fight.blueCorner?.fighter?.fighterId ?: return
-        _state.update { it.copy(error = null) }
-        loadFighter(redId, sync = redId != knownFighterId) { fighter ->
-            _state.update { it.copy(redFighter = fighter) }
-        }
-        loadFighter(blueId, sync = blueId != knownFighterId) {
-            fighter -> _state.update { it.copy(blueFighter = fighter) }
-        }
-    }
-
-    private fun loadFighter(fighterId: String, sync: Boolean, onUpdate: (Fighter) -> Unit) {
-        viewModelScope.launch {
-            if (sync) {
-                fighterRepository.syncFighter(fighterId)
-                    .onFailure { e ->
-                        _state.update { it.copy(error = AppErrorMapper.map(e)) }
-                    }
-            }
-
-            val fighter = fighterRepository.getFighter(fighterId).first()
-            onUpdate(fighter)
-        }
-    }
 
     fun onAction(action: FightDetailUiAction) {
         when (action) {
@@ -295,14 +265,11 @@ class FightDetailViewModel(
 
             fightRepository.syncFight(fightId)
                 .onSuccess {
-                _state.value.fight?.let { currentFight ->
-                    syncFighters(currentFight, knownFighterId = fighterId)
+                    _state.update { it.copy(isRefreshing = false) }
                 }
-                _state.update { it.copy(isRefreshing = false) }
-            }
                 .onFailure { e ->
-                _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
-            }
+                    _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
+                }
         }
     }
 

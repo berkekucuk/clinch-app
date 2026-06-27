@@ -60,7 +60,7 @@ fun HomeScreenRoot(
     onNavigateToEventDetail: (String) -> Unit,
     onNavigateToFighterSearch: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
@@ -72,7 +72,7 @@ fun HomeScreenRoot(
     }
 
     HomeScreen(
-        state = uiState,
+        state = state,
         onAction = viewModel::onAction,
     )
 }

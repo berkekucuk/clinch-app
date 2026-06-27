@@ -50,7 +50,7 @@ fun FighterSearchScreenRoot(
     onNavigateToFighterDetail: (String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
@@ -62,7 +62,7 @@ fun FighterSearchScreenRoot(
     }
 
     FighterSearchScreen(
-        state = uiState,
+        state = state,
         onAction = viewModel::onAction,
     )
 }
@@ -73,14 +73,15 @@ fun FighterSearchScreen(
     state: FighterSearchUiState,
     onAction: (FighterSearchUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val focusRequester = remember { FocusRequester() }
     var textFieldValue by remember { mutableStateOf(TextFieldValue(state.query, TextRange(state.query.length))) }
-    val onBackClicked = remember(onAction) { { onAction(FighterSearchUiAction.OnBackClicked) } }
-    val onClearQuery = remember(onAction) { { onAction(FighterSearchUiAction.OnClearQuery) } }
-    val onFighterClicked = remember(onAction) { { fighterId: String -> onAction(FighterSearchUiAction.OnFighterClicked(fighterId)) } }
 
+    // 3. UI Data & Definitions
     LaunchedEffect(state.query) {
         if (textFieldValue.text != state.query) {
             textFieldValue = TextFieldValue(state.query, TextRange(state.query.length))
@@ -100,7 +101,7 @@ fun FighterSearchScreen(
             ){
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(FighterSearchUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -141,7 +142,7 @@ fun FighterSearchScreen(
                     },
                     actions = {
                         if (state.query.isNotEmpty()) {
-                            IconButton(onClick = onClearQuery) {
+                            IconButton(onClick = { onAction(FighterSearchUiAction.OnClearQuery) }) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = null,
@@ -181,7 +182,7 @@ fun FighterSearchScreen(
                     FighterSearchListContainer(
                         fighters = state.results,
                         addingInteractionFighterId = state.addingInteractionFighterId,
-                        onFighterClicked = onFighterClicked,
+                        onFighterClicked = { fighterId -> onAction(FighterSearchUiAction.OnFighterClicked(fighterId)) },
                     )
                 }
                 state.query.length >= 2 -> {

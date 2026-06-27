@@ -3,27 +3,17 @@ package com.berkekucuk.mmaapp.presentation.screens.user_search
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -38,14 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -54,8 +42,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ErrorBox
-import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
-import com.berkekucuk.mmaapp.presentation.components.appClickable
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -64,7 +50,7 @@ fun UserSearchScreenRoot(
     onNavigateToUserProfile: (String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
@@ -76,7 +62,7 @@ fun UserSearchScreenRoot(
     }
 
     UserSearchScreen(
-        state = uiState,
+        state = state,
         onAction = viewModel::onAction,
     )
 }
@@ -87,14 +73,15 @@ fun UserSearchScreen(
     state: UserSearchUiState,
     onAction: (UserSearchUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val focusRequester = remember { FocusRequester() }
     var textFieldValue by remember { mutableStateOf(TextFieldValue(state.query, TextRange(state.query.length))) }
-    val onBackClicked = remember(onAction) { { onAction(UserSearchUiAction.OnBackClicked) } }
-    val onClearQuery = remember(onAction) { { onAction(UserSearchUiAction.OnClearQuery) } }
-    val onUserClicked = remember(onAction) { { userId: String -> onAction(UserSearchUiAction.OnUserClicked(userId)) } }
 
+    // 3. UI Data & Definitions
     LaunchedEffect(state.query) {
         if (textFieldValue.text != state.query) {
             textFieldValue = TextFieldValue(state.query, TextRange(state.query.length))
@@ -114,7 +101,7 @@ fun UserSearchScreen(
             ) {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(UserSearchUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -155,7 +142,7 @@ fun UserSearchScreen(
                     },
                     actions = {
                         if (state.query.isNotEmpty()) {
-                            IconButton(onClick = onClearQuery) {
+                            IconButton(onClick = { onAction(UserSearchUiAction.OnClearQuery) }) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = null,
@@ -193,7 +180,7 @@ fun UserSearchScreen(
                 state.results.isNotEmpty() -> {
                     UserSearchListContainer(
                         users = state.results,
-                        onUserClicked = onUserClicked
+                        onUserClicked = { userId -> onAction(UserSearchUiAction.OnUserClicked(userId)) }
                     )
                 }
                 state.query.length >= 2 -> {

@@ -81,49 +81,23 @@ fun InteractionListScreen(
     state: InteractionListUiState,
     onAction: (InteractionListUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val onBackClicked = remember(onAction) { { onAction(InteractionListUiAction.OnBackClicked) } }
-    val onFighterClicked = remember(onAction) { { fighterId: String -> onAction(InteractionListUiAction.OnFighterClicked(fighterId)) } }
-    val onAddFighterClicked = remember(onAction) { { onAction(InteractionListUiAction.OnAddFighterClicked) } }
-    val onRemoveFighterClicked = remember(onAction) { { fighterId: String -> onAction(InteractionListUiAction.OnRemoveFighterClicked(fighterId)) } }
-    val onConfirmRemove = remember(onAction) { { onAction(InteractionListUiAction.OnConfirmRemove) } }
-    val onDismissRemove = remember(onAction) { { onAction(InteractionListUiAction.OnDismissRemove) } }
-    val onRefresh = remember(onAction) { { onAction(InteractionListUiAction.OnRefresh) } }
-    val onErrorDismissed = remember(onAction) { { onAction(InteractionListUiAction.OnErrorDismissed) } }
-    val onDismissLimitAlert = remember(onAction) { { onAction(InteractionListUiAction.OnDismissLimitAlert) } }
-    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val errorMessage = strings.mapError(state.error)
+    // 2. Compose Core States
+    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 3. UI Data & Definitions
+    val errorMessage = strings.mapError(state.error)
+
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = onErrorDismissed
+        onDismiss = { onAction(InteractionListUiAction.OnErrorDismissed) }
     )
-
-    if (state.deletingFighterId != null) {
-        val fighterName = state.interactions.find { it.fighterId == state.deletingFighterId }?.fighter?.name ?: ""
-        AppAlertDialog(
-            onDismissRequest = onDismissRemove,
-            onConfirmClick = onConfirmRemove,
-            onDismissClick = onDismissRemove,
-            text = strings.profileRemoveFighterConfirm(fighterName),
-            confirmText = strings.commonRemove,
-            dismissText = strings.commonCancel,
-        )
-    }
-
-    if (state.showLimitAlert) {
-        AppAlertDialog(
-            onDismissRequest = onDismissLimitAlert,
-            onConfirmClick = onDismissLimitAlert,
-            title = strings.interactionLimitReachedTitle,
-            text = strings.interactionLimitReachedText,
-            confirmText = strings.dialogOkay,
-        )
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -158,7 +132,7 @@ fun InteractionListScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(InteractionListUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -167,7 +141,7 @@ fun InteractionListScreen(
                     },
                     actions = {
                         if (state.isOwner) {
-                            IconButton(onClick = onAddFighterClicked) {
+                            IconButton(onClick = { onAction(InteractionListUiAction.OnAddFighterClicked) }) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = null,
@@ -188,7 +162,7 @@ fun InteractionListScreen(
     ) { innerPadding ->
         ListContainer(
             isRefreshing = state.isRefreshing,
-            onRefresh = onRefresh,
+            onRefresh = { onAction(InteractionListUiAction.OnRefresh) },
             modifier = Modifier.padding(innerPadding),
             contentPadding = PaddingValues(top = 8.dp),
             verticalSpacing = 0.dp,
@@ -233,11 +207,11 @@ fun InteractionListScreen(
                                                 record = fighter.record.toString(),
                                                 imageUrl = fighter.imageUrl,
                                                 countryCode = fighter.countryCode,
-                                                onFighterClicked = { onFighterClicked(fighter.fighterId) },
+                                                onFighterClicked = { onAction(InteractionListUiAction.OnFighterClicked(fighter.fighterId)) },
                                             )
                                         }
                                         if (state.isOwner) {
-                                            IconButton(onClick = { onRemoveFighterClicked(fighter.fighterId) }) {
+                                            IconButton(onClick = { onAction(InteractionListUiAction.OnRemoveFighterClicked(fighter.fighterId)) }) {
                                                 Icon(
                                                     imageVector = Icons.Default.Remove,
                                                     contentDescription = null,
@@ -260,5 +234,27 @@ fun InteractionListScreen(
                 }
             }
         }
+    }
+
+    if (state.deletingFighterId != null) {
+        val fighterName = state.interactions.find { it.fighterId == state.deletingFighterId }?.fighter?.name ?: ""
+        AppAlertDialog(
+            onDismissRequest = { onAction(InteractionListUiAction.OnDismissRemove) },
+            onConfirmClick = { onAction(InteractionListUiAction.OnConfirmRemove) },
+            onDismissClick = { onAction(InteractionListUiAction.OnDismissRemove) },
+            text = strings.profileRemoveFighterConfirm(fighterName),
+            confirmText = strings.commonRemove,
+            dismissText = strings.commonCancel,
+        )
+    }
+
+    if (state.showLimitAlert) {
+        AppAlertDialog(
+            onDismissRequest = { onAction(InteractionListUiAction.OnDismissLimitAlert) },
+            onConfirmClick = { onAction(InteractionListUiAction.OnDismissLimitAlert) },
+            title = strings.interactionLimitReachedTitle,
+            text = strings.interactionLimitReachedText,
+            confirmText = strings.dialogOkay,
+        )
     }
 }

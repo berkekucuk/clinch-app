@@ -55,7 +55,7 @@ fun EventDetailScreenRoot(
     onNavigateToFightDetail: (fightId: String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
@@ -67,7 +67,7 @@ fun EventDetailScreenRoot(
     }
 
     EventDetailScreen(
-        state = uiState,
+        state = state,
         onAction = viewModel::onAction,
     )
 }

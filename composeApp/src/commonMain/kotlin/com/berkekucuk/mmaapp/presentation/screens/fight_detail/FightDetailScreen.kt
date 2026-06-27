@@ -70,7 +70,7 @@ fun FightDetailScreenRoot(
     onNavigateToLeaderboard: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val showPermissionRequest = remember { mutableStateOf(false) }
     val showSettingsDialog = remember { mutableStateOf(false) }
     val strings = LocalAppStrings.current
@@ -118,7 +118,7 @@ fun FightDetailScreenRoot(
     }
 
     FightDetailScreen(
-        state = uiState,
+        state = state,
         fromEventDetail = viewModel.fromEventDetail,
         onAction = viewModel::onAction,
     )

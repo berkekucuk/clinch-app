@@ -66,22 +66,22 @@ fun BlockedUsersScreen(
     state: BlockedUsersUiState,
     onAction: (BlockedUsersUiAction) -> Unit
 ) {
-    val onBackClicked = remember(onAction) { { onAction(BlockedUsersUiAction.OnBackClicked) } }
-    val onUserClicked = remember(onAction) { { userId: String -> onAction(BlockedUsersUiAction.OnUserClicked(userId)) } }
-    val onUnblockClicked = remember(onAction) { { userId: String -> onAction(BlockedUsersUiAction.OnUnblockClicked(userId)) } }
-    val onErrorShown = remember(onAction) { { onAction(BlockedUsersUiAction.OnErrorShown) } }
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
+    // 3. UI Data & Definitions
     val errorMessage = strings.mapError(state.error)
 
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = onErrorShown,
+        onDismiss = { onAction(BlockedUsersUiAction.OnErrorShown) },
     )
 
     Scaffold(
@@ -113,7 +113,7 @@ fun BlockedUsersScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(BlockedUsersUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack
@@ -173,7 +173,7 @@ fun BlockedUsersScreen(
                                     countryCode = null,
                                     trailingContent = {
                                         TextButton(
-                                            onClick = { onUnblockClicked(user.id) }
+                                            onClick = { onAction(BlockedUsersUiAction.OnUnblockClicked(user.id)) }
                                         ) {
                                             Text(
                                                 text = strings.unblockUser,
@@ -183,7 +183,7 @@ fun BlockedUsersScreen(
                                             )
                                         }
                                     },
-                                    onFighterClicked = { onUserClicked(user.id) }
+                                    onFighterClicked = { onAction(BlockedUsersUiAction.OnUserClicked(user.id)) }
                                 )
 
                                 if (index < state.blockedUsers.lastIndex) {

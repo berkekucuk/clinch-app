@@ -33,7 +33,6 @@ import com.berkekucuk.mmaapp.domain.enums.SettingsDialogType
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import org.koin.compose.viewmodel.koinViewModel
 
-
 @Composable
 fun SettingsScreenRoot(
     onBackClick: () -> Unit,
@@ -71,8 +70,22 @@ fun SettingsScreen(
     onBlockedUsersClick: () -> Unit,
     notificationStorage: NotificationStorage
 ) {
-    var notificationsEnabled by remember { mutableStateOf(false) }
+    // 1. Theme & Resources
+    val strings = LocalAppStrings.current
+    val colors = LocalAppColors.current
+    val uriHandler = LocalUriHandler.current
+
+    // 2. Compose Core States
     val scope = rememberCoroutineScope()
+    var notificationsEnabled by remember { mutableStateOf(false) }
+    var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // 3. UI Data & Definitions
+    val currentLanguage = strings.language
+    val currentMeasurementUnit = LocalMeasurementUnit.current
+    val currentOddsFormat = LocalOddsFormat.current
+    val currentThemeMode = LocalThemeMode.current
 
     LaunchedEffect(Unit) {
         notificationsEnabled = notificationStorage.load()
@@ -83,18 +96,6 @@ fun SettingsScreen(
             notificationsEnabled = notificationStorage.load()
         }
     }
-
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-    val currentLanguage = strings.language
-    val currentMeasurementUnit = LocalMeasurementUnit.current
-    val currentOddsFormat = LocalOddsFormat.current
-    val currentThemeMode = LocalThemeMode.current
-    val uriHandler = LocalUriHandler.current
-
-    var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val onDismissRequest = { activeDialog = null }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -210,7 +211,7 @@ fun SettingsScreen(
 
     if (activeDialog != null) {
         ModalBottomSheet(
-            onDismissRequest = onDismissRequest,
+            onDismissRequest = { activeDialog = null },
             sheetState = sheetState,
             containerColor = colors.dropdownMenuBackground
         ) {
@@ -242,7 +243,7 @@ fun SettingsScreen(
                             isSelected = currentThemeMode == ThemeMode.LIGHT,
                             onClick = {
                                 onThemeModeChange(ThemeMode.LIGHT)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                         SettingsBottomSheetOption(
@@ -250,7 +251,7 @@ fun SettingsScreen(
                             isSelected = currentThemeMode == ThemeMode.DARK,
                             onClick = {
                                 onThemeModeChange(ThemeMode.DARK)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                     }
@@ -260,7 +261,7 @@ fun SettingsScreen(
                             isSelected = currentLanguage == AppLanguage.EN,
                             onClick = {
                                 onLanguageChange(AppLanguage.EN)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                         SettingsBottomSheetOption(
@@ -268,7 +269,7 @@ fun SettingsScreen(
                             isSelected = currentLanguage == AppLanguage.TR,
                             onClick = {
                                 onLanguageChange(AppLanguage.TR)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                     }
@@ -278,7 +279,7 @@ fun SettingsScreen(
                             isSelected = currentOddsFormat == OddsFormat.DECIMAL,
                             onClick = {
                                 onOddsFormatChange(OddsFormat.DECIMAL)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                         SettingsBottomSheetOption(
@@ -286,7 +287,7 @@ fun SettingsScreen(
                             isSelected = currentOddsFormat == OddsFormat.AMERICAN,
                             onClick = {
                                 onOddsFormatChange(OddsFormat.AMERICAN)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                     }
@@ -296,7 +297,7 @@ fun SettingsScreen(
                             isSelected = currentMeasurementUnit == MeasurementUnit.METRIC,
                             onClick = {
                                 onMeasurementUnitChange(MeasurementUnit.METRIC)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                         SettingsBottomSheetOption(
@@ -304,7 +305,7 @@ fun SettingsScreen(
                             isSelected = currentMeasurementUnit == MeasurementUnit.IMPERIAL,
                             onClick = {
                                 onMeasurementUnitChange(MeasurementUnit.IMPERIAL)
-                                onDismissRequest()
+                                activeDialog = null
                             }
                         )
                     }

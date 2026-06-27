@@ -34,6 +34,7 @@ import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import org.koin.compose.viewmodel.koinViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun RankingsScreenRoot(
@@ -62,27 +63,27 @@ fun RankingScreen(
     state: RankingUiState,
     onAction: (RankingUiAction) -> Unit
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val tabs = listOf(strings.tabMens, strings.tabWomens)
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
+
+    // 2. Compose Core States
+    val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
     val mensListState = rememberLazyListState()
     val womensListState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
 
-    val onRefresh = remember(onAction) { { onAction(RankingUiAction.OnRefresh) } }
-    val onWeightClassClicked = remember(onAction) { { weightClassId: String -> onAction(RankingUiAction.OnWeightClassClicked(weightClassId)) } }
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
-
+    // 3. UI Data & Definitions
+    val tabs = listOf(strings.tabMens, strings.tabWomens)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
     val errorMessage = strings.mapError(state.error)
 
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
-        onAction = onRefresh,
+        onAction = { onAction(RankingUiAction.OnRefresh) },
     )
 
     Scaffold(
@@ -124,8 +125,8 @@ fun RankingScreen(
 
                 AppTabRow(
                     tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     containerColor = Color.Transparent
                 )
             }
@@ -143,16 +144,16 @@ fun RankingScreen(
                 0 -> RankingContainer(
                     weightClasses = state.weightClasses.filter { !it.isWomens },
                     isRefreshing = state.isRefreshing,
-                    onRefresh = onRefresh,
-                    onWeightClassClicked = onWeightClassClicked,
-                    listState = mensListState
+                    onRefresh = { onAction(RankingUiAction.OnRefresh) },
+                    onWeightClassClicked = { weightClassId -> onAction(RankingUiAction.OnWeightClassClicked(weightClassId)) },
+                    listState = mensListState,
                 )
                 1 -> RankingContainer(
                     weightClasses = state.weightClasses.filter { it.isWomens },
                     isRefreshing = state.isRefreshing,
-                    onRefresh = onRefresh,
-                    onWeightClassClicked = onWeightClassClicked,
-                    listState = womensListState
+                    onRefresh = { onAction(RankingUiAction.OnRefresh) },
+                    onWeightClassClicked = { weightClassId -> onAction(RankingUiAction.OnWeightClassClicked(weightClassId)) },
+                    listState = womensListState,
                 )
             }
         }

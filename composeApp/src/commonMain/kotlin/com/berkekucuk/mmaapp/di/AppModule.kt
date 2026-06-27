@@ -236,7 +236,8 @@ val appModule = module {
 
     single<FighterRepository> {
         FighterRepositoryImpl(
-            remoteDataSource = get(),
+            fighterRemoteDataSource = get(),
+            fightRemoteDataSource = get(),
             fighterDao = get(),
             fightDao = get(),
             rateLimiter = get()
@@ -321,7 +322,6 @@ val appModule = module {
 
     viewModel {
         FightDetailViewModel(
-            fighterRepository = get(),
             authRepository = get(),
             notificationRepository = get(),
             predictionRepository = get(),

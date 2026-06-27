@@ -20,7 +20,10 @@ fun FighterDto.toEntity(): FighterEntity {
         dateOfBirth = dateOfBirth,
         born = born,
         fightingOutOf = fightingOutOf,
-        countryCode = countryCode
+        countryCode = countryCode,
+        winRate = winRate,
+        koTkoRate = koTkoRate,
+        submissionRate = submissionRate
     )
 }
 
@@ -37,7 +40,10 @@ fun FighterEntity.toDomain(): Fighter{
         dateOfBirth = dateOfBirth ?: "",
         born = born ?: "",
         fightingOutOf = fightingOutOf ?: "",
-        countryCode = countryCode ?: ""
+        countryCode = countryCode ?: "",
+        winRate = winRate ?: 0f,
+        koTkoRate = koTkoRate ?: 0f,
+        submissionRate = submissionRate ?: 0f
     )
 }
 
@@ -54,7 +60,10 @@ fun Fighter.toEntity(): FighterEntity {
         dateOfBirth = dateOfBirth,
         born = born,
         fightingOutOf = fightingOutOf,
-        countryCode = countryCode
+        countryCode = countryCode,
+        winRate = winRate,
+        koTkoRate = koTkoRate,
+        submissionRate = submissionRate
     )
 }
 
@@ -72,6 +81,9 @@ fun FighterWithFightsRelation.toDomain(): Fighter {
         born = fighter.born,
         fightingOutOf = fighter.fightingOutOf,
         countryCode = fighter.countryCode ?: "",
+        winRate = fighter.winRate ?: 0f,
+        koTkoRate = fighter.koTkoRate ?: 0f,
+        submissionRate = fighter.submissionRate ?: 0f,
         fights = fights.map { it.toDomain() }
             .filterNot { it.isCancelledOrFizzled }
             .sortedByDescending { it.eventDate },
@@ -91,6 +103,9 @@ fun FighterDto.toDomain(): Fighter {
         dateOfBirth = dateOfBirth ?: "",
         born = born ?: "",
         fightingOutOf = fightingOutOf ?: "",
-        countryCode = countryCode ?: ""
+        countryCode = countryCode ?: "",
+        winRate = winRate ?: 0f,
+        koTkoRate = koTkoRate ?: 0f,
+        submissionRate = submissionRate ?: 0f
     )
 }

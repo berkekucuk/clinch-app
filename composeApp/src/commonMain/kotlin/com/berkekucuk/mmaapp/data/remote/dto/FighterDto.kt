@@ -17,5 +17,7 @@ data class FighterDto(
     val born: String? = null,
     @SerialName("fighting_out_of") val fightingOutOf: String? = null,
     @SerialName("country_code") val countryCode: String? = null,
-    @SerialName("fights") val fights: List<FightDto>? = null
+    @SerialName("win_rate") val winRate: Float? = null,
+    @SerialName("ko_tko_rate") val koTkoRate: Float? = null,
+    @SerialName("submission_rate") val submissionRate: Float? = null,
 )

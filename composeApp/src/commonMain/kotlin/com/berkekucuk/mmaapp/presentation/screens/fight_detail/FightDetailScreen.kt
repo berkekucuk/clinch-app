@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
 import com.berkekucuk.mmaapp.core.utils.OnResumeEffect
 import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
@@ -157,7 +156,6 @@ fun FightDetailScreen(
         fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
     }
     val showNotificationDialog = remember { mutableStateOf(false) }
-    val isRetryableError = state.error == AppError.NETWORK
     val errorMessage = strings.mapError(state.error)
 
     // 4. UI Actions
@@ -192,10 +190,8 @@ fun FightDetailScreen(
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        duration = if (isRetryableError) SnackbarDuration.Indefinite else SnackbarDuration.Short,
-        actionLabel = if (isRetryableError) strings.retry else null,
-        onAction = if (isRetryableError) { { onAction(FightDetailUiAction.OnRefresh) } } else null,
-        onDismiss = if (isRetryableError) { { onAction(FightDetailUiAction.OnErrorShown) } } else { { onAction(FightDetailUiAction.OnErrorShown) } },
+        duration = SnackbarDuration.Short,
+        onDismiss = { onAction(FightDetailUiAction.OnErrorShown) },
     )
 
     Scaffold(
@@ -322,8 +318,6 @@ fun FightDetailScreen(
                             FighterRadarChart(
                                 redCorner = fight.redCorner,
                                 blueCorner = fight.blueCorner,
-                                redFighterFull = state.redFighter,
-                                blueFighterFull = state.blueFighter,
                             )
                         }
                     }

@@ -44,24 +44,24 @@ class UserSearchViewModel(
                     if (query.length >= 2) {
                         searchUsers(query)
                     } else {
-                        _state.update { it.copy(results = emptyList(), error = null) }
+                        _state.update { it.copy(results = emptyList(), error = null, isLoading = false) }
                     }
                 }
         }
     }
 
     private suspend fun searchUsers(query: String) {
-        _state.update { it.copy(error = null) }
+        _state.update { it.copy(error = null, isLoading = true) }
 
         userRepository.searchUsers(query)
             .onSuccess { users ->
                 _state.update {
-                    it.copy(results = users)
+                    it.copy(results = users, isLoading = false)
                 }
             }
             .onFailure { e ->
                 _state.update {
-                    it.copy(error = AppErrorMapper.map(e))
+                    it.copy(error = AppErrorMapper.map(e), isLoading = false)
                 }
             }
     }
@@ -69,10 +69,10 @@ class UserSearchViewModel(
     fun onAction(action: UserSearchUiAction) {
         when (action) {
             is UserSearchUiAction.OnQueryChanged -> {
-                _state.update { it.copy(query = action.query, error = null) }
+                _state.update { it.copy(query = action.query, error = null, isLoading = action.query.length >= 2) }
             }
             UserSearchUiAction.OnClearQuery -> {
-                _state.update { it.copy(query = "", results = emptyList(), error = null) }
+                _state.update { it.copy(query = "", results = emptyList(), error = null, isLoading = false) }
             }
             is UserSearchUiAction.OnUserClicked -> {
                 viewModelScope.launch {

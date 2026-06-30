@@ -344,8 +344,10 @@ val appModule = module {
 
     viewModel {
         FighterDetailViewModel(
-            repository = get(),
-            savedStateHandle = get()
+            repository = get<FighterRepository>(),
+            savedStateHandle = get(),
+            authRepository = get<AuthRepository>(),
+            interactionRepository = get<InteractionRepository>()
         )
     }
 

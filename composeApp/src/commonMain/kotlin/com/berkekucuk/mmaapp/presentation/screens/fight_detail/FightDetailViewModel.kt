@@ -184,7 +184,7 @@ class FightDetailViewModel(
         }
 
         if (isAlarm && !notificationStorage.hasFullScreenIntentPermission()) {
-            _state.update { it.copy(showNotificationDialog = false, showFullScreenIntentSettingsDialog = true) }
+            _state.update { it.copy(showFullScreenIntentSettingsDialog = true) }
             return
         }
 

@@ -90,25 +90,16 @@ fun ProfileEditScreen(
     state: ProfileEditUiState,
     onAction: (ProfileEditUiAction) -> Unit,
 ) {
-    val onBackClicked = remember(onAction) { { onAction(ProfileEditUiAction.OnBackClicked) } }
-    val onFullNameChanged = remember(onAction) { { name: String -> onAction(ProfileEditUiAction.OnFullNameChanged(name)) } }
-    val onUsernameChanged = remember(onAction) { { username: String -> onAction(ProfileEditUiAction.OnUsernameChanged(username)) } }
-    val onSaveClicked = remember(onAction) { { onAction(ProfileEditUiAction.OnSaveClicked) } }
-    val onDeleteAccountClicked = remember(onAction) { { onAction(ProfileEditUiAction.OnDeleteAccountClicked) } }
-
-    val showDeleteDialog = remember { mutableStateOf(false) }
-    val onDeleteDialogDismiss = remember { { showDeleteDialog.value = false } }
-    val onDeleteConfirmed = remember(onAction) {
-        {
-            showDeleteDialog.value = false
-            onDeleteAccountClicked()
-        }
-    }
-
+    // 1. Theme & Resources
     val context = LocalPlatformContext.current
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val focusManager = LocalFocusManager.current
+    val showDeleteDialog = remember { mutableStateOf(false) }
+
+    // 3. UI Data & Definitions
     val errorMessage = strings.mapError(state.error)
 
     val avatarModel = remember(state.selectedImageBytes, state.avatarUrl) {
@@ -167,12 +158,12 @@ fun ProfileEditScreen(
                     actions = {
                         SaveButton(
                             text = strings.profileEditSaveChanges,
-                            onClick = onSaveClicked,
+                            onClick = { onAction(ProfileEditUiAction.OnSaveClicked) },
                             isSaving = state.isSaving,
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(ProfileEditUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -275,7 +266,7 @@ fun ProfileEditScreen(
 
             OutlinedTextField(
                 value = state.fullName,
-                onValueChange = onFullNameChanged,
+                onValueChange = { name -> onAction(ProfileEditUiAction.OnFullNameChanged(name)) },
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
                 label = { Text(strings.profileEditFullName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -300,7 +291,7 @@ fun ProfileEditScreen(
 
             OutlinedTextField(
                 value = state.username,
-                onValueChange = onUsernameChanged,
+                onValueChange = { username -> onAction(ProfileEditUiAction.OnUsernameChanged(username)) },
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
                 label = { Text(strings.profileEditUsernameLabel, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -347,8 +338,11 @@ fun ProfileEditScreen(
     }
     if (showDeleteDialog.value) {
         AppAlertDialog(
-            onDismissRequest = onDeleteDialogDismiss,
-            onConfirmClick = onDeleteConfirmed,
+            onDismissRequest = { showDeleteDialog.value = false },
+            onConfirmClick = {
+                showDeleteDialog.value = false
+                onAction(ProfileEditUiAction.OnDeleteAccountClicked)
+            },
             title = strings.profileEditDeleteAccountTitle,
             text = strings.profileEditDeleteAccountConfirm,
             confirmText = strings.profileEditDeleteAccount,

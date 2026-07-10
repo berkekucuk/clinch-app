@@ -7,8 +7,6 @@ import com.berkekucuk.mmaapp.domain.model.Fighter
 data class FightDetailUiState(
     val isRefreshing: Boolean = false,
     val fight: Fight? = null,
-    val redFighter: Fighter? = null,
-    val blueFighter: Fighter? = null,
     val error: AppError? = null,
     val isNotificationEnabled: Boolean = false,
     val showNotificationDialog: Boolean = false,

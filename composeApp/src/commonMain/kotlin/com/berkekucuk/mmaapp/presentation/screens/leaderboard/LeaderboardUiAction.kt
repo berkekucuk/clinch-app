@@ -7,4 +7,5 @@ sealed interface LeaderboardUiAction {
     data object OnErrorShown : LeaderboardUiAction
     data object OnNextPage : LeaderboardUiAction
     data object OnPreviousPage : LeaderboardUiAction
+    data object OnSearchClicked : LeaderboardUiAction
 }

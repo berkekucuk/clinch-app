@@ -164,47 +164,23 @@ fun MenuScreen(
     onStartGoogleSignIn: () -> Unit,
     onStartAppleSignIn: () -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val coroutineScope = rememberCoroutineScope()
-
-    val (showSignInSheet, setShowSignInSheet) = remember { mutableStateOf(false) }
-
-    val onSignInClick = remember(setShowSignInSheet) { { setShowSignInSheet(true) } }
-    val onDismissSignIn = remember(setShowSignInSheet) { { setShowSignInSheet(false) } }
-    val onStartGoogleSignInClick = remember(coroutineScope, setShowSignInSheet, onStartGoogleSignIn) {
-        {
-            setShowSignInSheet(false)
-            coroutineScope.launch {
-                kotlinx.coroutines.delay(300.milliseconds)
-                onStartGoogleSignIn()
-            }
-            Unit
-        }
-    }
-
-    val onStartAppleSignInClick = remember(setShowSignInSheet, onStartAppleSignIn) {
-        {
-            setShowSignInSheet(false)
-            onStartAppleSignIn()
-        }
-    }
-
-    val onProfileClick = remember(onAction) { { onAction(MenuUiAction.OnProfileClicked) } }
-    val onProfileEditClick = remember(onAction) { { onAction(MenuUiAction.OnProfileEditClicked) } }
-    val onSettingsClick = remember(onAction) { { onAction(MenuUiAction.OnSettingsClicked) } }
-    val onLeaderboardClick = remember(onAction) { { onAction(MenuUiAction.OnLeaderboardClicked) } }
-    val onSignOutClick = remember(onAction) { { onAction(MenuUiAction.OnSignOutClicked) } }
-
+    val showSignInSheet = remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 3. UI Data & Definitions
     val errorMessage = strings.mapError(state.error)
-    val onErrorShown = remember(onAction) { { onAction(MenuUiAction.OnErrorShown) } }
 
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = onErrorShown,
+        onDismiss = { onAction(MenuUiAction.OnErrorShown) },
     )
 
     Scaffold(
@@ -247,7 +223,7 @@ fun MenuScreen(
                 is AuthState.Loading -> {}
 
                 is AuthState.Unauthenticated -> {
-                    UnauthenticatedTopHeader(onSignInClick = onSignInClick)
+                    UnauthenticatedTopHeader(onSignInClick = { showSignInSheet.value = true })
                 }
 
                 is AuthState.Authenticated -> {
@@ -255,8 +231,8 @@ fun MenuScreen(
                         name = state.name ?: "",
                         username = state.username,
                         avatarUrl = state.avatarUrl,
-                        onProfileClick = onProfileClick,
-                        onProfileEditClick = onProfileEditClick,
+                        onProfileClick = { onAction(MenuUiAction.OnProfileClicked) },
+                        onProfileEditClick = { onAction(MenuUiAction.OnProfileEditClicked) },
                     )
                 }
             }
@@ -265,14 +241,14 @@ fun MenuScreen(
             MenuItemRow(
                 icon = Icons.Filled.Person,
                 title = strings.menuItemLeaderboard,
-                onClick = onLeaderboardClick
+                onClick = { onAction(MenuUiAction.OnLeaderboardClicked) }
             )
 
             HorizontalDivider(color = colors.dividerColor)
             MenuItemRow(
                 icon = Icons.Filled.Settings,
                 title = strings.menuItemSettings,
-                onClick = onSettingsClick
+                onClick = { onAction(MenuUiAction.OnSettingsClicked) }
             )
             HorizontalDivider(color = colors.dividerColor)
 
@@ -284,17 +260,26 @@ fun MenuScreen(
                     icon = Icons.AutoMirrored.Filled.Logout,
                     title = strings.profileSignOut,
                     tint = colors.loseColor,
-                    onClick = onSignOutClick,
+                    onClick = { onAction(MenuUiAction.OnSignOutClicked) },
                 )
             }
         }
     }
 
-    if (showSignInSheet) {
+    if (showSignInSheet.value) {
         SignInBottomSheet(
-            onDismiss = onDismissSignIn,
-            onStartGoogleSignIn = onStartGoogleSignInClick,
-            onStartAppleSignIn = onStartAppleSignInClick
+            onDismiss = { showSignInSheet.value = false },
+            onStartGoogleSignIn = {
+                showSignInSheet.value = false
+                coroutineScope.launch {
+                    kotlinx.coroutines.delay(300.milliseconds)
+                    onStartGoogleSignIn()
+                }
+            },
+            onStartAppleSignIn = {
+                showSignInSheet.value = false
+                onStartAppleSignIn()
+            }
         )
     }
 }

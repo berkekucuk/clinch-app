@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
-fun Modifier.appClickable(onClick: () -> Unit): Modifier = composed {
+fun Modifier.appClickable(enabled: Boolean = true, onClick: () -> Unit): Modifier = composed {
     val interactionSource = remember { MutableInteractionSource() }
     val colors = LocalAppColors.current
     val indicationColor = if (colors.isDark) colors.white else colors.black
@@ -16,6 +16,7 @@ fun Modifier.appClickable(onClick: () -> Unit): Modifier = composed {
     this.clickable(
         interactionSource = interactionSource,
         indication = ripple(color = indicationColor),
+        enabled = enabled,
         onClick = onClick
     )
 }

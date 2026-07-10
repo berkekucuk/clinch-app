@@ -44,6 +44,7 @@ import com.berkekucuk.mmaapp.presentation.screens.profile_edit.ProfileEditScreen
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankingDetailScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.blocked_users.BlockedUsersScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.user_search.UserSearchScreenRoot
 
 object DeepLinkManager {
     private val _route = Channel<Route>(Channel.BUFFERED)
@@ -340,6 +341,9 @@ fun App() {
                     onNavigateBack = { rootNavController.navigateUp() },
                     onNavigateToProfile = { userId ->
                         rootNavController.navigate(Route.Profile(userId))
+                    },
+                    onNavigateToUserSearch = {
+                        rootNavController.navigate(Route.UserSearch)
                     }
                 )
             }
@@ -353,6 +357,20 @@ fun App() {
                 BlockedUsersScreenRoot(
                     onNavigateBack = { rootNavController.navigateUp() },
                     onNavigateToProfile = { userId ->
+                        rootNavController.navigate(Route.Profile(userId))
+                    }
+                )
+            }
+
+            composable<Route.UserSearch>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                UserSearchScreenRoot(
+                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateToUserProfile = { userId ->
                         rootNavController.navigate(Route.Profile(userId))
                     }
                 )

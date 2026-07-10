@@ -31,6 +31,9 @@ private fun createUnknownFighter(): Fighter {
         born = "",
         fightingOutOf = "",
         countryCode = "",
-        imageUrl = ""
+        imageUrl = "",
+        winRate = 0f,
+        koTkoRate = 0f,
+        submissionRate = 0f
     )
 }

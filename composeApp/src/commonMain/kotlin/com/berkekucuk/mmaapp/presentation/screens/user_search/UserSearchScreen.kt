@@ -1,4 +1,4 @@
-package com.berkekucuk.mmaapp.presentation.screens.fighter_search
+package com.berkekucuk.mmaapp.presentation.screens.user_search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.ui.Alignment
-import com.berkekucuk.mmaapp.presentation.components.ErrorBox
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -28,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,12 +41,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
+import com.berkekucuk.mmaapp.presentation.components.ErrorBox
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun FighterSearchScreenRoot(
-    viewModel: FighterSearchViewModel = koinViewModel(),
-    onNavigateToFighterDetail: (String) -> Unit,
+fun UserSearchScreenRoot(
+    viewModel: UserSearchViewModel = koinViewModel(),
+    onNavigateToUserProfile: (String) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -55,13 +55,13 @@ fun FighterSearchScreenRoot(
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
             when (event) {
-                is FighterSearchNavigationEvent.ToFighterDetail -> onNavigateToFighterDetail(event.fighterId)
-                is FighterSearchNavigationEvent.Back -> onNavigateBack()
+                is UserSearchNavigationEvent.ToUserProfile -> onNavigateToUserProfile(event.userId)
+                is UserSearchNavigationEvent.Back -> onNavigateBack()
             }
         }
     }
 
-    FighterSearchScreen(
+    UserSearchScreen(
         state = state,
         onAction = viewModel::onAction,
     )
@@ -69,9 +69,9 @@ fun FighterSearchScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FighterSearchScreen(
-    state: FighterSearchUiState,
-    onAction: (FighterSearchUiAction) -> Unit,
+fun UserSearchScreen(
+    state: UserSearchUiState,
+    onAction: (UserSearchUiAction) -> Unit,
 ) {
     // 1. Theme & Resources
     val strings = LocalAppStrings.current
@@ -98,10 +98,10 @@ fun FighterSearchScreen(
         topBar = {
             Column(
                 modifier = Modifier.background(colors.rankingTopBar)
-            ){
+            ) {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { onAction(FighterSearchUiAction.OnBackClicked) }) {
+                        IconButton(onClick = { onAction(UserSearchUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
@@ -114,7 +114,7 @@ fun FighterSearchScreen(
                             value = textFieldValue,
                             onValueChange = { newValue ->
                                 textFieldValue = newValue
-                                onAction(FighterSearchUiAction.OnQueryChanged(newValue.text))
+                                onAction(UserSearchUiAction.OnQueryChanged(newValue.text))
                             },
                             singleLine = true,
                             textStyle = TextStyle(
@@ -127,7 +127,7 @@ fun FighterSearchScreen(
                                 Box {
                                     if (state.query.isEmpty()) {
                                         Text(
-                                            text = strings.fighterSearchPlaceholder,
+                                            text = strings.userSearchPlaceholder,
                                             color = colors.textSecondary,
                                             fontSize = 18.sp,
                                         )
@@ -142,7 +142,7 @@ fun FighterSearchScreen(
                     },
                     actions = {
                         if (state.query.isNotEmpty()) {
-                            IconButton(onClick = { onAction(FighterSearchUiAction.OnClearQuery) }) {
+                            IconButton(onClick = { onAction(UserSearchUiAction.OnClearQuery) }) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = null,
@@ -159,7 +159,6 @@ fun FighterSearchScreen(
                     ),
                 )
             }
-
         }
     ) { innerPadding ->
         Box(
@@ -179,15 +178,17 @@ fun FighterSearchScreen(
                     }
                 }
                 state.results.isNotEmpty() -> {
-                    FighterSearchListContainer(
-                        fighters = state.results,
-                        addingInteractionFighterId = state.addingInteractionFighterId,
-                        onFighterClicked = { fighterId -> onAction(FighterSearchUiAction.OnFighterClicked(fighterId)) },
+                    UserSearchListContainer(
+                        users = state.results,
+                        onUserClicked = { userId -> onAction(UserSearchUiAction.OnUserClicked(userId)) }
                     )
+                }
+                state.isLoading -> {
+                    // Do nothing, just wait.
                 }
                 state.query.length >= 2 -> {
                     ErrorBox(
-                        message = strings.fighterSearchEmpty,
+                        message = strings.userSearchEmpty,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(horizontal = 16.dp, vertical = 12.dp)

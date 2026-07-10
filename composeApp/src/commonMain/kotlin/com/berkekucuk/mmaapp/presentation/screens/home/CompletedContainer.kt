@@ -16,9 +16,9 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +43,7 @@ fun CompletedContainer(
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var showDropdownMenu by remember { mutableStateOf(false) }
 
     ListContainer(
         isRefreshing = isRefreshing,
@@ -59,8 +59,8 @@ fun CompletedContainer(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it }
+                    expanded = showDropdownMenu,
+                    onExpandedChange = { showDropdownMenu = it }
                 ) {
                     FilterChip(
                         selected = true,
@@ -73,7 +73,7 @@ fun CompletedContainer(
                             )
                         },
                         trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = showDropdownMenu)
                         },
                         modifier = Modifier.menuAnchor(
                             ExposedDropdownMenuAnchorType.PrimaryNotEditable,
@@ -87,8 +87,8 @@ fun CompletedContainer(
                     )
 
                     ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
+                        expanded = showDropdownMenu,
+                        onDismissRequest = { showDropdownMenu = false },
                         modifier = Modifier.heightIn(max = 300.dp),
                         containerColor = colors.dropdownMenuBackground
                     ) {
@@ -102,7 +102,7 @@ fun CompletedContainer(
                                 },
                                 onClick = {
                                     onYearSelected(year)
-                                    expanded = false
+                                    showDropdownMenu = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                             )

@@ -52,6 +52,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.berkekucuk.mmaapp.core.utils.openStore
 import com.berkekucuk.mmaapp.domain.model.AppUpdateStatus
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreenRoot(
@@ -59,7 +60,7 @@ fun HomeScreenRoot(
     onNavigateToEventDetail: (String) -> Unit,
     onNavigateToFighterSearch: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
@@ -71,7 +72,7 @@ fun HomeScreenRoot(
     }
 
     HomeScreen(
-        state = uiState,
+        state = state,
         onAction = viewModel::onAction,
     )
 }
@@ -82,34 +83,36 @@ fun HomeScreen(
     state: HomeUiState,
     onAction: (HomeUiAction) -> Unit,
 ) {
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val tabs = listOf(strings.tabUpcoming, strings.tabCompleted)
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val snackbarHostState = remember { SnackbarHostState() }
+    val appLogoRes = if (colors.isDark) Res.drawable.app_logo else Res.drawable.app_logo_light
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    // 2. Compose Core States
     val coroutineScope = rememberCoroutineScope()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
     val upcomingListState = rememberLazyListState()
     val completedListState = rememberLazyListState()
 
-    val onSearchClicked = remember(onAction) { { onAction(HomeUiAction.OnSearchClicked) } }
-    val onRefreshUpcomingTab = remember(onAction) { { onAction(HomeUiAction.OnRefreshUpcomingTab) } }
-    val onRefreshCompletedTab = remember(onAction) { { onAction(HomeUiAction.OnRefreshCompletedTab) } }
-    val onEventClicked = remember(onAction) { { eventId: String -> onAction(HomeUiAction.OnEventClicked(eventId)) } }
-    val onYearSelected = remember(onAction) { { year: Int -> onAction(HomeUiAction.OnYearSelected(year)) } }
-
+    // 3. UI Data & Definitions
+    val tabs = listOf(strings.tabUpcoming, strings.tabCompleted)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
     val errorMessage = strings.mapError(state.error)
 
-    val updateStatus = state.updateStatus
-    val isForceUpdate = updateStatus is AppUpdateStatus.ForceUpdate
-    val onDismissFlexibleUpdate = remember(onAction) { { onAction(HomeUiAction.OnDismissFlexibleUpdate) } }
+    // 4. Update Dialog Logic
+    val isForceUpdate = state.updateStatus is AppUpdateStatus.ForceUpdate
+    val showUpdateDialog = state.updateStatus != null && state.updateStatus != AppUpdateStatus.UpToDate
+    val updateDialogTitle = if (isForceUpdate) strings.updateForceTitle else strings.updateFlexibleTitle
+    val updateDialogText = if (isForceUpdate) strings.updateForceMessage else strings.updateFlexibleMessage
+    val updateDialogDismissText = if (!isForceUpdate) strings.updateLaterButton else null
+    val updateDialogDismissAction: (() -> Unit)? = if (!isForceUpdate) { { onAction(HomeUiAction.OnDismissFlexibleUpdate) } } else null
 
     SnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
-        onAction = onRefreshCompletedTab,
+        onAction = { onAction(HomeUiAction.OnRefreshCompletedTab) },
     )
 
     Scaffold(
@@ -137,10 +140,7 @@ fun HomeScreen(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically){
                             Image(
-                                painter = painterResource(
-                                    if (colors.isDark) Res.drawable.app_logo
-                                    else Res.drawable.app_logo_light
-                                ),
+                                painter = painterResource(appLogoRes),
                                 contentDescription = null,
                                 modifier = Modifier.size(36.dp)
                             )
@@ -154,7 +154,7 @@ fun HomeScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = onSearchClicked) {
+                        IconButton(onClick = { onAction(HomeUiAction.OnSearchClicked) }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = null,
@@ -172,8 +172,8 @@ fun HomeScreen(
 
                 AppTabRow(
                     tabs = tabs,
-                    pagerState = pagerState,
-                    coroutineScope = coroutineScope,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
                     containerColor = Color.Transparent
                 )
             }
@@ -196,18 +196,18 @@ fun HomeScreen(
                     0 -> UpcomingContainer(
                         events = state.upcomingEvents,
                         isRefreshing = state.isRefreshingUpcomingTab,
-                        onRefresh = onRefreshUpcomingTab,
-                        onEventClick = onEventClicked,
+                        onRefresh = { onAction(HomeUiAction.OnRefreshUpcomingTab) },
+                        onEventClick = { eventId -> onAction(HomeUiAction.OnEventClicked(eventId)) },
                         listState = upcomingListState,
                     )
                     1 -> CompletedContainer(
                         completedEvents = state.completedEvents,
                         isRefreshing = state.isRefreshingCompletedTab,
-                        onRefresh = onRefreshCompletedTab,
-                        onEventClick = onEventClicked,
+                        onRefresh = { onAction(HomeUiAction.OnRefreshCompletedTab) },
+                        onEventClick = { eventId -> onAction(HomeUiAction.OnEventClicked(eventId)) },
                         availableYears = state.availableYears,
                         selectedYear = state.selectedYear,
-                        onYearSelected = onYearSelected,
+                        onYearSelected = { year -> onAction(HomeUiAction.OnYearSelected(year)) },
                         listState = completedListState,
                     )
                 }
@@ -215,15 +215,15 @@ fun HomeScreen(
         }
     }
 
-    if (updateStatus != null && updateStatus != AppUpdateStatus.UpToDate) {
+    if (showUpdateDialog) {
         AppAlertDialog(
-            onDismissRequest = { if (!isForceUpdate) onDismissFlexibleUpdate() },
+            onDismissRequest = { updateDialogDismissAction?.invoke() },
             onConfirmClick = { openStore() },
-            onDismissClick = if (!isForceUpdate) onDismissFlexibleUpdate else null,
-            title = if (isForceUpdate) strings.updateForceTitle else strings.updateFlexibleTitle,
-            text = if (isForceUpdate) strings.updateForceMessage else strings.updateFlexibleMessage,
+            onDismissClick = updateDialogDismissAction,
+            title = updateDialogTitle,
+            text = updateDialogText,
             confirmText = strings.updateButton,
-            dismissText = if (!isForceUpdate) strings.updateLaterButton else null
+            dismissText = updateDialogDismissText
         )
     }
 }

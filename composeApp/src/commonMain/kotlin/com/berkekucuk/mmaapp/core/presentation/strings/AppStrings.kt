@@ -107,12 +107,13 @@ data class AppStrings(
     // Fighter Search Screen
     val fighterSearchPlaceholder: String,
     val fighterSearchEmpty: String,
+    val userSearchPlaceholder: String,
+    val userSearchEmpty: String,
     // Common Errors
     val retry: String,
     val dialogAccept: String,
     val dialogCancel: String,
-    val fightNotificationDialogMessage: String,
-    val fightNotificationRemoveDialogMessage: String,
+    val fightReminderDialogMessage: String,
     val fightReminderRemoveDialogMessage: String,
     val notificationPermissionSettingsTitle: String,
     val notificationPermissionSettingsMessage: String,

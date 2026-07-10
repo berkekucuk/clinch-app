@@ -9,6 +9,10 @@ A modern, cross-platform Mixed Martial Arts application built with **Kotlin Mult
 <a href="https://github.com/berkekucuk/mma-scraping">
   <img src="https://img.shields.io/badge/Scraping%20Pipeline-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Scraping Pipeline GitHub" height="40">
 </a>
+<br>
+<a href="https://github.com/berkekucuk/clinch-notifier">
+  <img src="https://img.shields.io/badge/Push%20Notification%20Service-GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="Push Notification Service GitHub" height="40">
+</a>
 
 ## 📲 Download
 
@@ -42,7 +46,7 @@ A modern, cross-platform Mixed Martial Arts application built with **Kotlin Mult
 ## 🛠️ Tech Stack
 
 * **UI Framework:** Jetpack Compose & Compose Multiplatform
-* **Architecture:** Clean Architecture (MVVM/MVI pattern)
+* **Architecture:** Clean Architecture (MVI pattern)
 * **Local Database:** Room Database (KMP implementation)
 * **Backend & Authentication:** Supabase (PostgreSQL, Auth)
 * **Dependency Injection:** Koin

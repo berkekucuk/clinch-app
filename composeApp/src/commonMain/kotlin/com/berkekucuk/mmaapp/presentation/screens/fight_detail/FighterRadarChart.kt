@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.model.Participant
 import kotlin.math.PI
 import kotlin.math.cos
@@ -48,8 +47,6 @@ private data class RadarData(
 fun FighterRadarChart(
     redCorner: Participant?,
     blueCorner: Participant?,
-    redFighterFull: Fighter?,
-    blueFighterFull: Fighter?,
     modifier: Modifier = Modifier,
 ) {
     val strings = LocalAppStrings.current
@@ -62,18 +59,16 @@ fun FighterRadarChart(
         strings.radarLabelKoTkoRate,
         strings.radarLabelSubRate,
     )
-    val redRates = remember(redFighterFull) { redFighterFull?.calculateRates() ?: FighterRates(0f, 0f, 0f) }
-    val blueRates = remember(blueFighterFull) { blueFighterFull?.calculateRates() ?: FighterRates(0f, 0f, 0f) }
-    val redData = remember(redCorner, redRates) {
+    val redData = remember(redCorner) {
         RadarData(
-            values = buildRadarValues(redCorner, redRates),
+            values = buildRadarValues(redCorner),
             color = colors.radarRed,
             fillColor = colors.radarRedFill,
         )
     }
-    val blueData = remember(blueCorner, blueRates) {
+    val blueData = remember(blueCorner) {
         RadarData(
-            values = buildRadarValues(blueCorner, blueRates),
+            values = buildRadarValues(blueCorner),
             color = colors.radarBlue,
             fillColor = colors.radarBlueFill,
         )

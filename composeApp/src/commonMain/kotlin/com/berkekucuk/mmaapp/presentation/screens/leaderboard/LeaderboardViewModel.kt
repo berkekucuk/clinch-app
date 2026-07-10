@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.async
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class LeaderboardViewModel(
@@ -105,13 +104,12 @@ class LeaderboardViewModel(
             val currentUserId = authRepository.getAuthenticatedUserId()
             val page = currentPageFlow.value
 
-            val overallDeferred = async { leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId) }
-            val weeklyDeferred = if (!onlyOverall) async { leaderboardRepository.syncWeeklyLeaderboard() } else null
-            val configDeferred = if (!onlyOverall) async { configRepository.syncConfig("leaderboard_info_text") } else null
-
-            val overallResult = overallDeferred.await()
-            val weeklyResult = weeklyDeferred?.await()
-            configDeferred?.await()
+            val weeklyResult = if (!onlyOverall) leaderboardRepository.syncWeeklyLeaderboard() else null
+            val overallResult = leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
+            
+            if (!onlyOverall) {
+                configRepository.syncConfig("leaderboard_info_text")
+            }
 
             val firstError = listOfNotNull(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
             if (firstError != null) {
@@ -130,6 +128,7 @@ class LeaderboardViewModel(
             LeaderboardUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
             LeaderboardUiAction.OnNextPage -> nextPage()
             LeaderboardUiAction.OnPreviousPage -> previousPage()
+            LeaderboardUiAction.OnSearchClicked -> navigateTo(LeaderboardNavigationEvent.ToUserSearch)
         }
     }
 

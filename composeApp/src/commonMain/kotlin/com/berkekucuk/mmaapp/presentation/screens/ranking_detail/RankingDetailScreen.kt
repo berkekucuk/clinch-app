@@ -33,7 +33,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -74,12 +73,11 @@ fun RankingDetailScreen(
     state: RankingDetailUiState,
     onAction: (RankingDetailUiAction) -> Unit
 ) {
-    val onBackClicked = remember(onAction) { { onAction(RankingDetailUiAction.OnBackClicked) } }
-    val onFighterClicked = remember(onAction) { { fighterId: String -> onAction(RankingDetailUiAction.OnFighterClicked(fighterId)) } }
-    val onRefresh = remember(onAction) { { onAction(RankingDetailUiAction.OnRefresh) } }
-
+    // 1. Theme & Resources
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+
+    // 2. Compose Core States
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Scaffold(
@@ -99,7 +97,7 @@ fun RankingDetailScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClicked) {
+                        IconButton(onClick = { onAction(RankingDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack
@@ -118,7 +116,7 @@ fun RankingDetailScreen(
     ) { innerPadding ->
         ListContainer(
             isRefreshing = state.isRefreshing,
-            onRefresh = onRefresh,
+            onRefresh = { onAction(RankingDetailUiAction.OnRefresh) },
             modifier = Modifier.padding(innerPadding),
             contentPadding = PaddingValues(top = 8.dp),
             verticalSpacing = 0.dp,
@@ -145,7 +143,7 @@ fun RankingDetailScreen(
                                     record = fighter.record.toString(),
                                     imageUrl = fighter.imageUrl,
                                     countryCode = fighter.countryCode,
-                                    onFighterClicked = { onFighterClicked(fighter.fighterId) },
+                                    onFighterClicked = { onAction(RankingDetailUiAction.OnFighterClicked(fighter.fighterId)) },
                                     trailingContent = {
                                         val rankChange = ranking.rankChange
                                         if (rankChange != null && rankChange != 0) {

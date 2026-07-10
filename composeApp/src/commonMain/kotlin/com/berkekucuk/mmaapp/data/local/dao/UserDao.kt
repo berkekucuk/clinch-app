@@ -31,7 +31,7 @@ interface UserDao {
     @Query("DELETE FROM users WHERE id = :userId")
     suspend fun deleteUser(userId: String)
 
-    @Query("DELETE FROM users WHERE id NOT IN (:retainedIds) AND id != :currentUserId")
+    @Query("DELETE FROM users WHERE id NOT IN (:retainedIds) AND id != :currentUserId AND id NOT IN (SELECT user_id FROM weekly_leaderboard)")
     suspend fun deleteUsersExcept(retainedIds: List<String>, currentUserId: String)
 
     @Transaction

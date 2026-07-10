@@ -40,4 +40,12 @@ class IosNotificationStorage : NotificationStorage {
     override fun setRequestedPermission(requested: Boolean) {
         standardUserDefaults.setBool(requested, "has_requested_permission")
     }
+
+    override fun hasFullScreenIntentPermission(): Boolean {
+        return true
+    }
+
+    override fun openFullScreenIntentSettings() {
+        // No-op for iOS
+    }
 }

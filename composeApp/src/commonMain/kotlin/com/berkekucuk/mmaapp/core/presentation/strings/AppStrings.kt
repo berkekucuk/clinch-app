@@ -117,6 +117,8 @@ data class AppStrings(
     val fightReminderRemoveDialogMessage: String,
     val notificationPermissionSettingsTitle: String,
     val notificationPermissionSettingsMessage: String,
+    val fullScreenIntentSettingsTitle: String,
+    val fullScreenIntentSettingsMessage: String,
     val riskUnsure: String,
     val riskNormal: String,
     val riskConfident: String,

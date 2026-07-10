@@ -69,17 +69,15 @@ fun FightDetailScreenRoot(
     onNavigateToLeaderboard: () -> Unit,
     onNavigateBack: () -> Unit,
 ) {
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val showPermissionRequest = remember { mutableStateOf(false) }
-    val showSettingsDialog = remember { mutableStateOf(false) }
-    val strings = LocalAppStrings.current
 
     NotificationPermissionHandler(
         trigger = showPermissionRequest.value,
         onResult = { isGranted ->
             showPermissionRequest.value = false
             if (isGranted) {
-                viewModel.onAction(FightDetailUiAction.OnNotificationClicked(false))
+                viewModel.onAction(FightDetailUiAction.OnSubmitNotificationClicked(false))
             }
         },
         onDismiss = { showPermissionRequest.value = false }
@@ -95,29 +93,12 @@ fun FightDetailScreenRoot(
                 is FightDetailNavigationEvent.RequestNotificationPermission -> {
                     showPermissionRequest.value = true
                 }
-                is FightDetailNavigationEvent.ShowSettingsDialog -> {
-                    showSettingsDialog.value = true
-                }
             }
         }
     }
 
-    if (showSettingsDialog.value) {
-        AppAlertDialog(
-            onDismissRequest = { showSettingsDialog.value = false },
-            onConfirmClick = {
-                showSettingsDialog.value = false
-                viewModel.onAction(FightDetailUiAction.OnOpenSettingsClicked)
-            },
-            title = strings.notificationPermissionSettingsTitle,
-            text = strings.notificationPermissionSettingsMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
-        )
-    }
-
     FightDetailScreen(
-        state = uiState,
+        state = state,
         fromEventDetail = viewModel.fromEventDetail,
         onAction = viewModel::onAction,
     )
@@ -144,9 +125,7 @@ fun FightDetailScreen(
     val eventId = state.fight?.eventId
     val displayTitle = state.fight?.eventName
     val fight = state.fight
-    val hasMetaInfo = fight != null && (
-            fight.roundsFormat.isNotBlank() || fight.roundSummary.isNotBlank() || fight.weightClassLbs != null
-            )
+    val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || fight.roundSummary.isNotBlank() || fight.weightClassLbs != null)
     val tabs = listOf(strings.tabFightDetails, strings.tabFightComparison)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedRisk = remember { mutableStateOf(50) }
@@ -320,7 +299,7 @@ fun FightDetailScreen(
         if (!state.isNotificationEnabled && !isIos) {
             AppAlertDialog(
                 onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
-                onConfirmClick = { onAction(FightDetailUiAction.OnNotificationClicked(selectedNotificationIsAlarm.value)) },
+                onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
                 title = strings.notificationTypeTitle,
                 confirmText = strings.dialogAccept,
                 dismissText = strings.dialogCancel,
@@ -380,7 +359,7 @@ fun FightDetailScreen(
         } else {
             AppAlertDialog(
                 onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
-                onConfirmClick = { onAction(FightDetailUiAction.OnNotificationClicked(selectedNotificationIsAlarm.value)) },
+                onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
                 text = if (state.isNotificationEnabled) {
                     strings.fightReminderRemoveDialogMessage
                 } else {
@@ -393,7 +372,29 @@ fun FightDetailScreen(
         }
     }
 
-    if (state.showPredictionConfirmDialog) {
+    if (state.showNotificationSettingsDialog) {
+        AppAlertDialog(
+            onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationSettingsDialog) },
+            onConfirmClick = { onAction(FightDetailUiAction.OnOpenNotificationSettingsClicked) },
+            title = strings.notificationPermissionSettingsTitle,
+            text = strings.notificationPermissionSettingsMessage,
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
+    }
+
+    if (state.showFullScreenIntentSettingsDialog) {
+        AppAlertDialog(
+            onDismissRequest = { onAction(FightDetailUiAction.OnDismissFullScreenIntentSettingsDialog) },
+            onConfirmClick = { onAction(FightDetailUiAction.OnOpenFullScreenIntentSettingsClicked) },
+            title = strings.fullScreenIntentSettingsTitle,
+            text = strings.fullScreenIntentSettingsMessage,
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
+    }
+
+    if (state.showPredictionDialog) {
         AppAlertDialog(
             onDismissRequest = { onAction(FightDetailUiAction.OnDismissPredictionDialog) },
             onConfirmClick = onPredictionConfirmed,

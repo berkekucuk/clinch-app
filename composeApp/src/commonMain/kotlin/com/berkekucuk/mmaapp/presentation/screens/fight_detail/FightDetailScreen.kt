@@ -360,11 +360,12 @@ fun FightDetailScreen(
             AppAlertDialog(
                 onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
                 onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
-                text = if (state.isNotificationEnabled) {
-                    strings.fightReminderRemoveDialogMessage
+                title = if (state.isNotificationEnabled) {
+                    strings.fightReminderRemoveDialogTitle
                 } else {
-                    strings.fightReminderDialogMessage
+                    strings.fightReminderDialogTitle
                 },
+                text = if (!state.isNotificationEnabled) strings.fightReminderDialogMessage else null,
                 confirmText = strings.dialogAccept,
                 dismissText = strings.dialogCancel,
                 isConfirmLoading = state.isSubmittingNotification

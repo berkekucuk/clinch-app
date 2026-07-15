@@ -13,4 +13,7 @@ interface FightDao {
 
     @Upsert
     suspend fun upsertFights(fights: List<FightEntity>)
+
+    @Query("DELETE FROM fights WHERE event_id IN (:eventIds)")
+    suspend fun deleteFightsByEventIds(eventIds: List<String>)
 }

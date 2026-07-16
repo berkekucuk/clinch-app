@@ -5,12 +5,20 @@ sealed interface FightDetailUiAction {
     data object OnBackClicked: FightDetailUiAction
     data object OnRefresh: FightDetailUiAction
     data class OnEventClicked(val eventId: String): FightDetailUiAction
-    data object OnNotificationClicked: FightDetailUiAction
     data object OnErrorShown: FightDetailUiAction
-    data object OnResume: FightDetailUiAction
-    data class OnSubmitPredictionClicked(val predictedWinnerId: String, val selectedRisk: Int): FightDetailUiAction
     data object OnLeaderboardClicked: FightDetailUiAction
-    data object OnOpenSettingsClicked: FightDetailUiAction
+
+    // Notifications
+    data object OnNotificationIconClicked: FightDetailUiAction
+    data class OnSubmitNotificationClicked(val isAlarm: Boolean = false): FightDetailUiAction
+    data object OnDismissNotificationDialog: FightDetailUiAction
+    data object OnOpenNotificationSettingsClicked: FightDetailUiAction
+    data object OnDismissNotificationSettingsDialog: FightDetailUiAction
+    data object OnOpenFullScreenIntentSettingsClicked: FightDetailUiAction
+    data object OnDismissFullScreenIntentSettingsDialog: FightDetailUiAction
+
+    // Predictions
     data class OnPredictClicked(val predictedWinnerId: String): FightDetailUiAction
+    data class OnSubmitPredictionClicked(val predictedWinnerId: String, val selectedRisk: Int): FightDetailUiAction
     data object OnDismissPredictionDialog: FightDetailUiAction
 }

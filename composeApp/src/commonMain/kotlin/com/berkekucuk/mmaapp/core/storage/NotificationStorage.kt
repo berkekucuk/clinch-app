@@ -6,4 +6,6 @@ interface NotificationStorage {
     fun openNotificationSettings()
     fun hasRequestedPermission(): Boolean
     fun setRequestedPermission(requested: Boolean)
+    fun hasFullScreenIntentPermission(): Boolean
+    fun openFullScreenIntentSettings()
 }

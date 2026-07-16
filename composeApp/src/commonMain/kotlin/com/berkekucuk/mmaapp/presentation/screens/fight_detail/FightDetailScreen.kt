@@ -51,12 +51,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
-import com.berkekucuk.mmaapp.core.utils.OnResumeEffect
 import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.FightItem
+import com.berkekucuk.mmaapp.core.utils.isIos
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
@@ -71,15 +71,13 @@ fun FightDetailScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showPermissionRequest = remember { mutableStateOf(false) }
-    val showSettingsDialog = remember { mutableStateOf(false) }
-    val strings = LocalAppStrings.current
 
     NotificationPermissionHandler(
         trigger = showPermissionRequest.value,
         onResult = { isGranted ->
             showPermissionRequest.value = false
             if (isGranted) {
-                viewModel.onAction(FightDetailUiAction.OnNotificationClicked)
+                viewModel.onAction(FightDetailUiAction.OnSubmitNotificationClicked(false))
             }
         },
         onDismiss = { showPermissionRequest.value = false }
@@ -95,25 +93,8 @@ fun FightDetailScreenRoot(
                 is FightDetailNavigationEvent.RequestNotificationPermission -> {
                     showPermissionRequest.value = true
                 }
-                is FightDetailNavigationEvent.ShowSettingsDialog -> {
-                    showSettingsDialog.value = true
-                }
             }
         }
-    }
-
-    if (showSettingsDialog.value) {
-        AppAlertDialog(
-            onDismissRequest = { showSettingsDialog.value = false },
-            onConfirmClick = {
-                showSettingsDialog.value = false
-                viewModel.onAction(FightDetailUiAction.OnOpenSettingsClicked)
-            },
-            title = strings.notificationPermissionSettingsTitle,
-            text = strings.notificationPermissionSettingsMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
-        )
     }
 
     FightDetailScreen(
@@ -144,19 +125,15 @@ fun FightDetailScreen(
     val eventId = state.fight?.eventId
     val displayTitle = state.fight?.eventName
     val fight = state.fight
-    val hasMetaInfo = fight != null && (
-            fight.roundsFormat.isNotBlank() ||
-            fight.roundSummary.isNotBlank() ||
-            fight.weightClassLbs != null
-    )
+    val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || fight.roundSummary.isNotBlank() || fight.weightClassLbs != null)
     val tabs = listOf(strings.tabFightDetails, strings.tabFightComparison)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedRisk = remember { mutableStateOf(50) }
     val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
         fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
     }
-    val showNotificationDialog = remember { mutableStateOf(false) }
     val errorMessage = strings.mapError(state.error)
+    val selectedNotificationIsAlarm = remember { mutableStateOf(false) }
 
     // 4. UI Actions
     val onRedCornerClick = fight?.redCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
@@ -172,20 +149,12 @@ fun FightDetailScreen(
         selectedRisk.value = 50
         onAction(FightDetailUiAction.OnPredictClicked(id))
     }
-    val onPredictionDialogDismiss = { onAction(FightDetailUiAction.OnDismissPredictionDialog) }
     val onPredictionConfirmed = {
         val id = state.pendingPredictionFighterId
         if (id != null) {
             onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
         }
     }
-    val onNotificationDialogDismiss = { showNotificationDialog.value = false }
-    val onNotificationConfirmed = {
-        showNotificationDialog.value = false
-        onAction(FightDetailUiAction.OnNotificationClicked)
-    }
-
-    OnResumeEffect { onAction(FightDetailUiAction.OnResume) }
 
     SnackbarEffect(
         message = errorMessage,
@@ -225,7 +194,7 @@ fun FightDetailScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { showNotificationDialog.value = true }) {
+                        IconButton(onClick = { onAction(FightDetailUiAction.OnNotificationIconClicked) }) {
                             Icon(
                                 imageVector = if (state.isNotificationEnabled) Icons.Filled.Notifications else Icons.Outlined.Notifications,
                                 contentDescription = null,
@@ -301,7 +270,7 @@ fun FightDetailScreen(
                             EventLinkRow(
                                 eventName = displayTitle,
                                 isBackNavigation = fromEventDetail,
-                                onClick = onEventLinkClick,
+                                onClick = onEventLinkClick
                             )
                         }
                     }
@@ -326,19 +295,109 @@ fun FightDetailScreen(
         }
     }
 
-    if (showNotificationDialog.value) {
+    if (state.showNotificationDialog) {
+        if (!state.isNotificationEnabled && !isIos) {
+            AppAlertDialog(
+                onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
+                onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
+                title = strings.notificationTypeTitle,
+                confirmText = strings.dialogAccept,
+                dismissText = strings.dialogCancel,
+                isConfirmLoading = state.isSubmittingNotification,
+                content = {
+                    Column(modifier = Modifier.selectableGroup()) {
+                        Text(
+                            text = strings.notificationTypeMessage,
+                            color = colors.textSecondary,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        val options = listOf(
+                            false to strings.notificationTypeRegular,
+                            true to strings.notificationTypeAlarm
+                        )
+                        options.forEach { (isAlarm, label) ->
+                            val selected = (selectedNotificationIsAlarm.value == isAlarm)
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .background(
+                                        color = if (selected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (selected) colors.winnerFrame else Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .selectable(
+                                        selected = selected,
+                                        onClick = { selectedNotificationIsAlarm.value = isAlarm },
+                                        role = Role.RadioButton
+                                    )
+                                    .padding(horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = selected,
+                                    onClick = null,
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = colors.winnerFrame,
+                                        unselectedColor = colors.textSecondary
+                                    )
+                                )
+                                Text(
+                                    text = label,
+                                    color = colors.textPrimary,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        } else {
+            AppAlertDialog(
+                onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
+                onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
+                title = if (state.isNotificationEnabled) {
+                    strings.fightReminderRemoveDialogTitle
+                } else {
+                    strings.fightReminderDialogTitle
+                },
+                text = if (!state.isNotificationEnabled) strings.fightReminderDialogMessage else null,
+                confirmText = strings.dialogAccept,
+                dismissText = strings.dialogCancel,
+                isConfirmLoading = state.isSubmittingNotification
+            )
+        }
+    }
+
+    if (state.showNotificationSettingsDialog) {
         AppAlertDialog(
-            onDismissRequest = onNotificationDialogDismiss,
-            onConfirmClick = onNotificationConfirmed,
-            text = if (state.isNotificationEnabled) strings.fightNotificationRemoveDialogMessage else strings.fightNotificationDialogMessage,
+            onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationSettingsDialog) },
+            onConfirmClick = { onAction(FightDetailUiAction.OnOpenNotificationSettingsClicked) },
+            title = strings.notificationPermissionSettingsTitle,
+            text = strings.notificationPermissionSettingsMessage,
             confirmText = strings.dialogAccept,
             dismissText = strings.dialogCancel
         )
     }
 
-    if (state.showPredictionConfirmDialog) {
+    if (state.showFullScreenIntentSettingsDialog) {
         AppAlertDialog(
-            onDismissRequest = onPredictionDialogDismiss,
+            onDismissRequest = { onAction(FightDetailUiAction.OnDismissFullScreenIntentSettingsDialog) },
+            onConfirmClick = { onAction(FightDetailUiAction.OnOpenFullScreenIntentSettingsClicked) },
+            title = strings.fullScreenIntentSettingsTitle,
+            text = strings.fullScreenIntentSettingsMessage,
+            confirmText = strings.dialogAccept,
+            dismissText = strings.dialogCancel
+        )
+    }
+
+    if (state.showPredictionDialog) {
+        AppAlertDialog(
+            onDismissRequest = { onAction(FightDetailUiAction.OnDismissPredictionDialog) },
             onConfirmClick = onPredictionConfirmed,
             title = strings.predictionConfirmTitle,
             confirmText = strings.dialogAccept,

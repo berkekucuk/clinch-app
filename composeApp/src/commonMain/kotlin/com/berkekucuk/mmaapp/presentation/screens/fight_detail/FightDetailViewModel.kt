@@ -38,7 +38,6 @@ class FightDetailViewModel(
     val state = _state.asStateFlow()
     private val _navigation = MutableSharedFlow<FightDetailNavigationEvent>()
     val navigation = _navigation.asSharedFlow()
-    private var isPendingNotificationRequest = false
     private var refreshJob: Job? = null
 
     init {
@@ -85,7 +84,6 @@ class FightDetailViewModel(
         }
     }
 
-
     fun onAction(action: FightDetailUiAction) {
         when (action) {
             is FightDetailUiAction.OnFighterClicked -> {
@@ -98,37 +96,48 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnBackClicked -> navigateTo(FightDetailNavigationEvent.Back)
             is FightDetailUiAction.OnRefresh -> onRefresh()
             is FightDetailUiAction.OnEventClicked -> navigateTo(FightDetailNavigationEvent.ToEventDetail(action.eventId))
-            is FightDetailUiAction.OnNotificationClicked -> onNotificationClicked()
             is FightDetailUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
-            is FightDetailUiAction.OnResume -> {
-                if (isPendingNotificationRequest) {
-                    viewModelScope.launch {
-                        if (notificationStorage.load()) {
-                            isPendingNotificationRequest = false
-                            onNotificationClicked()
-                        }
-                    }
-                }
-            }
-            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId, action.selectedRisk)
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
-            is FightDetailUiAction.OnOpenSettingsClicked -> {
+
+            // Notifications
+            is FightDetailUiAction.OnNotificationIconClicked -> {
+                _state.update { it.copy(showNotificationDialog = true) }
+            }
+            is FightDetailUiAction.OnSubmitNotificationClicked -> submitNotification(action.isAlarm)
+            is FightDetailUiAction.OnDismissNotificationDialog -> {
+                _state.update { it.copy(showNotificationDialog = false) }
+            }
+            is FightDetailUiAction.OnOpenNotificationSettingsClicked -> {
+                _state.update { it.copy(showNotificationSettingsDialog = false) }
                 notificationStorage.openNotificationSettings()
             }
-            is FightDetailUiAction.OnPredictClicked -> {
-                _state.update { it.copy(showPredictionConfirmDialog = true, pendingPredictionFighterId = action.predictedWinnerId) }
+            is FightDetailUiAction.OnDismissNotificationSettingsDialog -> {
+                _state.update { it.copy(showNotificationSettingsDialog = false) }
             }
+            is FightDetailUiAction.OnOpenFullScreenIntentSettingsClicked -> {
+                _state.update { it.copy(showFullScreenIntentSettingsDialog = false) }
+                notificationStorage.openFullScreenIntentSettings()
+            }
+            is FightDetailUiAction.OnDismissFullScreenIntentSettingsDialog -> {
+                _state.update { it.copy(showFullScreenIntentSettingsDialog = false) }
+            }
+
+            // Predictions
+            is FightDetailUiAction.OnPredictClicked -> {
+                _state.update { it.copy(showPredictionDialog = true, pendingPredictionFighterId = action.predictedWinnerId) }
+            }
+            is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId, action.selectedRisk)
             is FightDetailUiAction.OnDismissPredictionDialog -> {
-                _state.update { it.copy(showPredictionConfirmDialog = false, pendingPredictionFighterId = null) }
+                _state.update { it.copy(showPredictionDialog = false, pendingPredictionFighterId = null) }
             }
         }
     }
 
-    private fun onNotificationClicked() {
+    private fun submitNotification(isAlarm: Boolean) {
         viewModelScope.launch {
             val userId = authRepository.getAuthenticatedUserId()
             if (userId == null) {
-                _state.update { it.copy(error = AppError.UNAUTHENTICATED) }
+                _state.update { it.copy(error = AppError.UNAUTHENTICATED, showNotificationDialog = false) }
                 return@launch
             }
 
@@ -139,7 +148,7 @@ class FightDetailViewModel(
             if (isNotificationEnabled) {
                 removeNotification(fight.fightId, userId)
             } else {
-                enableNotificationWithPermissionCheck(fight.fightId, userId)
+                submitNotificationWithPermissionCheck(fight.fightId, userId, isAlarm)
             }
         }
     }
@@ -150,35 +159,49 @@ class FightDetailViewModel(
 
     private fun canToggleNotification(fight: Fight, isNotificationEnabled: Boolean): Boolean {
         if (isFightCompleted(fight) && !isNotificationEnabled) {
-            _state.update { it.copy(error = AppError.FIGHT_OVER) }
+            _state.update { it.copy(error = AppError.FIGHT_OVER, showNotificationDialog = false) }
             return false
         }
         return true
     }
 
     private suspend fun removeNotification(fightId: String, userId: String) {
+        _state.update { it.copy(isSubmittingNotification = true, error = null) }
         notificationRepository.removeFightNotification(fightId, userId)
-            .onFailure { e ->
-                _state.update { it.copy(error = AppErrorMapper.map(e)) }
+            .onSuccess {
+                _state.update { it.copy(showNotificationDialog = false) }
             }
+            .onFailure { e ->
+                _state.update { it.copy(showNotificationDialog = false, error = AppErrorMapper.map(e)) }
+            }
+        _state.update { it.copy(isSubmittingNotification = false) }
     }
 
-    private suspend fun enableNotificationWithPermissionCheck(fightId: String, userId: String) {
+    private suspend fun submitNotificationWithPermissionCheck(fightId: String, userId: String, isAlarm: Boolean) {
         if (!notificationStorage.load()) {
             handleMissingPermission()
             return
         }
 
-        notificationRepository.addFightNotification(fightId, userId)
-            .onFailure { e ->
-            _state.update { it.copy(error = AppErrorMapper.map(e)) }
+        if (isAlarm && !notificationStorage.hasFullScreenIntentPermission()) {
+            _state.update { it.copy(showFullScreenIntentSettingsDialog = true) }
+            return
         }
+
+        _state.update { it.copy(isSubmittingNotification = true, error = null) }
+        notificationRepository.addFightNotification(fightId, userId, isAlarm)
+            .onSuccess {
+                _state.update { it.copy(showNotificationDialog = false) }
+            }
+            .onFailure { e ->
+                _state.update { it.copy(showNotificationDialog = false, error = AppErrorMapper.map(e)) }
+            }
+        _state.update { it.copy(isSubmittingNotification = false) }
     }
 
     private fun handleMissingPermission() {
-        isPendingNotificationRequest = true
         if (notificationStorage.hasRequestedPermission()) {
-            navigateTo(FightDetailNavigationEvent.ShowSettingsDialog)
+            _state.update { it.copy(showNotificationSettingsDialog = true) }
         } else {
             notificationStorage.setRequestedPermission(true)
             navigateTo(FightDetailNavigationEvent.RequestNotificationPermission)
@@ -192,7 +215,7 @@ class FightDetailViewModel(
                 _state.update { 
                     it.copy(
                         error = AppError.UNAUTHENTICATED,
-                        showPredictionConfirmDialog = false,
+                        showPredictionDialog = false,
                         pendingPredictionFighterId = null
                     ) 
                 }
@@ -204,7 +227,7 @@ class FightDetailViewModel(
                 _state.update { 
                     it.copy(
                         error = AppError.FIGHT_OVER,
-                        showPredictionConfirmDialog = false,
+                        showPredictionDialog = false,
                         pendingPredictionFighterId = null
                     ) 
                 }
@@ -215,7 +238,7 @@ class FightDetailViewModel(
                 _state.update { 
                     it.copy(
                         error = AppError.ODDS_NOT_PUBLISHED,
-                        showPredictionConfirmDialog = false,
+                        showPredictionDialog = false,
                         pendingPredictionFighterId = null
                     ) 
                 }
@@ -231,7 +254,7 @@ class FightDetailViewModel(
                     _state.update { 
                         it.copy(
                             isSubmittingPrediction = false,
-                            showPredictionConfirmDialog = false,
+                            showPredictionDialog = false,
                             pendingPredictionFighterId = null
                         ) 
                     }
@@ -240,7 +263,7 @@ class FightDetailViewModel(
                     _state.update { 
                         it.copy(
                             isSubmittingPrediction = false,
-                            showPredictionConfirmDialog = false,
+                            showPredictionDialog = false,
                             pendingPredictionFighterId = null,
                             error = AppErrorMapper.map(e)
                         ) 

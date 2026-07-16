@@ -7,4 +7,5 @@ import kotlinx.serialization.Serializable
 data class FightNotificationDto(
     @SerialName("user_id") val userId: String,
     @SerialName("fight_id") val fightId: String,
+    @SerialName("is_alarm") val isAlarm: Boolean? = false,
 )

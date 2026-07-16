@@ -6,29 +6,24 @@ import com.berkekucuk.mmaapp.domain.enums.ReportReason
 
 data class AppStrings(
     val language: AppLanguage,
-    // Home Screen
     val tabUpcoming: String,
     val tabCompleted: String,
     val toBeAnnounced: String,
     val tba: String,
     val liveEvent: String,
     val selectYear: String,
-    // Fighter Portrait / NameColumn
     val contentDescriptionFlag: String,
     val contentDescriptionInfo: String,
     val contentDescriptionWin: String,
     val contentDescriptionLoss: String,
-    // Event Detail Screen
     val eventDetailsFallback: String,
     val contentDescriptionBack: String,
     val tabMainCard: String,
     val tabPrelims: String,
     val emptyMainCardFights: String,
     val emptyPrelimFights: String,
-    // Fight Detail Screen Tabs
     val tabFightDetails: String,
     val tabFightComparison: String,
-    // Fight Detail Screen
     val fightDetailLabelName: String,
     val fightDetailLabelAge: String,
     val fightDetailLabelHometown: String,
@@ -41,14 +36,12 @@ data class AppStrings(
     val fightDetailLabelMethod: String,
     val fightDetailLabelRoundSummary: String,
     val heightCm: (String) -> String,
-    // Radar Chart
     val radarLabelHeight: String,
     val radarLabelReach: String,
     val radarLabelOdds: String,
     val radarLabelWinRate: String,
     val radarLabelKoTkoRate: String,
     val radarLabelSubRate: String,
-    // Rankings Screen
     val rankingsTitle: String,
     val tabMens: String,
     val tabWomens: String,
@@ -57,7 +50,6 @@ data class AppStrings(
     val contentDescriptionCollapse: String,
     val contentDescriptionExpand: String,
     val rankingsChampionRankLabel: String,
-    // Fighter Detail Screen
     val tabOverview: String,
     val tabFights: String,
     val fighterDetailLabelRecord: String,
@@ -78,7 +70,6 @@ data class AppStrings(
     val fighterDetailResultDraw: String,
     val fighterDetailResultNoContest: String,
     val fighterDetailResultPending: String,
-    // Profile Screen
     val profileEdit: String,
     val profileSignOut: String,
     val profileTabOverview: String,
@@ -89,7 +80,6 @@ data class AppStrings(
     val profileGoatFighters: String,
     val profileHatedFighters: String,
     val profileJoinedDate: (String) -> String,
-    // Profile Edit Screen
     val profileEditTitle: String,
     val profileEditPersonalInfo: String,
     val profileEditEmail: String,
@@ -104,24 +94,24 @@ data class AppStrings(
     val reportReasonDisplayName: (ReportReason) -> String,
     val blockUserTitle: String,
     val blockUserConfirm: String,
-    // Fighter Search Screen
     val fighterSearchPlaceholder: String,
     val fighterSearchEmpty: String,
     val userSearchPlaceholder: String,
     val userSearchEmpty: String,
-    // Common Errors
     val retry: String,
     val dialogAccept: String,
     val dialogCancel: String,
-    val fightNotificationDialogMessage: String,
-    val fightNotificationRemoveDialogMessage: String,
+    val fightReminderDialogTitle: String,
+    val fightReminderDialogMessage: String,
+    val fightReminderRemoveDialogTitle: String,
     val notificationPermissionSettingsTitle: String,
     val notificationPermissionSettingsMessage: String,
+    val fullScreenIntentSettingsTitle: String,
+    val fullScreenIntentSettingsMessage: String,
     val riskUnsure: String,
     val riskNormal: String,
     val riskConfident: String,
     val riskAllIn: String,
-    // Settings Screen
     val settingsTitle: String,
     val settingsSectionLanguage: String,
     val settingsSectionMeasurements: String,
@@ -135,7 +125,6 @@ data class AppStrings(
     val settingsSectionSupportSub: String,
     val unblockUser: String,
     val blockedUsersEmpty: String,
-    // Menu Screen
     val menuSignInPrompt: String,
     val menuTitle: String,
     val menuItemLeaderboard: String,
@@ -149,27 +138,21 @@ data class AppStrings(
     val menuSignInWithApple: String,
     val menuNotificationsEnabled: String,
     val menuNotificationsDisabled: String,
-    // Bottom Nav
     val navEvents: String,
     val navRankings: String,
     val navMenu: String,
-    // Enum display names
     val weightClassDisplayName: (String) -> String,
     val resultDisplayName: (String) -> String,
     val toUpperCase: (String) -> String,
-    // Fight Prediction
     val predictionQuestionTitle: String,
     val predictionConfirmTitle: String,
     val predictionConfirmMessage: (String) -> String,
-    // Leaderboard
     val leaderboardInfoTitle: String,
     val leaderboardInfoClose: String,
     val tabOverall: String,
     val tabWeekly: String,
-    // Notifications
     val notificationChannelName: String,
     val notificationChannelDescription: String,
-    // Common
     val commonRemove: String,
     val commonCancel: String,
     val profileRemoveFighterConfirm: (String) -> String,
@@ -177,11 +160,16 @@ data class AppStrings(
     val interactionLimitReachedText: String,
     val dialogOkay: String,
     val mapError: (AppError?) -> String?,
-    // App Update
     val updateForceTitle: String,
     val updateForceMessage: String,
     val updateFlexibleTitle: String,
     val updateFlexibleMessage: String,
     val updateButton: String,
     val updateLaterButton: String,
+    val alarmFightTime: String,
+    val alarmDismiss: String,
+    val notificationTypeTitle: String,
+    val notificationTypeMessage: String,
+    val notificationTypeRegular: String,
+    val notificationTypeAlarm: String,
 )

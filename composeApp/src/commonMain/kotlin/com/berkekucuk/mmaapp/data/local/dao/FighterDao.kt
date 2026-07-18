@@ -29,4 +29,18 @@ interface FighterDao {
 
     @Query("DELETE FROM fighter_fights WHERE fighter_id = :fighterId")
     suspend fun deleteFighterFightCrossRefs(fighterId: String)
+
+    @Query("DELETE FROM fighter_fights WHERE fighter_id = :fighterId AND fight_id NOT IN (:retainedFightIds)")
+    suspend fun deleteFighterFightCrossRefsExcept(fighterId: String, retainedFightIds: List<String>)
+
+    @Transaction
+    suspend fun replaceFighterFightCrossRefs(fighterId: String, crossRefs: List<FighterFightCrossRef>) {
+        val newFightIds = crossRefs.map { it.fightId }
+        if (newFightIds.isEmpty()) {
+            deleteFighterFightCrossRefs(fighterId)
+        } else {
+            deleteFighterFightCrossRefsExcept(fighterId, newFightIds)
+            upsertFighterFightCrossRefs(crossRefs)
+        }
+    }
 }

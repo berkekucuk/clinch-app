@@ -39,3 +39,21 @@ fun FightEntity.toDomain(): Fight {
         participants = participants.map { it.toDomain() }
     )
 }
+
+fun FightDto.toDomain(): Fight {
+    return Fight(
+        fightId = fightId,
+        eventId = eventId,
+        eventName = eventName,
+        eventDate = eventDate,
+        methodType = methodType ?: "",
+        methodDetail = methodDetail ?: "",
+        roundSummary = roundSummary ?: "",
+        boutType = boutType ?: "",
+        weightClassLbs = weightClassLbs,
+        weightClassId = weightClassId ?: "",
+        roundsFormat = roundsFormat ?: "",
+        fightOrder = fightOrder ?: 0,
+        participants = participants?.map { it.toDomain() } ?: emptyList()
+    )
+}

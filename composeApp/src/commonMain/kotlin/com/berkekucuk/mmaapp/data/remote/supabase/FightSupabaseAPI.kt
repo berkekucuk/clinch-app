@@ -12,15 +12,8 @@ class FightSupabaseAPI(
 
     override suspend fun fetchFight(fightId: String): FightDto {
         return client.postgrest.rpc(
-            function = "get_fight_v2",
+            function = "get_fight_v3",
             parameters = mapOf("p_fight_id" to fightId)
         ).decodeList<FightDto>().first()
-    }
-
-    override suspend fun fetchFightsByFighter(fighterId: String): List<FightDto> {
-        return client.postgrest.rpc(
-            function = "get_fight_v2",
-            parameters = mapOf("p_fighter_id" to fighterId)
-        ).decodeList<FightDto>()
     }
 }

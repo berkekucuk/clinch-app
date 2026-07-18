@@ -2,6 +2,7 @@ package com.berkekucuk.mmaapp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import com.berkekucuk.mmaapp.data.local.entity.FightEntity
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,22 @@ interface FightDao {
     @Upsert
     suspend fun upsertFights(fights: List<FightEntity>)
 
-    @Query("DELETE FROM fights WHERE event_id IN (:eventIds)")
-    suspend fun deleteFightsByEventIds(eventIds: List<String>)
+    @Query("DELETE FROM fights WHERE event_id = :eventId")
+    suspend fun deleteFights(eventId: String)
+
+    @Query("DELETE FROM fights WHERE event_id = :eventId AND fight_id NOT IN (:retainedIds)")
+    suspend fun deleteFightsExcept(eventId: String, retainedIds: List<String>)
+
+    @Transaction
+    suspend fun replaceFights(eventsMap: Map<String, List<FightEntity>>) {
+        eventsMap.forEach { (eventId, fights) ->
+            val newIds = fights.map { it.fightId }
+            if (newIds.isEmpty()) {
+                deleteFights(eventId)
+            } else {
+                deleteFightsExcept(eventId, newIds)
+                upsertFights(fights)
+            }
+        }
+    }
 }

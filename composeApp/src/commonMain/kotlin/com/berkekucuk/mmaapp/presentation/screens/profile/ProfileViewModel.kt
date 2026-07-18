@@ -92,29 +92,36 @@ class ProfileViewModel(
 
             val page = currentPageFlow.value
 
-            if (!onlyPredictions) {
+            if (onlyPredictions) {
+                syncPredictions(page)
+                    .onFailure { e -> _state.update { it.copy(error = AppErrorMapper.map(e)) } }
+            } else {
                 userRepository.syncUser(userId)
                     .onFailure { e ->
-                    _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
-                    return@launch
+                        _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
+                        return@launch
+                    }
+
+                val interactionDeferred = async { interactionRepository.syncInteractions(userId) }
+                val predictionDeferred = async { syncPredictions(page) }
+
+                val interactionResult = interactionDeferred.await()
+                val predictionResult = predictionDeferred.await()
+
+                val firstError = listOfNotNull(predictionResult, interactionResult)
+                    .firstNotNullOfOrNull { it.exceptionOrNull() }
+
+                if (firstError != null) {
+                    _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
                 }
-            }
-
-            val interactionDeferred = if (!onlyPredictions) async { interactionRepository.syncInteractions(userId) } else null
-            val predictionDeferred = async { predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20) }
-
-            val interactionResult = interactionDeferred?.await()
-            val predictionResult = predictionDeferred.await()
-
-            val firstError = listOfNotNull(predictionResult, interactionResult)
-                .firstNotNullOfOrNull { it.exceptionOrNull() }
-
-            if (firstError != null) {
-                _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
             }
 
             _state.update { it.copy(isRefreshing = false) }
         }
+    }
+
+    private suspend fun syncPredictions(page: Int): Result<Unit> {
+        return predictionRepository.syncPredictions(userId, limit = 20, offset = page * 20)
     }
 
     fun onAction(action: ProfileUiAction) {

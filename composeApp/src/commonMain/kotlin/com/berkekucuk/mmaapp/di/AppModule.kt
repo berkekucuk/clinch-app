@@ -237,7 +237,6 @@ val appModule = module {
     single<FighterRepository> {
         FighterRepositoryImpl(
             fighterRemoteDataSource = get(),
-            fightRemoteDataSource = get(),
             fighterDao = get(),
             fightDao = get(),
             rateLimiter = get()

@@ -13,21 +13,21 @@ class EventSupabaseAPI(
 
     override suspend fun fetchEventById(id: String): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v2",
+            function = "get_events_v3",
             parameters = mapOf("p_event_id" to id)
         ).decodeList<EventDto>()
     }
 
     override suspend fun fetchEventsByYear(year: Int): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v2",
+            function = "get_events_v3",
             parameters = mapOf("p_year" to year)
         ).decodeList<EventDto>()
     }
 
     override suspend fun fetchEventsAfter(date: Instant): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v2",
+            function = "get_events_v3",
             parameters = mapOf("p_date" to date.toString())
         ).decodeList<EventDto>()
     }

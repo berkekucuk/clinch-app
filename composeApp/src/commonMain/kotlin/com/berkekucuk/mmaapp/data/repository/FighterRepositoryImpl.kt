@@ -24,7 +24,6 @@ import com.berkekucuk.mmaapp.data.remote.dto.FighterDto
 
 class FighterRepositoryImpl(
     private val fighterRemoteDataSource: FighterRemoteDataSource,
-    private val fightRemoteDataSource: FightRemoteDataSource,
     private val fighterDao: FighterDao,
     private val fightDao: FightDao,
     private val rateLimiter: RateLimiter
@@ -47,7 +46,7 @@ class FighterRepositoryImpl(
                     return@runCatching
                 }
                 val remoteFighter = fighterRemoteDataSource.fetchFighter(fighterId)
-                val remoteFights = fightRemoteDataSource.fetchFightsByFighter(fighterId)
+                val remoteFights = remoteFighter.fights ?: emptyList()
                 saveFighterAndFights(remoteFighter, remoteFights)
             }.onFailure {
                 if (it is CancellationException) throw it
@@ -67,13 +66,10 @@ class FighterRepositoryImpl(
         }
         
         // 3. Update Junction table (Fighter <-> Fights)
-        fighterDao.deleteFighterFightCrossRefs(remoteFighter.fighterId)
         val crossRefs = fights.map { 
             FighterFightCrossRef(fighterId = remoteFighter.fighterId, fightId = it.fightId)
         }
-        if (crossRefs.isNotEmpty()) {
-            fighterDao.upsertFighterFightCrossRefs(crossRefs)
-        }
+        fighterDao.replaceFighterFightCrossRefs(remoteFighter.fighterId, crossRefs)
     }
 
     override suspend fun searchFighters(query: String): Result<List<Fighter>> {

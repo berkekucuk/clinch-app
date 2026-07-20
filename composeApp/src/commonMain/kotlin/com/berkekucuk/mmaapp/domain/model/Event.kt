@@ -15,22 +15,19 @@ data class Event(
     val eventYear: Int?,
     val fights: List<Fight>
 ) {
-    val mainFight: Fight?
-        get() = fights.firstOrNull { it.boutType.equals("Main Event", ignoreCase = true) }
+    val mainFight: Fight? = fights.firstOrNull { it.boutType.equals("Main Event", ignoreCase = true) }
             ?: fights.firstOrNull()
 
-    val mainCardFights: List<Fight>
-        get() = fights.filter {
+    val mainCardFights: List<Fight> = fights.filter {
             it.boutType.contains("Main Card", ignoreCase = true) ||
             it.boutType.contains("Main Event", ignoreCase = true) ||
             it.boutType.contains("Co-Main", ignoreCase = true) ||
-                    it.boutType.contains("Postlim", ignoreCase = true)
-        }.sortedByDescending { it.fightOrder }
+            it.boutType.contains("Postlim", ignoreCase = true)
+        }
 
-    val prelimFights: List<Fight>
-        get() = fights.filter {
+    val prelimFights: List<Fight> = fights.filter {
             it.boutType.contains("Prelim", ignoreCase = true)
-        }.sortedByDescending { it.fightOrder }
+        }
 }
 
 

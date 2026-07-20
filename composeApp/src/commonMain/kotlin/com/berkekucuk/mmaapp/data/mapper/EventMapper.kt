@@ -20,15 +20,14 @@ fun EventDto.toEntity(): EventEntity {
 
 fun EventWithFightsRelation.toDomain(): Event {
     return Event(
-        eventId = event.eventId,
-        name = event.name,
-        status = EventStatus.fromString(event.status),
-        datetimeUtc = event.datetimeUtc,
-        venue = event.venue,
-        location = event.location,
-        eventYear = event.eventYear,
-        fights = fights
-            .filter { !it.boutType.equals("cancelled", ignoreCase = true) }
+        eventId = this.event.eventId,
+        name = this.event.name,
+        status = EventStatus.fromString(this.event.status),
+        datetimeUtc = this.event.datetimeUtc,
+        venue = this.event.venue,
+        location = this.event.location,
+        eventYear = this.event.eventYear,
+        fights = this.fights
             .map { it.toDomain() }
             .sortedByDescending { it.fightOrder }
     )

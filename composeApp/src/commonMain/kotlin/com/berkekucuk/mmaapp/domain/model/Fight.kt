@@ -19,12 +19,9 @@ data class Fight(
     val fightOrder: Int,
     val participants: List<Participant>
 ) {
-    val redCorner: Participant?
-        get() = participants.find { it.isRedCorner }
+    val redCorner: Participant? = participants.find { it.isRedCorner }
 
-    val blueCorner: Participant?
-        get() = participants.find { !it.isRedCorner }
+    val blueCorner: Participant? = participants.find { !it.isRedCorner }
 
-    val isCancelledOrFizzled: Boolean
-        get() = boutType == "cancelled" || boutType == "fizzled"
+    val isCancelledOrFizzled: Boolean = boutType == "cancelled" || boutType == "fizzled"
 }

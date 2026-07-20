@@ -1,7 +1,9 @@
 package com.berkekucuk.mmaapp.domain.model
 
+import androidx.compose.runtime.Immutable
 import kotlin.time.Instant
 
+@Immutable
 data class Prediction(
     val predictionId: String,
     val fightId: String,
@@ -13,6 +15,5 @@ data class Prediction(
     val createdAt: Instant,
     val fight: Fight?
 ) {
-    val isCancelledOrFizzled: Boolean
-        get() = fight?.isCancelledOrFizzled == true
+    val isCancelledOrFizzled: Boolean = fight?.isCancelledOrFizzled == true
 }

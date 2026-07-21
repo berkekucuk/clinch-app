@@ -102,7 +102,8 @@ fun EventItem(
                     modifier = Modifier.padding(top = 2.dp)
                 ) {
                     Text(
-                        text = event.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek) ?: strings.tba,
+                        text = (event.datetimeUtcMain ?: event.datetimeUtc)
+                            ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek) ?: strings.tba,
                         color = colors.dateColor,
                         fontSize = 12.sp,
                         maxLines = 1,

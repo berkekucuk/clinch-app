@@ -11,6 +11,7 @@ data class EventEntity(
     val name: String? = null,
     val status: String? = null,
     @ColumnInfo(name = "datetime_utc") val datetimeUtc: Instant? = null,
+    @ColumnInfo(name = "datetime_utc_main") val datetimeUtcMain: Instant? = null,
     val venue: String? = null,
     val location: String? = null,
     @ColumnInfo(name = "event_year") val eventYear: Int? = null

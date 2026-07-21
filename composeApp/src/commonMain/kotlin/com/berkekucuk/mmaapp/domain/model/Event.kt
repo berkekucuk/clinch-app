@@ -10,6 +10,7 @@ data class Event(
     val name: String?,
     val status: EventStatus,
     val datetimeUtc: Instant?,
+    val datetimeUtcMain: Instant?,
     val venue: String?,
     val location: String?,
     val eventYear: Int?,
@@ -29,5 +30,4 @@ data class Event(
             it.boutType.contains("Prelim", ignoreCase = true)
         }
 }
-
 

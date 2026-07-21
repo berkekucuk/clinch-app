@@ -10,6 +10,7 @@ data class EventDto(
     val name: String? = null,
     val status: String? = null,
     @SerialName("datetime_utc") val datetimeUtc: Instant? = null,
+    @SerialName("datetime_utc_main") val datetimeUtcMain: Instant? = null,
     val venue: String? = null,
     val location: String? = null,
     @SerialName("event_year") val eventYear: Int? = null,

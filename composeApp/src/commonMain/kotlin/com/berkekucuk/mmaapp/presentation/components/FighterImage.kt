@@ -33,6 +33,7 @@ fun FighterImage(
     countryCode: String,
     result: String? = null,
     alignment: Alignment.Horizontal,
+    modifier: Modifier = Modifier,
     imageSize: Dp = 55.dp,
     flagWidth: Dp = 18.dp,
     flagHeight: Dp = 12.dp,
@@ -74,7 +75,7 @@ fun FighterImage(
         }
     }
 
-    Box {
+    Box(modifier = modifier) {
         AsyncImage(
             model = imageRequest,
             contentDescription = name,

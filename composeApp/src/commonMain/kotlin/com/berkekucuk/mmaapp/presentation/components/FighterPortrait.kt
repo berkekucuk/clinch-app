@@ -1,6 +1,5 @@
 package com.berkekucuk.mmaapp.presentation.components
 
-import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,9 +46,27 @@ fun FighterPortrait(
                 nameTrailingContent = nameTrailingContent,
             )
             Spacer(modifier = Modifier.width(6.dp))
-            FighterImage(imageUrl ?: "", name ?: "", countryCode ?: "", result, alignment, imageSize, flagWidth, flagHeight)
+            FighterImage(
+                imageUrl = imageUrl ?: "",
+                name = name ?: "",
+                countryCode = countryCode ?: "",
+                result = result,
+                alignment = alignment,
+                imageSize = imageSize,
+                flagWidth = flagWidth,
+                flagHeight = flagHeight
+            )
         } else {
-            FighterImage(imageUrl ?: "", name ?: "", countryCode ?: "", result, alignment, imageSize, flagWidth, flagHeight)
+            FighterImage(
+                imageUrl = imageUrl ?: "",
+                name = name ?: "",
+                countryCode = countryCode ?: "",
+                result = result,
+                alignment = alignment,
+                imageSize = imageSize,
+                flagWidth = flagWidth,
+                flagHeight = flagHeight
+            )
             Spacer(modifier = Modifier.width(6.dp))
             NameColumn(
                 name = name ?: "",

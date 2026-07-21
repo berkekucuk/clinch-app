@@ -3,6 +3,7 @@ package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -61,57 +62,64 @@ fun LeaderboardContainer(
                 }
             }
         } else {
-            item {
+            itemsIndexed(
+                items = leaderboard,
+                key = { _, user -> user.id }
+            ) { index, user ->
+                val isCurrentUser = user.id == currentUserId
+                val pageMultiplier = if (isOverall) currentPage else 0
+                val shape = when (index) {
+                    0 -> RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    leaderboard.lastIndex -> RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                    else -> RoundedCornerShape(0.dp)
+                }
+
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(shape)
                         .background(colors.fightItemBackground)
                 ) {
-                    leaderboard.forEachIndexed { index, user ->
-                        val isCurrentUser = user.id == currentUserId
-                        val pageMultiplier = if (isOverall) currentPage else 0
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .then(if (isCurrentUser) Modifier.background(colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
-                                .padding(horizontal = 12.dp)
-                        ) {
-                            RankedFighterRow(
-                                rankNumber = (pageMultiplier * LeaderboardViewModel.PAGE_SIZE) + index + 1,
-                                name = user.fullName ?: user.username ?: "Unknown",
-                                record = user.username?.let { "@$it" } ?: "",
-                                imageUrl = user.avatarUrl ?: "",
-                                countryCode = null,
-                                trailingContent = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(end = 4.dp)
-                                    ) {
-                                        Text(
-                                            text = user.points.toString(),
-                                            color = colors.winnerFrame,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp
-                                        )
-                                        Spacer(Modifier.width(4.dp))
-                                        Icon(
-                                            imageVector = Icons.Default.EmojiEvents,
-                                            contentDescription = null,
-                                            tint = colors.winnerFrame,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                },
-                                onFighterClicked = { onAction(LeaderboardUiAction.OnUserClicked(user.id)) }
-                            )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(if (isCurrentUser) Modifier.background(colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
+                            .padding(horizontal = 12.dp)
+                    ) {
+                        RankedFighterRow(
+                            rankNumber = (pageMultiplier * LeaderboardViewModel.PAGE_SIZE) + index + 1,
+                            name = user.fullName ?: user.username ?: "Unknown",
+                            record = user.username?.let { "@$it" } ?: "",
+                            imageUrl = user.avatarUrl ?: "",
+                            countryCode = null,
+                            trailingContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(end = 4.dp)
+                                ) {
+                                    Text(
+                                        text = user.points.toString(),
+                                        color = colors.winnerFrame,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.EmojiEvents,
+                                        contentDescription = null,
+                                        tint = colors.winnerFrame,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            },
+                            onFighterClicked = { onAction(LeaderboardUiAction.OnUserClicked(user.id)) }
+                        )
 
-                            if (index < leaderboard.lastIndex) {
-                                HorizontalDivider(
-                                    color = colors.dividerColor,
-                                    thickness = 0.8.dp,
-                                )
-                            }
+                        if (index < leaderboard.lastIndex) {
+                            HorizontalDivider(
+                                color = colors.dividerColor,
+                                thickness = 0.8.dp,
+                            )
                         }
                     }
                 }

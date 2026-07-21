@@ -182,8 +182,7 @@ fun LeaderboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(colors.pagerBackground),
-            beyondViewportPageCount = 1
+                .background(colors.pagerBackground)
         ) { page ->
             when (page) {
                 0 -> LeaderboardContainer(

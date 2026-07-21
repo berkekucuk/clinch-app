@@ -51,7 +51,7 @@ import kotlinx.coroutines.IO
         AppConfigEntity::class,
         WeeklyLeaderboardEntity::class
     ],
-    version = 33
+    version = 34
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -122,6 +122,12 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
     }
 }
 
+val MIGRATION_33_34 = object : Migration(33, 34) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL("ALTER TABLE `events` ADD COLUMN `datetime_utc_main` INTEGER")
+    }
+}
+
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
@@ -131,7 +137,14 @@ fun getRoomDatabase(
     builder: RoomDatabase.Builder<AppDatabase>
 ): AppDatabase {
     return builder
-        .addMigrations(MIGRATION_28_29, MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
+        .addMigrations(
+            MIGRATION_28_29,
+            MIGRATION_29_30,
+            MIGRATION_30_31,
+            MIGRATION_31_32,
+            MIGRATION_32_33,
+            MIGRATION_33_34
+        )
         .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)

@@ -12,6 +12,7 @@ fun EventDto.toEntity(): EventEntity {
         name = this.name,
         status = this.status,
         datetimeUtc = this.datetimeUtc,
+        datetimeUtcMain = this.datetimeUtcMain,
         venue = this.venue,
         location = this.location,
         eventYear = this.eventYear
@@ -24,6 +25,7 @@ fun EventWithFightsRelation.toDomain(): Event {
         name = this.event.name,
         status = EventStatus.fromString(this.event.status),
         datetimeUtc = this.event.datetimeUtc,
+        datetimeUtcMain = this.event.datetimeUtcMain,
         venue = this.event.venue,
         location = this.event.location,
         eventYear = this.event.eventYear,

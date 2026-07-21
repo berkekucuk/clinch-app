@@ -199,7 +199,8 @@ fun EventDetailScreen(
                         onFightClick = { fightId -> onAction(EventDetailUiAction.OnFightClicked(fightId)) },
                         emptyMessage = strings.emptyMainCardFights,
                         listState = mainCardListState,
-                        eventDate = state.event?.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
+                        eventDate = (state.event?.datetimeUtcMain ?: state.event?.datetimeUtc)
+                            ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
                         eventVenueAndLocation = listOfNotNull(state.event?.venue, state.event?.location).joinToString(", ").ifEmpty { null },
                         isLive = state.event?.status == EventStatus.LIVE,
                         extraBottomPadding = navBarBottomPadding,

@@ -62,6 +62,7 @@ object DeepLinkManager {
 @Composable
 fun App() {
     val rootNavController = rememberNavController()
+    val navigationThrottle = remember { NavigationThrottle() }
 
     val languageStorage: LanguageStorage = koinInject()
     val languageState = remember {
@@ -120,7 +121,7 @@ fun App() {
 
     LaunchedEffect(Unit) {
         DeepLinkManager.route.collect { route ->
-            rootNavController.navigate(route)
+            rootNavController.safeNavigate(navigationThrottle, route)
         }
     }
 
@@ -146,25 +147,25 @@ fun App() {
             ) {
                 MainScreenWrapper(
                     onNavigateToEventDetail = { eventId ->
-                        rootNavController.navigate(Route.EventDetail(eventId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.EventDetail(eventId))
                     },
                     onNavigateToRankingDetail = { weightClassId ->
-                        rootNavController.navigate(Route.RankingDetail(weightClassId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.RankingDetail(weightClassId))
                     },
                     onNavigateToProfile = { userId ->
-                        rootNavController.navigate(Route.Profile(userId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
                     },
                     onNavigateToProfileEdit = {
-                        rootNavController.navigate(Route.ProfileEdit)
+                        rootNavController.safeNavigate(navigationThrottle, Route.ProfileEdit)
                     },
                     onNavigateToFighterSearch = {
-                        rootNavController.navigate(Route.FighterSearch())
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterSearch())
                     },
                     onNavigateToSettings = {
-                        rootNavController.navigate(Route.Settings)
+                        rootNavController.safeNavigate(navigationThrottle, Route.Settings)
                     },
                     onNavigateToLeaderboard = {
-                        rootNavController.navigate(Route.Leaderboard)
+                        rootNavController.safeNavigate(navigationThrottle, Route.Leaderboard)
                     },
                 )
             }
@@ -177,14 +178,15 @@ fun App() {
             ) {
                 EventDetailScreenRoot(
                     onNavigateToFightDetail = { fightId ->
-                        rootNavController.navigate(
+                        rootNavController.safeNavigate(
+                            navigationThrottle,
                             Route.FightDetail(
                                 fightId = fightId,
                                 fromEventDetail = true
                             )
                         )
                     },
-                    onNavigateBack = { rootNavController.navigateUp() }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 
@@ -196,15 +198,15 @@ fun App() {
             ) {
                 FightDetailScreenRoot(
                     onNavigateToFighterDetail = { fighterId ->
-                        rootNavController.navigate(Route.FighterDetail(fighterId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterDetail(fighterId))
                     },
                     onNavigateToEventDetail = { eventId ->
-                        rootNavController.navigate(Route.EventDetail(eventId, fromFightDetail = true))
+                        rootNavController.safeNavigate(navigationThrottle, Route.EventDetail(eventId, fromFightDetail = true))
                     },
                     onNavigateToLeaderboard = {
-                        rootNavController.navigate(Route.Leaderboard)
+                        rootNavController.safeNavigate(navigationThrottle, Route.Leaderboard)
                     },
-                    onNavigateBack = { rootNavController.navigateUp() }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 
@@ -216,7 +218,8 @@ fun App() {
             ) {
                 FighterDetailScreenRoot(
                     onNavigateToFightDetail = { fightId, fighterId ->
-                        rootNavController.navigate(
+                        rootNavController.safeNavigate(
+                            navigationThrottle,
                             Route.FightDetail(
                                 fightId = fightId,
                                 fighterId = fighterId,
@@ -224,7 +227,7 @@ fun App() {
                             )
                         )
                     },
-                    onNavigateBack = { rootNavController.navigateUp() }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 
@@ -235,7 +238,7 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 ProfileEditScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 
@@ -246,12 +249,12 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 ProfileScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToInteractionList = { userId, type ->
-                        rootNavController.navigate(Route.InteractionList(userId, type))
+                        rootNavController.safeNavigate(navigationThrottle, Route.InteractionList(userId, type))
                     },
                     onNavigateToFightDetail = { fightId ->
-                        rootNavController.navigate(Route.FightDetail(fightId = fightId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FightDetail(fightId = fightId))
                     }
                 )
             }
@@ -263,12 +266,12 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 InteractionListScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToFighterDetail = { fighterId ->
-                        rootNavController.navigate(Route.FighterDetail(fighterId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterDetail(fighterId))
                     },
                     onNavigateToFighterSearch = { interactionType ->
-                        rootNavController.navigate(Route.FighterSearch(interactionType))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterSearch(interactionType))
                     }
                 )
             }
@@ -280,9 +283,9 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 RankingDetailScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToFighterDetail = { fighterId ->
-                        rootNavController.navigate(Route.FighterDetail(fighterId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterDetail(fighterId))
                     }
                 )
             }
@@ -295,9 +298,9 @@ fun App() {
             ) {
                 FighterSearchScreenRoot(
                     onNavigateToFighterDetail = { fighterId ->
-                        rootNavController.navigate(Route.FighterDetail(fighterId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.FighterDetail(fighterId))
                     },
-                    onNavigateBack = { rootNavController.navigateUp() }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 
@@ -308,7 +311,7 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 SettingsScreenRoot(
-                    onBackClick = { rootNavController.navigateUp() },
+                    onBackClick = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onLanguageChange = {
                         languageState.value = it
                         languageStorage.save(it.name)
@@ -326,7 +329,7 @@ fun App() {
                         themeStorage.save(it.name)
                     },
                     onBlockedUsersClick = {
-                        rootNavController.navigate(Route.BlockedUsers)
+                        rootNavController.safeNavigate(navigationThrottle, Route.BlockedUsers)
                     }
                 )
             }
@@ -338,12 +341,12 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 LeaderboardScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToProfile = { userId ->
-                        rootNavController.navigate(Route.Profile(userId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
                     },
                     onNavigateToUserSearch = {
-                        rootNavController.navigate(Route.UserSearch)
+                        rootNavController.safeNavigate(navigationThrottle, Route.UserSearch)
                     }
                 )
             }
@@ -355,9 +358,9 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 BlockedUsersScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToProfile = { userId ->
-                        rootNavController.navigate(Route.Profile(userId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
                     }
                 )
             }
@@ -369,9 +372,9 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 UserSearchScreenRoot(
-                    onNavigateBack = { rootNavController.navigateUp() },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
                     onNavigateToUserProfile = { userId ->
-                        rootNavController.navigate(Route.Profile(userId))
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
                     }
                 )
             }

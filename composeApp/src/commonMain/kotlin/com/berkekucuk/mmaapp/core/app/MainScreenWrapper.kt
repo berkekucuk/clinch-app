@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -38,6 +39,7 @@ fun MainScreenWrapper(
     val bottomNavController = rememberNavController()
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val navigationThrottle = remember { NavigationThrottle() }
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
 
@@ -66,7 +68,10 @@ fun MainScreenWrapper(
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                bottomNavController.navigate(item.route) {
+                                bottomNavController.safeNavigate(
+                                    throttle = navigationThrottle,
+                                    route = item.route
+                                ) {
                                     popUpTo(bottomNavController.graph.findStartDestination().id) {
                                         saveState = true
                                     }

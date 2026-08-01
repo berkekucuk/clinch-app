@@ -12,6 +12,8 @@ import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
 import com.berkekucuk.mmaapp.domain.model.Prediction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -26,6 +28,8 @@ class PredictionRepositoryImpl(
 
     override fun getPredictedWinnerId(fightId: String, userId: String): Flow<String?> {
         return predictionDao.getPredictedWinnerId(fightId, userId)
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.IO)
     }
 
     override fun getPredictions(userId: String, limit: Int, offset: Int): Flow<List<Prediction>> {
@@ -33,6 +37,8 @@ class PredictionRepositoryImpl(
             .map { entities ->
                 entities.map { it.toDomain() }
             }
+            .distinctUntilChanged()
+            .flowOn(Dispatchers.IO)
     }
 
     override suspend fun syncPredictions(userId: String, limit: Int, offset: Int): Result<Unit> {

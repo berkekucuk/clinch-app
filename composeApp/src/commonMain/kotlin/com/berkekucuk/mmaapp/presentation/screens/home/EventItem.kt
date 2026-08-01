@@ -55,11 +55,12 @@ fun EventItem(
     val infiniteTransition = rememberInfiniteTransition()
     val dotAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 0f,
+        targetValue = if (isLive) 0f else 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(700),
+            animation = tween(if (isLive) 700 else 1),
             repeatMode = RepeatMode.Reverse
-        )
+        ),
+        label = "liveDotAlpha"
     )
     val cardShape = RoundedCornerShape(12.dp)
 

@@ -1,0 +1,8 @@
+# Baseline Profile for MMAapp
+
+Lcom/berkekucuk/mmaapp/**;
+Lcom/berkekucuk/mmaapp/core/**;
+Lcom/berkekucuk/mmaapp/data/**;
+Lcom/berkekucuk/mmaapp/di/**;
+Lcom/berkekucuk/mmaapp/domain/**;
+Lcom/berkekucuk/mmaapp/presentation/**;

@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
@@ -131,6 +133,18 @@ fun FighterDetailScreen(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = strings.contentDescriptionBack,
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {onAction(FighterDetailUiAction.OnToggleFavorite)}
+                        ) {
+                            Icon(
+                                imageVector = if (state.isFavorite) Icons.Filled.Star
+                                else Icons.Outlined.StarBorder,
+                                contentDescription = "Favorite",
+                                tint = colors.textPrimary
                             )
                         }
                     },

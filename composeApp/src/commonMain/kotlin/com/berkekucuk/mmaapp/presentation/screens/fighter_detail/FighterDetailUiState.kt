@@ -8,4 +8,6 @@ data class FighterDetailUiState(
     val isRefreshing: Boolean = false,
     val fighter: Fighter? = null,
     val error: AppError? = null,
+    val isFavorite: Boolean = false,
+    val favoriteInteractionId: String? = null,
 )

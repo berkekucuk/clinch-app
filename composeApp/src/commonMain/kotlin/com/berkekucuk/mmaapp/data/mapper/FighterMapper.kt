@@ -21,9 +21,17 @@ fun FighterDto.toEntity(): FighterEntity {
         born = born,
         fightingOutOf = fightingOutOf,
         countryCode = countryCode,
-        winRate = winRate,
-        koTkoRate = koTkoRate,
-        submissionRate = submissionRate
+        winRate = winRate ?: 0f,
+        koTkoRate = koTkoRate ?: 0f,
+        submissionRate = submissionRate ?: 0f,
+        slpm = slpm ?: 0f,
+        strAcc = strAcc ?: 0f,
+        sapm = sapm ?: 0f,
+        strDef = strDef ?: 0f,
+        tdAvg = tdAvg ?: 0f,
+        tdAcc = tdAcc ?: 0f,
+        tdDef = tdDef ?: 0f,
+        subAvg = subAvg ?: 0f
     )
 }
 
@@ -44,12 +52,20 @@ fun FighterWithFightsRelation.toDomain(): Fighter {
         winRate = fighter.winRate ?: 0f,
         koTkoRate = fighter.koTkoRate ?: 0f,
         submissionRate = fighter.submissionRate ?: 0f,
+        slpm = fighter.slpm ?: 0f,
+        strAcc = fighter.strAcc ?: 0f,
+        sapm = fighter.sapm ?: 0f,
+        strDef = fighter.strDef ?: 0f,
+        tdAvg = fighter.tdAvg ?: 0f,
+        tdAcc = fighter.tdAcc ?: 0f,
+        tdDef = fighter.tdDef ?: 0f,
+        subAvg = fighter.subAvg ?: 0f,
         fights = fights.map { it.toDomain() }
             .sortedByDescending { it.eventDate },
     )
 }
 
-fun FighterEntity.toDomain(): Fighter{
+fun FighterEntity.toDomain(): Fighter {
     return Fighter(
         fighterId = fighterId,
         name = name ?: "",
@@ -65,7 +81,15 @@ fun FighterEntity.toDomain(): Fighter{
         countryCode = countryCode ?: "",
         winRate = winRate ?: 0f,
         koTkoRate = koTkoRate ?: 0f,
-        submissionRate = submissionRate ?: 0f
+        submissionRate = submissionRate ?: 0f,
+        slpm = slpm ?: 0f,
+        strAcc = strAcc ?: 0f,
+        sapm = sapm ?: 0f,
+        strDef = strDef ?: 0f,
+        tdAvg = tdAvg ?: 0f,
+        tdAcc = tdAcc ?: 0f,
+        tdDef = tdDef ?: 0f,
+        subAvg = subAvg ?: 0f
     )
 }
 
@@ -85,7 +109,15 @@ fun Fighter.toEntity(): FighterEntity {
         countryCode = countryCode,
         winRate = winRate,
         koTkoRate = koTkoRate,
-        submissionRate = submissionRate
+        submissionRate = submissionRate,
+        slpm = slpm,
+        strAcc = strAcc,
+        sapm = sapm,
+        strDef = strDef,
+        tdAvg = tdAvg,
+        tdAcc = tdAcc,
+        tdDef = tdDef,
+        subAvg = subAvg
     )
 }
 
@@ -106,6 +138,14 @@ fun FighterDto.toDomain(): Fighter {
         winRate = winRate ?: 0f,
         koTkoRate = koTkoRate ?: 0f,
         submissionRate = submissionRate ?: 0f,
+        slpm = slpm ?: 0f,
+        strAcc = strAcc ?: 0f,
+        sapm = sapm ?: 0f,
+        strDef = strDef ?: 0f,
+        tdAvg = tdAvg ?: 0f,
+        tdAcc = tdAcc ?: 0f,
+        tdDef = tdDef ?: 0f,
+        subAvg = subAvg ?: 0f,
         fights = fights?.map { it.toDomain() } ?: emptyList()
     )
 }

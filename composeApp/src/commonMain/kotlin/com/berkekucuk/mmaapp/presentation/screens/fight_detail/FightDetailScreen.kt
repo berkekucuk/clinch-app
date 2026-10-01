@@ -18,11 +18,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.semantics.Role
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
@@ -30,10 +25,13 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -43,23 +41,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
-import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
-import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.core.utils.isIos
+import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import com.berkekucuk.mmaapp.presentation.components.AppTabRow
+import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
-import org.koin.compose.viewmodel.koinViewModel
+import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
 import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun FightDetailScreenRoot(
@@ -125,7 +125,7 @@ fun FightDetailScreen(
     val eventId = state.fight?.eventId
     val displayTitle = state.fight?.eventName
     val fight = state.fight
-    val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || fight.roundSummary.isNotBlank() || fight.weightClassLbs != null)
+    val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || !fight.roundSummary.isNullOrBlank() || fight.weightClassLbs != null || !fight.referee.isNullOrBlank())
     val tabs = listOf(strings.tabFightDetails, strings.tabFightComparison)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedRisk = remember { mutableStateOf(50) }
@@ -244,7 +244,7 @@ fun FightDetailScreen(
                     verticalSpacing = 8.dp,
                     extraBottomPadding = navBarBottomPadding,
                 ) {
-                    if (state.showPredictionBoard){
+                    if (state.showPredictionBoard) {
                         item(contentType = "PredictionBoard") {
                             PredictionBoard(
                                 state = state,
@@ -263,6 +263,20 @@ fun FightDetailScreen(
                     if (hasMetaInfo) {
                         item(contentType = "FightMetaCard") {
                             FightMetaCard(fight = fight)
+                        }
+                    }
+                    if (fight != null) {
+                        if (fight.stats.isNotEmpty()) {
+                            item(contentType = "FightMatchStats") {
+                                FightMatchStatsCard(fight = fight)
+                            }
+                        } else {
+                            item(contentType = "FighterCareerStats") {
+                                FighterCareerStatsSection(
+                                    redFighter = fight.redCorner?.fighter,
+                                    blueFighter = fight.blueCorner?.fighter,
+                                )
+                            }
                         }
                     }
                     if (!eventId.isNullOrBlank() && displayTitle != null) {

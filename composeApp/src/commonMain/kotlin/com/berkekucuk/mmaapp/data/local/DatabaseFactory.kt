@@ -16,6 +16,7 @@ import com.berkekucuk.mmaapp.data.local.dao.RankingDao
 import com.berkekucuk.mmaapp.data.local.dao.NotificationDao
 import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
+import com.berkekucuk.mmaapp.data.local.dao.FightStatDao
 import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
 import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
 import com.berkekucuk.mmaapp.data.local.dao.WeeklyLeaderboardDao
@@ -28,6 +29,7 @@ import com.berkekucuk.mmaapp.data.local.entity.SyncedYearEntity
 import com.berkekucuk.mmaapp.data.local.entity.WeightClassEntity
 import com.berkekucuk.mmaapp.data.local.entity.FighterFightCrossRef
 import com.berkekucuk.mmaapp.data.local.entity.FightEntity
+import com.berkekucuk.mmaapp.data.local.entity.FightStatEntity
 import com.berkekucuk.mmaapp.data.local.entity.InteractionEntity
 import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
 import com.berkekucuk.mmaapp.data.local.entity.AppConfigEntity
@@ -45,13 +47,14 @@ import kotlinx.coroutines.IO
         PredictionEntity::class,
         FightNotificationEntity::class,
         FightEntity::class,
+        FightStatEntity::class,
         FighterFightCrossRef::class,
         InteractionEntity::class,
         BlockedUserEntity::class,
         AppConfigEntity::class,
         WeeklyLeaderboardEntity::class
     ],
-    version = 34
+    version = 35
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -63,6 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun notificationDao(): NotificationDao
     abstract fun predictionDao(): PredictionDao
     abstract fun fightDao(): FightDao
+    abstract fun fightStatDao(): FightStatDao
     abstract fun interactionDao(): InteractionDao
     abstract fun appConfigDao(): AppConfigDao
     abstract fun weeklyLeaderboardDao(): WeeklyLeaderboardDao
@@ -128,6 +132,54 @@ val MIGRATION_33_34 = object : Migration(33, 34) {
     }
 }
 
+val MIGRATION_34_35 = object : Migration(34, 35) {
+    override fun migrate(connection: SQLiteConnection) {
+        connection.execSQL("ALTER TABLE `fights` ADD COLUMN `title_type` TEXT")
+        connection.execSQL("ALTER TABLE `fights` ADD COLUMN `referee` TEXT")
+        connection.execSQL("ALTER TABLE `fights` ADD COLUMN `bonuses` TEXT")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `slpm` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `str_acc` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `sapm` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `str_def` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `td_avg` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `td_acc` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `td_def` REAL")
+        connection.execSQL("ALTER TABLE `fighters` ADD COLUMN `sub_avg` REAL")
+        connection.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `fight_stats` (
+                `fight_id` TEXT NOT NULL,
+                `fighter_id` TEXT NOT NULL,
+                `round` INTEGER NOT NULL,
+                `knockdowns` INTEGER,
+                `sig_strikes_landed` INTEGER,
+                `sig_strikes_attempted` INTEGER,
+                `total_strikes_landed` INTEGER,
+                `total_strikes_attempted` INTEGER,
+                `takedowns_landed` INTEGER,
+                `takedowns_attempted` INTEGER,
+                `submission_attempts` INTEGER,
+                `reversals` INTEGER,
+                `control_time_seconds` INTEGER,
+                `head_landed` INTEGER,
+                `head_attempted` INTEGER,
+                `body_landed` INTEGER,
+                `body_attempted` INTEGER,
+                `leg_landed` INTEGER,
+                `leg_attempted` INTEGER,
+                `distance_landed` INTEGER,
+                `distance_attempted` INTEGER,
+                `clinch_landed` INTEGER,
+                `clinch_attempted` INTEGER,
+                `ground_landed` INTEGER,
+                `ground_attempted` INTEGER,
+                PRIMARY KEY(`fight_id`, `fighter_id`, `round`)
+            )
+            """.trimIndent()
+        )
+    }
+}
+
 @Suppress("KotlinNoActualForExpect")
 expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
     override fun initialize(): AppDatabase
@@ -143,7 +195,8 @@ fun getRoomDatabase(
             MIGRATION_30_31,
             MIGRATION_31_32,
             MIGRATION_32_33,
-            MIGRATION_33_34
+            MIGRATION_33_34,
+            MIGRATION_34_35
         )
         .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())

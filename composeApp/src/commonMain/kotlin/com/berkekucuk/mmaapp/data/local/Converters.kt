@@ -69,4 +69,10 @@ class Converters {
 
     @TypeConverter
     fun toParticipantsList(value: String?): List<ParticipantDto> = decodeList(value)
+
+    @TypeConverter
+    fun fromStringList(value: List<String>?): String = encodeList(value)
+
+    @TypeConverter
+    fun toStringList(value: String?): List<String> = decodeList(value)
 }

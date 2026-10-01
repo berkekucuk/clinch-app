@@ -34,6 +34,14 @@ private fun createUnknownFighter(): Fighter {
         imageUrl = "",
         winRate = 0f,
         koTkoRate = 0f,
-        submissionRate = 0f
+        submissionRate = 0f,
+        slpm = 0f,
+        strAcc = 0f,
+        sapm = 0f,
+        strDef = 0f,
+        tdAvg = 0f,
+        tdAcc = 0f,
+        tdDef = 0f,
+        subAvg = 0f
     )
 }

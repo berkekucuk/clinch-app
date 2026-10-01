@@ -22,5 +22,13 @@ data class FighterEntity(
     @ColumnInfo(name = "country_code") val countryCode: String? = null,
     @ColumnInfo(name = "win_rate") val winRate: Float? = null,
     @ColumnInfo(name = "ko_tko_rate") val koTkoRate: Float? = null,
-    @ColumnInfo(name = "submission_rate") val submissionRate: Float? = null
+    @ColumnInfo(name = "submission_rate") val submissionRate: Float? = null,
+    @ColumnInfo(name = "slpm") val slpm: Float? = null,
+    @ColumnInfo(name = "str_acc") val strAcc: Float? = null,
+    @ColumnInfo(name = "sapm") val sapm: Float? = null,
+    @ColumnInfo(name = "str_def") val strDef: Float? = null,
+    @ColumnInfo(name = "td_avg") val tdAvg: Float? = null,
+    @ColumnInfo(name = "td_acc") val tdAcc: Float? = null,
+    @ColumnInfo(name = "td_def") val tdDef: Float? = null,
+    @ColumnInfo(name = "sub_avg") val subAvg: Float? = null
 )

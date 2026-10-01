@@ -19,5 +19,13 @@ data class Fighter(
     val winRate: Float,
     val koTkoRate: Float,
     val submissionRate: Float,
-    val fights: List<Fight> = emptyList(),
+    val slpm: Float,
+    val strAcc: Float,
+    val sapm: Float,
+    val strDef: Float,
+    val tdAvg: Float,
+    val tdAcc: Float,
+    val tdDef: Float,
+    val subAvg: Float,
+    val fights: List<Fight> = emptyList()
 )

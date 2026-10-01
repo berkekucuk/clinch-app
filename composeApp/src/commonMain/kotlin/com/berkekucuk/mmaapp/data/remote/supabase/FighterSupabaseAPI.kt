@@ -12,7 +12,7 @@ class FighterSupabaseAPI(
 
     override suspend fun fetchFighter(id: String): FighterDto {
         return client.postgrest.rpc(
-            function = "get_fighter_v3",
+            function = "get_fighter_v4",
             parameters = mapOf("p_fighter_id" to id)
         ).decodeList<FighterDto>().first()
     }

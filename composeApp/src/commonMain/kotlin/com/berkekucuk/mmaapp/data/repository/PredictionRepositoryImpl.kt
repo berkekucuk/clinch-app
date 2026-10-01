@@ -54,7 +54,7 @@ class PredictionRepositoryImpl(
                 if (remotePredictions.isNotEmpty()) {
                     val remoteFights = remotePredictions.mapNotNull { it.fight }
                     if (remoteFights.isNotEmpty()) {
-                        fightDao.upsertFights(remoteFights.map { it.toEntity() })
+                        fightDao.insertFightsIfNotExist(remoteFights.map { it.toEntity() })
                     }
                     predictionDao.upsertPredictions(remotePredictions.map { it.toEntity() })
                 }

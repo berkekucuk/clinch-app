@@ -38,9 +38,9 @@ fun FightItem(
 
     val methodText = remember(fight.methodType, fight.methodDetail) {
         buildString {
-            if (fight.methodType.isNotBlank()) {
+            if (!fight.methodType.isNullOrBlank()) {
                 append(fight.methodType)
-                if (fight.methodDetail.isNotBlank()) {
+                if (!fight.methodDetail.isNullOrBlank()) {
                     append(" - ${fight.methodDetail}")
                 }
             }

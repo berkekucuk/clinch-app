@@ -140,6 +140,10 @@ val appModule = module {
     }
 
     single {
+        get<AppDatabase>().fightStatDao()
+    }
+
+    single {
         get<AppDatabase>().interactionDao()
     }
 
@@ -211,6 +215,7 @@ val appModule = module {
     single<FightRepository> {
         FightRepositoryImpl(
             fightDao = get(),
+            fightStatDao = get(),
             remoteDataSource = get(),
             rateLimiter = get()
         )

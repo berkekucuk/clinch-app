@@ -44,6 +44,7 @@ class FightDetailViewModel(
         observeFight()
         observeFightNotificationStatus()
         observePredictionStatus()
+        syncFight()
     }
 
     private fun observeFight() {
@@ -94,7 +95,7 @@ class FightDetailViewModel(
                 }
             }
             is FightDetailUiAction.OnBackClicked -> navigateTo(FightDetailNavigationEvent.Back)
-            is FightDetailUiAction.OnRefresh -> onRefresh()
+            is FightDetailUiAction.OnRefresh -> syncFight(isRefreshing = true)
             is FightDetailUiAction.OnEventClicked -> navigateTo(FightDetailNavigationEvent.ToEventDetail(action.eventId))
             is FightDetailUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
@@ -154,7 +155,7 @@ class FightDetailViewModel(
     }
 
     private fun isFightCompleted(fight: Fight): Boolean {
-        return fight.methodType.isNotBlank() || fight.methodDetail.isNotBlank()
+        return !fight.methodType.isNullOrBlank() || !fight.methodDetail.isNullOrBlank()
     }
 
     private fun canToggleNotification(fight: Fight, isNotificationEnabled: Boolean): Boolean {
@@ -280,11 +281,11 @@ class FightDetailViewModel(
         return fight.participants.find { it.fighter.fighterId == predictedWinnerId }?.oddsValue ?: 0
     }
 
-    private fun onRefresh() {
+    private fun syncFight(isRefreshing: Boolean = false) {
         if (refreshJob?.isActive == true) return
 
         refreshJob = viewModelScope.launch {
-            _state.update { it.copy(isRefreshing = true, error = null) }
+            _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
             fightRepository.syncFight(fightId)
                 .onSuccess {

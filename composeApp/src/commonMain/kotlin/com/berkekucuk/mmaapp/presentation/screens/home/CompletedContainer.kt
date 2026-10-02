@@ -28,6 +28,13 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Event
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +51,7 @@ fun CompletedContainer(
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
     var showDropdownMenu by remember { mutableStateOf(false) }
+    val dropdownScrollState = rememberScrollState()
 
     ListContainer(
         isRefreshing = isRefreshing,
@@ -89,7 +97,14 @@ fun CompletedContainer(
                     ExposedDropdownMenu(
                         expanded = showDropdownMenu,
                         onDismissRequest = { showDropdownMenu = false },
-                        modifier = Modifier.heightIn(max = 300.dp),
+                        scrollState = dropdownScrollState,
+                        modifier = Modifier
+                            .heightIn(max = 300.dp)
+                            .simpleVerticalScrollbar(
+                                state = dropdownScrollState,
+                                color = colors.textSecondary.copy(alpha = 0.5f),
+                                trackColor = colors.dividerColor.copy(alpha = 0.3f),
+                            ),
                         containerColor = colors.dropdownMenuBackground
                     ) {
                         availableYears.forEach { year ->
@@ -125,3 +140,37 @@ fun CompletedContainer(
     }
 }
 
+private fun Modifier.simpleVerticalScrollbar(
+    state: ScrollState,
+    color: Color,
+    trackColor: Color = Color.Transparent,
+    width: androidx.compose.ui.unit.Dp = 3.dp,
+    padding: androidx.compose.ui.unit.Dp = 3.dp,
+): Modifier = drawWithContent {
+    drawContent()
+    if (state.maxValue > 0) {
+        val totalHeight = size.height
+        val contentHeight = totalHeight + state.maxValue
+        val scrollbarHeight = ((totalHeight / contentHeight) * totalHeight).coerceAtLeast(24.dp.toPx())
+        val scrollbarOffsetY = (state.value.toFloat() / state.maxValue) * (totalHeight - scrollbarHeight)
+
+        val paddingPx = padding.toPx()
+        val widthPx = width.toPx()
+
+        if (trackColor != Color.Transparent) {
+            drawRoundRect(
+                color = trackColor,
+                topLeft = Offset(size.width - widthPx - paddingPx, 0f),
+                size = Size(widthPx, totalHeight),
+                cornerRadius = CornerRadius(widthPx / 2, widthPx / 2)
+            )
+        }
+
+        drawRoundRect(
+            color = color,
+            topLeft = Offset(size.width - widthPx - paddingPx, scrollbarOffsetY),
+            size = Size(widthPx, scrollbarHeight),
+            cornerRadius = CornerRadius(widthPx / 2, widthPx / 2)
+        )
+    }
+}

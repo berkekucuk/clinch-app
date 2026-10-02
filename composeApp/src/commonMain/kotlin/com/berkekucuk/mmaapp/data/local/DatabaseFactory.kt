@@ -177,6 +177,7 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             )
             """.trimIndent()
         )
+        connection.execSQL("ALTER TABLE `weight_classes` ADD COLUMN `weight_limit` INTEGER")
     }
 }
 

@@ -9,6 +9,7 @@ fun WeightClassDto.toEntity(): WeightClassEntity {
     return WeightClassEntity(
         id = id,
         sortOrder = sortOrder ?: Int.MAX_VALUE,
+        weightLimit = weightLimit,
         rankings = rankings ?: emptyList()
     )
 }
@@ -17,6 +18,7 @@ fun WeightClassEntity.toDomain(): WeightClass {
     return WeightClass(
         id = id,
         sortOrder = sortOrder,
+        weightLimit = weightLimit,
         rankings = rankings
             .sortedBy { it.rankNumber }
             .map { RankedFighter(rankNumber = it.rankNumber, rankChange = it.rankChange, fighter = it.fighter?.toDomain()) }

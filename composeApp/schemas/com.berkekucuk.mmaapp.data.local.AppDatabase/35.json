@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 35,
-    "identityHash": "9a7dea16c1f056ade3673f4ce7e9fa77",
+    "identityHash": "8c8ef55d25fb3058975ee89d2abd7b3d",
     "entities": [
       {
         "tableName": "events",
@@ -59,7 +59,7 @@
       },
       {
         "tableName": "weight_classes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `sort_order` INTEGER NOT NULL, `rankings_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `sort_order` INTEGER NOT NULL, `weight_limit` INTEGER, `rankings_json` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -72,6 +72,11 @@
             "columnName": "sort_order",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "weightLimit",
+            "columnName": "weight_limit",
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "rankings",
@@ -825,7 +830,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a7dea16c1f056ade3673f4ce7e9fa77')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c8ef55d25fb3058975ee89d2abd7b3d')"
     ]
   }
 }

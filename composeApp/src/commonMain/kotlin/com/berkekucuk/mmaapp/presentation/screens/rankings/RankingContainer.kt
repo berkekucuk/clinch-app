@@ -31,6 +31,7 @@ fun RankingContainer(
             item(key = "header_${weightClass.id}") {
                 WeightClassCard(
                     weightClassName = displayName,
+                    weightLimit = weightClass.weightLimit,
                     champion = champion,
                     onWeightClassClicked = { onWeightClassClicked(weightClass.id) }
                 )

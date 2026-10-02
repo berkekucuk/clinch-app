@@ -45,6 +45,7 @@ data class AppColors(
     val radarBlueFill: Color,
     val statComparisonTrack: Color,
     val statComparisonMuted: Color,
+    val statSingleBar: Color,
     val championGold: Color,
     val cardShadowElevation: Dp,
 )

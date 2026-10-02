@@ -334,8 +334,8 @@ fun StatComparisonRow(
     modifier: Modifier = Modifier,
 ) {
     val colors = LocalAppColors.current
-    val trackColor = if (colors.isDark) Color(0xFF242428) else Color(0xFFE5E7EB)
-    val mutedBarColor = if (colors.isDark) Color(0xFF3F3F46) else Color(0xFFCBD5E1)
+    val trackColor = colors.statComparisonTrack
+    val mutedBarColor = colors.statComparisonMuted
 
     val (isLeftWinner, isRightWinner) = when {
         leftNum == null || rightNum == null -> Pair(false, false)

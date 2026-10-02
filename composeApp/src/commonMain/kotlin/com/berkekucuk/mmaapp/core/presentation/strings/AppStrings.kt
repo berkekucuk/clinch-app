@@ -211,4 +211,6 @@ data class AppStrings(
     val notificationTypeMessage: String,
     val notificationTypeRegular: String,
     val notificationTypeAlarm: String,
+    val titleFightUndisputed: (String) -> String,
+    val titleFightInterim: (String) -> String,
 )

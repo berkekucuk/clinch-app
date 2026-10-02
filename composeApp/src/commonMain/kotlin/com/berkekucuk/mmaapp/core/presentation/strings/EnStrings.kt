@@ -271,4 +271,6 @@ val EnStrings = AppStrings(
     notificationTypeMessage = "We'll send you a reminder right before the fight starts. Please select your notification type:\n\nNote: Please make sure your phone's media/alarm volume is turned up to hear the alarm.",
     notificationTypeRegular = "Notification",
     notificationTypeAlarm = "Alarm",
+    titleFightUndisputed = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Title Bout 🏆" else "Title Bout 🏆" },
+    titleFightInterim = { weightClass -> if (weightClass.isNotBlank()) "Interim $weightClass Title Bout 🏆" else "Interim Title Bout 🏆" },
 )

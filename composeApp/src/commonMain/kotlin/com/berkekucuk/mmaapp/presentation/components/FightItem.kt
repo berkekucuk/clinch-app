@@ -1,7 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
 import androidx.compose.foundation.background
-import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
@@ -51,8 +53,34 @@ fun FightItem(
     val colors = LocalAppColors.current
     val weightClassLabel = strings.weightClassDisplayName(fight.weightClassId)
 
-    val headerText = remember(methodText, weightClassLabel) {
-        methodText.ifEmpty { weightClassLabel }
+    val isTitleFight = !fight.titleType.isNullOrBlank()
+
+    val titleLabel = remember(fight.titleType, weightClassLabel) {
+        val titleType = fight.titleType?.trim()
+        if (titleType.isNullOrBlank()) null
+        else {
+            when (titleType.lowercase()) {
+                "undisputed" -> strings.titleFightUndisputed(weightClassLabel)
+                "interim" -> strings.titleFightInterim(weightClassLabel)
+                else -> if (weightClassLabel.isNotBlank()) "$weightClassLabel $titleType 🏆" else "$titleType 🏆"
+            }
+        }
+    }
+
+    val titleFightHeaderText = remember(titleLabel, methodText, colors.championGold, colors.textSecondary) {
+        if (titleLabel.isNullOrBlank()) null
+        else {
+            buildAnnotatedString {
+                withStyle(SpanStyle(color = colors.championGold, fontWeight = FontWeight.SemiBold)) {
+                    append(titleLabel)
+                }
+                if (methodText.isNotBlank()) {
+                    withStyle(SpanStyle(color = colors.textSecondary, fontWeight = FontWeight.Medium)) {
+                        append(" • $methodText")
+                    }
+                }
+            }
+        }
     }
 
     val redRecord = remember(redCorner) {
@@ -79,12 +107,22 @@ fun FightItem(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = headerText,
-                    color = colors.textSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                )
+                if (isTitleFight && titleFightHeaderText != null) {
+                    Text(
+                        text = titleFightHeaderText,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                    )
+                } else {
+                    val headerText = methodText.ifEmpty { weightClassLabel }
+                    Text(
+                        text = headerText,
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))

@@ -279,4 +279,6 @@ val TrStrings = AppStrings(
     notificationTypeMessage = "Dövüş başlamadan hemen önce size bir hatırlatma göndereceğiz. Lütfen uyarı türünü seçin:\n\nNot: Alarmı duyabilmeniz için lütfen cihazınızın medya/alarm ses seviyesinin açık olduğundan emin olun.",
     notificationTypeRegular = "Bildirim",
     notificationTypeAlarm = "Alarm",
+    titleFightUndisputed = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Kemer Maçı 🏆" else "Kemer Maçı 🏆" },
+    titleFightInterim = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Geçici Kemer Maçı 🏆" else "Geçici Kemer Maçı 🏆" },
 )

@@ -61,7 +61,9 @@ class EventRepositoryImpl(
         return withContext(Dispatchers.IO) {
             val currentYear = dateTimeProvider.currentYear
             if (needsInitialSync(currentYear)) {
-                syncEventsByYear(currentYear)
+                syncEventsByYear(currentYear).onSuccess {
+                    syncEventsByYear(currentYear + 1)
+                }
             } else {
                 syncPendingEvents()
             }

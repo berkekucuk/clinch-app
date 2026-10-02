@@ -51,7 +51,8 @@ fun FightItem(
 
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val weightClassLabel = strings.weightClassDisplayName(fight.weightClassId)
+    val isOpenWeight = fight.weightClassId.equals("OW", ignoreCase = true)
+    val weightClassLabel = if (isOpenWeight) "" else strings.weightClassDisplayName(fight.weightClassId)
 
     val isTitleFight = !fight.titleType.isNullOrBlank()
 

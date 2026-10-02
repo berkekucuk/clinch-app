@@ -203,6 +203,7 @@ val TrStrings = AppStrings(
             "LHW" -> "Hafif Ağır Siklet"
             "HW" -> "Ağır Siklet"
             "CW" -> "Ara Siklet"
+            "OW" -> "Açık Siklet"
             "MENS_P4P" -> "Erkekler Pound-for-Pound"
             "WOMENS_P4P" -> "Kadınlar Pound-for-Pound"
             else -> id

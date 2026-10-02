@@ -203,6 +203,7 @@ val EnStrings = AppStrings(
             "LHW" -> "Light Heavyweight"
             "HW" -> "Heavyweight"
             "CW" -> "Catchweight"
+            "OW" -> "Openweight"
             "MENS_P4P" -> "Men's Pound-for-Pound"
             "WOMENS_P4P" -> "Women's Pound-for-Pound"
             else -> id

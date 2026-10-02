@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 data class WeightClass(
     val id: String,
     val sortOrder: Int,
+    val weightLimit: Int? = null,
     val rankings: List<RankedFighter>
 ) {
     val isWomens: Boolean = id in setOf("womens_p4p", "SW", "W_FLW", "W_BW")

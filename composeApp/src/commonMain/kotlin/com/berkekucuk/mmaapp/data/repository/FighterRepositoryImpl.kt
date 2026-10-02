@@ -59,10 +59,10 @@ class FighterRepositoryImpl(
         // 1. Save fighter to local database
         fighterDao.upsertFighters(listOf(remoteFighter.toEntity()))
         
-        // 2. Save fights to centralized table
+        // 2. Save fights to centralized table (preserve existing rich fight data if already present)
         val fightEntities = fights.map { it.toEntity() }
         if (fightEntities.isNotEmpty()) {
-            fightDao.upsertFights(fightEntities)
+            fightDao.insertFightsIfNotExist(fightEntities)
         }
         
         // 3. Update Junction table (Fighter <-> Fights)

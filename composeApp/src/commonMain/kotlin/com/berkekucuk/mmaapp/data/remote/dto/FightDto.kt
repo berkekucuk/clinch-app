@@ -18,5 +18,9 @@ data class FightDto(
     @SerialName("weight_class_id") val weightClassId: String? = null,
     @SerialName("rounds_format") val roundsFormat: String? = null,
     @SerialName("fight_order") val fightOrder: Int? = null,
-    @SerialName("participants") val participants: List<ParticipantDto>? = null
+    @SerialName("title_type") val titleType: String? = null,
+    @SerialName("referee") val referee: String? = null,
+    @SerialName("bonuses") val bonuses: List<String>? = null,
+    @SerialName("participants") val participants: List<ParticipantDto>? = null,
+    @SerialName("stats") val stats: List<FightStatDto>? = null
 )

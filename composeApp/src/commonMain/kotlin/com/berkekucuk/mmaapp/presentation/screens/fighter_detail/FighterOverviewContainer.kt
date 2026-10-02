@@ -51,5 +51,23 @@ fun FighterOverviewContainer(
                 weightClassDisplay = weightClassDisplay,
             )
         }
+
+        if (fighter.hasFinishingStats) {
+            item(key = "finishing_stats_card") {
+                FighterFinishingStatsCard(fighter = fighter)
+            }
+        }
+
+        if (fighter.hasStrikingStats) {
+            item(key = "striking_stats_card") {
+                FighterStrikingStatsCard(fighter = fighter)
+            }
+        }
+
+        if (fighter.hasGrapplingStats) {
+            item(key = "grappling_stats_card") {
+                FighterGrapplingStatsCard(fighter = fighter)
+            }
+        }
     }
 }

@@ -144,8 +144,8 @@ fun FightHistoryRow(
     }
 }
 
-private fun abbreviateMethod(methodType: String): String? {
-    if (methodType.isBlank()) return null
+private fun abbreviateMethod(methodType: String?): String? {
+    if (methodType.isNullOrBlank()) return null
     return when {
         methodType.contains("decision", ignoreCase = true) -> "DEC"
         methodType.contains("tko", ignoreCase = true) || methodType.contains("ko", ignoreCase = true) -> "KO/TKO"

@@ -52,12 +52,15 @@ fun FighterRadarChart(
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
     val axisLabels = listOf(
-        strings.radarLabelHeight,
-        strings.radarLabelReach,
-        strings.radarLabelOdds,
-        strings.radarLabelWinRate,
-        strings.radarLabelKoTkoRate,
+        strings.radarLabelSlpm,
+        strings.radarLabelStrAcc,
+        strings.radarLabelStrDef,
+        strings.radarLabelTdAvg,
+        strings.radarLabelTdAcc,
+        strings.radarLabelTdDef,
         strings.radarLabelSubRate,
+        strings.radarLabelKoTkoRate,
+        strings.radarLabelWinRate,
     )
     val redData = remember(redCorner) {
         RadarData(
@@ -92,10 +95,10 @@ fun FighterRadarChart(
             Canvas(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
                 val centerX = size.width / 2f
                 val centerY = size.height / 2f
-                val radius = size.minDimension * 0.34f
+                val radius = size.minDimension * 0.33f
 
-                for (level in 1..3) {
-                    val r = radius * level / 3f
+                for (level in 1..4) {
+                    val r = radius * level / 4f
                     val gridPath = Path()
                     for (i in 0 until RADAR_AXIS_COUNT) {
                         val angle = (2 * PI / RADAR_AXIS_COUNT) * i - PI / 2

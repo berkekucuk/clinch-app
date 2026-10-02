@@ -33,7 +33,6 @@ interface FighterDao {
     @Query("DELETE FROM fighter_fights WHERE fighter_id = :fighterId AND fight_id NOT IN (:retainedFightIds)")
     suspend fun deleteFighterFightCrossRefsExcept(fighterId: String, retainedFightIds: List<String>)
 
-    @Transaction
     suspend fun replaceFighterFightCrossRefs(fighterId: String, crossRefs: List<FighterFightCrossRef>) {
         val newFightIds = crossRefs.map { it.fightId }
         if (newFightIds.isEmpty()) {

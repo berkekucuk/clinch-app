@@ -20,5 +20,13 @@ data class FighterDto(
     @SerialName("win_rate") val winRate: Float? = null,
     @SerialName("ko_tko_rate") val koTkoRate: Float? = null,
     @SerialName("submission_rate") val submissionRate: Float? = null,
+    val slpm: Float? = null,
+    @SerialName("str_acc") val strAcc: Float? = null,
+    val sapm: Float? = null,
+    @SerialName("str_def") val strDef: Float? = null,
+    @SerialName("td_avg") val tdAvg: Float? = null,
+    @SerialName("td_acc") val tdAcc: Float? = null,
+    @SerialName("td_def") val tdDef: Float? = null,
+    @SerialName("sub_avg") val subAvg: Float? = null,
     val fights: List<FightDto>? = null
 )

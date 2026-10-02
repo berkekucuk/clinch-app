@@ -46,5 +46,9 @@ val LightColors = AppColors(
     radarRedFill = Color(0x30E53935),
     radarBlue = Color(0xFF1E88E5),
     radarBlueFill = Color(0x301E88E5),
+    statComparisonTrack = Color(0xFFE5E7EB),
+    statComparisonMuted = Color(0xFFB8BFC8),
+    statSingleBar = Color(0xFF64748B),
+    championGold = Color(0xFFB8860B),
     cardShadowElevation = 6.dp,
 )

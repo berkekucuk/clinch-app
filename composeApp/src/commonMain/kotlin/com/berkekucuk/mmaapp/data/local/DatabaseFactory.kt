@@ -54,7 +54,7 @@ import kotlinx.coroutines.IO
         AppConfigEntity::class,
         WeeklyLeaderboardEntity::class
     ],
-    version = 35
+    version = 36
 )
 @TypeConverters(Converters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -177,7 +177,57 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             )
             """.trimIndent()
         )
+    }
+}
+
+val MIGRATION_35_36 = object : Migration(35, 36) {
+    override fun migrate(connection: SQLiteConnection) {
         connection.execSQL("ALTER TABLE `weight_classes` ADD COLUMN `weight_limit` INTEGER")
+
+        // Rebuild fights table so method_type, method_detail, round_summary match nullable schema in Room 36
+        connection.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `fights_new` (
+                `fight_id` TEXT NOT NULL,
+                `event_id` TEXT NOT NULL,
+                `event_name` TEXT,
+                `event_date` INTEGER,
+                `method_type` TEXT,
+                `method_detail` TEXT,
+                `round_summary` TEXT,
+                `bout_type` TEXT NOT NULL,
+                `weight_class_lbs` INTEGER,
+                `weight_class_id` TEXT NOT NULL,
+                `rounds_format` TEXT NOT NULL,
+                `fight_order` INTEGER NOT NULL,
+                `title_type` TEXT,
+                `referee` TEXT,
+                `bonuses` TEXT,
+                `participants` TEXT NOT NULL,
+                PRIMARY KEY(`fight_id`)
+            )
+            """.trimIndent()
+        )
+        connection.execSQL(
+            """
+            INSERT INTO `fights_new` (
+                `fight_id`, `event_id`, `event_name`, `event_date`,
+                `method_type`, `method_detail`, `round_summary`,
+                `bout_type`, `weight_class_lbs`, `weight_class_id`,
+                `rounds_format`, `fight_order`, `title_type`,
+                `referee`, `bonuses`, `participants`
+            )
+            SELECT 
+                `fight_id`, `event_id`, `event_name`, `event_date`,
+                `method_type`, `method_detail`, `round_summary`,
+                `bout_type`, `weight_class_lbs`, `weight_class_id`,
+                `rounds_format`, `fight_order`, `title_type`,
+                `referee`, `bonuses`, `participants`
+            FROM `fights`
+            """.trimIndent()
+        )
+        connection.execSQL("DROP TABLE `fights`")
+        connection.execSQL("ALTER TABLE `fights_new` RENAME TO `fights`")
     }
 }
 
@@ -197,7 +247,8 @@ fun getRoomDatabase(
             MIGRATION_31_32,
             MIGRATION_32_33,
             MIGRATION_33_34,
-            MIGRATION_34_35
+            MIGRATION_34_35,
+            MIGRATION_35_36
         )
         .fallbackToDestructiveMigration(true)
         .setDriver(BundledSQLiteDriver())

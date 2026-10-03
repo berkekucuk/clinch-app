@@ -13,6 +13,7 @@ fun WeeklyLeaderboardDto.toEntity(): WeeklyLeaderboardEntity {
         fullName = fullName,
         avatarUrl = avatarUrl,
         weeklyPoints = weeklyPoints,
+        leaderboardPoints = leaderboardPoints,
         createdAt = createdAt
     )
 }

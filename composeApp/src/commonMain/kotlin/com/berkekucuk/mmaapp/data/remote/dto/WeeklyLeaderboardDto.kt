@@ -12,5 +12,6 @@ data class WeeklyLeaderboardDto(
     @SerialName("full_name") val fullName: String? = null,
     @SerialName("avatar_url") val avatarUrl: String? = null,
     @SerialName("weekly_points") val weeklyPoints: Int,
+    @SerialName("leaderboard_points") val leaderboardPoints: Int = 0,
     @SerialName("created_at") val createdAt: Instant? = null
 )

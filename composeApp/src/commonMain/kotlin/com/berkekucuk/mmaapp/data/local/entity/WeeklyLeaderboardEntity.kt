@@ -12,5 +12,6 @@ data class WeeklyLeaderboardEntity(
     @ColumnInfo(name = "full_name") val fullName: String? = null,
     @ColumnInfo(name = "avatar_url") val avatarUrl: String? = null,
     @ColumnInfo(name = "weekly_points") val weeklyPoints: Int = 0,
+    @ColumnInfo(name = "leaderboard_points") val leaderboardPoints: Int = 0,
     @ColumnInfo(name = "created_at") val createdAt: Instant? = null
 )

@@ -7,6 +7,8 @@ data class FightDetailUiState(
     val isRefreshing: Boolean = false,
     val fight: Fight? = null,
     val error: AppError? = null,
+    val showSignInSheet: Boolean = false,
+    val showSignInSuccess: Boolean = false,
 
     // Notifications
     val isNotificationEnabled: Boolean = false,

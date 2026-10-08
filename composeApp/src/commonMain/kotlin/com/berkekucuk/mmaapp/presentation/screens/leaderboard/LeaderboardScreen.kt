@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import org.koin.compose.viewmodel.koinViewModel
@@ -100,7 +100,7 @@ fun LeaderboardScreen(
         }
     }
 
-    SnackbarEffect(
+    AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
@@ -118,7 +118,7 @@ fun LeaderboardScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )

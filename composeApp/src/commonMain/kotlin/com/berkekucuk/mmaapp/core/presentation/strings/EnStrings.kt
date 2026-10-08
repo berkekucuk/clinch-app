@@ -169,6 +169,7 @@ val EnStrings = AppStrings(
     menuProfileSettings = "Profile Settings",
     menuSignInWithGoogle = "Sign in with Google",
     menuSignInWithApple = "Sign in with Apple",
+    signInSuccess = "Signed in successfully",
     menuNotificationsDisabled = "You have disabled Notifications",
     menuNotificationsEnabled = "Enabled",
     navEvents = "Events",

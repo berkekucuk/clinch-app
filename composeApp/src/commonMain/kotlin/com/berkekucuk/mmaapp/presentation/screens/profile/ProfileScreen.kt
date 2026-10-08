@@ -63,8 +63,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -116,7 +116,7 @@ fun ProfileScreen(
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val errorMessage = strings.mapError(state.error)
 
-    SnackbarEffect(
+    AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
@@ -134,7 +134,7 @@ fun ProfileScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )

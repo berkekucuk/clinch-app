@@ -54,12 +54,15 @@ import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
 import com.berkekucuk.mmaapp.core.utils.isIos
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
+import com.berkekucuk.mmaapp.presentation.screens.menu.SignInBottomSheet
+import com.berkekucuk.mmaapp.presentation.screens.menu.rememberSocialAuthHandler
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun FightDetailScreenRoot(
@@ -97,10 +100,18 @@ fun FightDetailScreenRoot(
         }
     }
 
+    val authHandler = rememberSocialAuthHandler(
+        onSuccess = {
+            viewModel.onAction(FightDetailUiAction.OnSignInSuccess)
+        }
+    )
+
     FightDetailScreen(
         state = state,
         fromEventDetail = viewModel.fromEventDetail,
         onAction = viewModel::onAction,
+        onStartGoogleSignIn = authHandler.startGoogleSignIn,
+        onStartAppleSignIn = authHandler.startAppleSignIn,
     )
 }
 
@@ -110,6 +121,8 @@ fun FightDetailScreen(
     state: FightDetailUiState,
     fromEventDetail: Boolean,
     onAction: (FightDetailUiAction) -> Unit,
+    onStartGoogleSignIn: () -> Unit,
+    onStartAppleSignIn: () -> Unit,
 ) {
     // 1. Theme & Resources
     val strings = LocalAppStrings.current
@@ -156,11 +169,24 @@ fun FightDetailScreen(
         }
     }
 
-    SnackbarEffect(
-        message = errorMessage,
+    val isSnackbarSuccess = remember { mutableStateOf(false) }
+    val snackbarMessage = when {
+        state.error != null -> {
+            isSnackbarSuccess.value = false
+            errorMessage
+        }
+        state.showSignInSuccess -> {
+            isSnackbarSuccess.value = true
+            strings.signInSuccess
+        }
+        else -> null
+    }
+
+    AppSnackbarEffect(
+        message = snackbarMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = { onAction(FightDetailUiAction.OnErrorShown) },
+        onDismiss = { onAction(FightDetailUiAction.OnSnackbarDismissed) },
     )
 
     Scaffold(
@@ -174,8 +200,9 @@ fun FightDetailScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
+                        isSuccess = isSnackbarSuccess.value,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }
@@ -469,6 +496,23 @@ fun FightDetailScreen(
                         }
                     }
                 }
+            }
+        )
+    }
+
+    if (state.showSignInSheet) {
+        SignInBottomSheet(
+            onDismiss = { onAction(FightDetailUiAction.OnDismissSignInSheet) },
+            onStartGoogleSignIn = {
+                onAction(FightDetailUiAction.OnDismissSignInSheet)
+                coroutineScope.launch {
+                    kotlinx.coroutines.delay(300.milliseconds)
+                    onStartGoogleSignIn()
+                }
+            },
+            onStartAppleSignIn = {
+                onAction(FightDetailUiAction.OnDismissSignInSheet)
+                onStartAppleSignIn()
             }
         )
     }

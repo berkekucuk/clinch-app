@@ -97,9 +97,6 @@ class MenuViewModel(
             MenuUiAction.OnLeaderboardClicked -> {
                 navigateTo(MenuNavigationEvent.ToLeaderboard)
             }
-            is MenuUiAction.OnErrorOccurred -> {
-                _state.update { it.copy(error = action.error) }
-            }
             MenuUiAction.OnErrorShown -> {
                 _state.update { it.copy(error = null) }
             }

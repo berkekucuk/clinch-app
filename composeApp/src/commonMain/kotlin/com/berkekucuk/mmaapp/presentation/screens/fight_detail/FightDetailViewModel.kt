@@ -13,11 +13,14 @@ import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
+import com.berkekucuk.mmaapp.domain.model.AuthState
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,12 +42,46 @@ class FightDetailViewModel(
     private val _navigation = MutableSharedFlow<FightDetailNavigationEvent>()
     val navigation = _navigation.asSharedFlow()
     private var refreshJob: Job? = null
+    private var currentUserId: String? = null
 
     init {
+        observeAuthState()
         observeFight()
-        observeFightNotificationStatus()
-        observePredictionStatus()
         syncFight()
+    }
+
+    private fun observeAuthState() {
+        viewModelScope.launch {
+            authRepository.authState
+                .collectLatest { authState ->
+                    val userId = (authState as? AuthState.Authenticated)?.userId
+                    currentUserId = userId
+
+                    if (userId != null) {
+                        coroutineScope {
+                            launch {
+                                notificationRepository.getFightNotificationStatus(fightId, userId)
+                                    .collect { isEnabled ->
+                                        _state.update { it.copy(isNotificationEnabled = isEnabled) }
+                                    }
+                            }
+                            launch {
+                                predictionRepository.getPredictedWinnerId(fightId, userId)
+                                    .collect { predictedId ->
+                                        _state.update { it.copy(predictedWinnerId = predictedId) }
+                                    }
+                            }
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(
+                                isNotificationEnabled = false,
+                                predictedWinnerId = null
+                            )
+                        }
+                    }
+                }
+        }
     }
 
     private fun observeFight() {
@@ -61,27 +98,19 @@ class FightDetailViewModel(
         }
     }
 
-    private fun observeFightNotificationStatus() {
-        viewModelScope.launch {
-            val userId = authRepository.getAuthenticatedUserId()
-            if (userId != null) {
-                notificationRepository.getFightNotificationStatus(fightId, userId)
-                    .collect { isEnabled ->
-                        _state.update { it.copy(isNotificationEnabled = isEnabled) }
-                    }
-            }
-        }
-    }
+    private fun syncFight(isRefreshing: Boolean = false) {
+        if (refreshJob?.isActive == true) return
 
-    private fun observePredictionStatus() {
-        viewModelScope.launch {
-            val userId = authRepository.getAuthenticatedUserId()
-            if (userId != null) {
-                predictionRepository.getPredictedWinnerId(fightId, userId)
-                    .collect { predictedId ->
-                        _state.update { it.copy(predictedWinnerId = predictedId) }
-                    }
-            }
+        refreshJob = viewModelScope.launch {
+            _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
+
+            fightRepository.syncFight(fightId)
+                .onSuccess {
+                    _state.update { it.copy(isRefreshing = false) }
+                }
+                .onFailure { e ->
+                    _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
+                }
         }
     }
 
@@ -102,7 +131,11 @@ class FightDetailViewModel(
 
             // Notifications
             is FightDetailUiAction.OnNotificationIconClicked -> {
-                _state.update { it.copy(showNotificationDialog = true) }
+                if (currentUserId == null) {
+                    _state.update { it.copy(showSignInSheet = true) }
+                } else {
+                    _state.update { it.copy(showNotificationDialog = true) }
+                }
             }
             is FightDetailUiAction.OnSubmitNotificationClicked -> submitNotification(action.isAlarm)
             is FightDetailUiAction.OnDismissNotificationDialog -> {
@@ -125,27 +158,37 @@ class FightDetailViewModel(
 
             // Predictions
             is FightDetailUiAction.OnPredictClicked -> {
-                _state.update { it.copy(showPredictionDialog = true, pendingPredictionFighterId = action.predictedWinnerId) }
+                if (currentUserId == null) {
+                    _state.update { it.copy(showSignInSheet = true) }
+                } else {
+                    _state.update {
+                        it.copy(
+                            showPredictionDialog = true,
+                            pendingPredictionFighterId = action.predictedWinnerId
+                        )
+                    }
+                }
             }
             is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId, action.selectedRisk)
             is FightDetailUiAction.OnDismissPredictionDialog -> {
                 _state.update { it.copy(showPredictionDialog = false, pendingPredictionFighterId = null) }
             }
+
+            // Auth
+            is FightDetailUiAction.OnDismissSignInSheet -> {
+                _state.update { it.copy(showSignInSheet = false) }
+            }
         }
     }
 
     private fun submitNotification(isAlarm: Boolean) {
+        val userId = currentUserId ?: return
+
+        val fight = _state.value.fight ?: return
+        val isNotificationEnabled = _state.value.isNotificationEnabled
+        if (!canToggleNotification(fight, isNotificationEnabled)) return
+
         viewModelScope.launch {
-            val userId = authRepository.getAuthenticatedUserId()
-            if (userId == null) {
-                _state.update { it.copy(error = AppError.UNAUTHENTICATED, showNotificationDialog = false) }
-                return@launch
-            }
-
-            val fight = _state.value.fight ?: return@launch
-            val isNotificationEnabled = _state.value.isNotificationEnabled
-            if (!canToggleNotification(fight, isNotificationEnabled)) return@launch
-
             if (isNotificationEnabled) {
                 removeNotification(fight.fightId, userId)
             } else {
@@ -168,6 +211,7 @@ class FightDetailViewModel(
 
     private suspend fun removeNotification(fightId: String, userId: String) {
         _state.update { it.copy(isSubmittingNotification = true, error = null) }
+
         notificationRepository.removeFightNotification(fightId, userId)
             .onSuccess {
                 _state.update { it.copy(showNotificationDialog = false) }
@@ -190,6 +234,7 @@ class FightDetailViewModel(
         }
 
         _state.update { it.copy(isSubmittingNotification = true, error = null) }
+
         notificationRepository.addFightNotification(fightId, userId, isAlarm)
             .onSuccess {
                 _state.update { it.copy(showNotificationDialog = false) }
@@ -210,44 +255,34 @@ class FightDetailViewModel(
     }
 
     private fun submitPrediction(predictedWinnerId: String, selectedRisk: Int) {
+        val userId = currentUserId ?: return
+        val fight = _state.value.fight ?: return
+
+        if (isFightCompleted(fight)) {
+            _state.update { 
+                it.copy(
+                    error = AppError.FIGHT_OVER,
+                    showPredictionDialog = false,
+                    pendingPredictionFighterId = null
+                ) 
+            }
+            return
+        }
+
+        if (!areOddsPublished(fight)) {
+            _state.update { 
+                it.copy(
+                    error = AppError.ODDS_NOT_PUBLISHED,
+                    showPredictionDialog = false,
+                    pendingPredictionFighterId = null
+                ) 
+            }
+            return
+        }
+
+        val lockedOdds = getLockedOdds(fight, predictedWinnerId)
+
         viewModelScope.launch {
-            val userId = authRepository.getAuthenticatedUserId()
-            if (userId == null) {
-                _state.update { 
-                    it.copy(
-                        error = AppError.UNAUTHENTICATED,
-                        showPredictionDialog = false,
-                        pendingPredictionFighterId = null
-                    ) 
-                }
-                return@launch
-            }
-
-            val fight = _state.value.fight ?: return@launch
-            if (isFightCompleted(fight)) {
-                _state.update { 
-                    it.copy(
-                        error = AppError.FIGHT_OVER,
-                        showPredictionDialog = false,
-                        pendingPredictionFighterId = null
-                    ) 
-                }
-                return@launch
-            }
-
-            if(!areOddsPublished(fight)){
-                _state.update { 
-                    it.copy(
-                        error = AppError.ODDS_NOT_PUBLISHED,
-                        showPredictionDialog = false,
-                        pendingPredictionFighterId = null
-                    ) 
-                }
-                return@launch
-            }
-
-            val lockedOdds = getLockedOdds(fight, predictedWinnerId)
-
             _state.update { it.copy(isSubmittingPrediction = true, error = null) }
             
             predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds, selectedRisk)
@@ -279,22 +314,6 @@ class FightDetailViewModel(
 
     private fun getLockedOdds(fight: Fight, predictedWinnerId: String): Int {
         return fight.participants.find { it.fighter.fighterId == predictedWinnerId }?.oddsValue ?: 0
-    }
-
-    private fun syncFight(isRefreshing: Boolean = false) {
-        if (refreshJob?.isActive == true) return
-
-        refreshJob = viewModelScope.launch {
-            _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
-
-            fightRepository.syncFight(fightId)
-                .onSuccess {
-                    _state.update { it.copy(isRefreshing = false) }
-                }
-                .onFailure { e ->
-                    _state.update { it.copy(isRefreshing = false, error = AppErrorMapper.map(e)) }
-                }
-        }
     }
 
     private fun navigateTo(event: FightDetailNavigationEvent) {

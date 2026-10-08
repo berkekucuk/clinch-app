@@ -58,8 +58,11 @@ import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.screens.menu.SignInBottomSheet
+import com.berkekucuk.mmaapp.presentation.screens.menu.rememberSocialAuthHandler
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun FightDetailScreenRoot(
@@ -97,10 +100,14 @@ fun FightDetailScreenRoot(
         }
     }
 
+    val authHandler = rememberSocialAuthHandler()
+
     FightDetailScreen(
         state = state,
         fromEventDetail = viewModel.fromEventDetail,
         onAction = viewModel::onAction,
+        onStartGoogleSignIn = authHandler.startGoogleSignIn,
+        onStartAppleSignIn = authHandler.startAppleSignIn,
     )
 }
 
@@ -110,6 +117,8 @@ fun FightDetailScreen(
     state: FightDetailUiState,
     fromEventDetail: Boolean,
     onAction: (FightDetailUiAction) -> Unit,
+    onStartGoogleSignIn: () -> Unit,
+    onStartAppleSignIn: () -> Unit,
 ) {
     // 1. Theme & Resources
     val strings = LocalAppStrings.current
@@ -469,6 +478,23 @@ fun FightDetailScreen(
                         }
                     }
                 }
+            }
+        )
+    }
+
+    if (state.showSignInSheet) {
+        SignInBottomSheet(
+            onDismiss = { onAction(FightDetailUiAction.OnDismissSignInSheet) },
+            onStartGoogleSignIn = {
+                onAction(FightDetailUiAction.OnDismissSignInSheet)
+                coroutineScope.launch {
+                    kotlinx.coroutines.delay(300.milliseconds)
+                    onStartGoogleSignIn()
+                }
+            },
+            onStartAppleSignIn = {
+                onAction(FightDetailUiAction.OnDismissSignInSheet)
+                onStartAppleSignIn()
             }
         )
     }

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun SnackbarEffect(
+fun AppSnackbarEffect(
     message: String?,
     snackbarHostState: SnackbarHostState,
     duration: SnackbarDuration = SnackbarDuration.Indefinite,

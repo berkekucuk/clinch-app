@@ -41,9 +41,9 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.enums.EventStatus
 import com.berkekucuk.mmaapp.core.utils.toUserFriendlyDate
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import org.koin.compose.viewmodel.koinViewModel
@@ -102,7 +102,7 @@ fun EventDetailScreen(
         (state.event?.name ?: "").split(":", limit = 2).getOrNull(1)?.trim()
     }
 
-    SnackbarEffect(
+    AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
@@ -120,7 +120,7 @@ fun EventDetailScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )

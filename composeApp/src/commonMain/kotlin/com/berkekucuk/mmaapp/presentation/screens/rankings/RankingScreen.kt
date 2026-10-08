@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
 
@@ -79,7 +79,7 @@ fun RankingScreen(
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val errorMessage = strings.mapError(state.error)
 
-    SnackbarEffect(
+    AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
         actionLabel = strings.retry,
@@ -96,7 +96,7 @@ fun RankingScreen(
             SnackbarHost(
                 hostState = snackbarHostState,
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )

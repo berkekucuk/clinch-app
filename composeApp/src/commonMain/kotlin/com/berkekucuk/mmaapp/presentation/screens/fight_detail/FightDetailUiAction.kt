@@ -5,7 +5,7 @@ sealed interface FightDetailUiAction {
     data object OnBackClicked: FightDetailUiAction
     data object OnRefresh: FightDetailUiAction
     data class OnEventClicked(val eventId: String): FightDetailUiAction
-    data object OnErrorShown: FightDetailUiAction
+    data object OnSnackbarDismissed: FightDetailUiAction
     data object OnLeaderboardClicked: FightDetailUiAction
 
     // Notifications
@@ -24,4 +24,5 @@ sealed interface FightDetailUiAction {
 
     // Auth
     data object OnDismissSignInSheet: FightDetailUiAction
+    data object OnSignInSuccess: FightDetailUiAction
 }

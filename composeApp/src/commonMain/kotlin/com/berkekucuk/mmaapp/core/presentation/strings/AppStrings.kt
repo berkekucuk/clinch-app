@@ -175,6 +175,7 @@ data class AppStrings(
     val menuProfileSettings: String,
     val menuSignInWithGoogle: String,
     val menuSignInWithApple: String,
+    val signInSuccess: String,
     val menuNotificationsEnabled: String,
     val menuNotificationsDisabled: String,
     val navEvents: String,

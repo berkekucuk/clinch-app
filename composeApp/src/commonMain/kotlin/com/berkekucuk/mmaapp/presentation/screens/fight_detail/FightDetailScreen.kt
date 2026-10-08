@@ -54,10 +54,10 @@ import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
 import com.berkekucuk.mmaapp.core.utils.isIos
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
-import com.berkekucuk.mmaapp.presentation.components.ErrorSnackbar
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
-import com.berkekucuk.mmaapp.presentation.components.SnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.presentation.screens.menu.SignInBottomSheet
 import com.berkekucuk.mmaapp.presentation.screens.menu.rememberSocialAuthHandler
 import kotlinx.coroutines.launch
@@ -100,7 +100,11 @@ fun FightDetailScreenRoot(
         }
     }
 
-    val authHandler = rememberSocialAuthHandler()
+    val authHandler = rememberSocialAuthHandler(
+        onSuccess = {
+            viewModel.onAction(FightDetailUiAction.OnSignInSuccess)
+        }
+    )
 
     FightDetailScreen(
         state = state,
@@ -165,11 +169,24 @@ fun FightDetailScreen(
         }
     }
 
-    SnackbarEffect(
-        message = errorMessage,
+    val isSnackbarSuccess = remember { mutableStateOf(false) }
+    val snackbarMessage = when {
+        state.error != null -> {
+            isSnackbarSuccess.value = false
+            errorMessage
+        }
+        state.showSignInSuccess -> {
+            isSnackbarSuccess.value = true
+            strings.signInSuccess
+        }
+        else -> null
+    }
+
+    AppSnackbarEffect(
+        message = snackbarMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = { onAction(FightDetailUiAction.OnErrorShown) },
+        onDismiss = { onAction(FightDetailUiAction.OnSnackbarDismissed) },
     )
 
     Scaffold(
@@ -183,8 +200,9 @@ fun FightDetailScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
                 snackbar = { snackbarData ->
-                    ErrorSnackbar(
+                    AppSnackbar(
                         snackbarData = snackbarData,
+                        isSuccess = isSnackbarSuccess.value,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }

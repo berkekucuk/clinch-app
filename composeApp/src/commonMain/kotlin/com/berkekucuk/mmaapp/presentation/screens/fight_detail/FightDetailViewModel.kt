@@ -126,7 +126,9 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnBackClicked -> navigateTo(FightDetailNavigationEvent.Back)
             is FightDetailUiAction.OnRefresh -> syncFight(isRefreshing = true)
             is FightDetailUiAction.OnEventClicked -> navigateTo(FightDetailNavigationEvent.ToEventDetail(action.eventId))
-            is FightDetailUiAction.OnErrorShown -> _state.update { it.copy(error = null) }
+            is FightDetailUiAction.OnSnackbarDismissed -> {
+                _state.update { it.copy(error = null, showSignInSuccess = false) }
+            }
             is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
 
             // Notifications
@@ -178,6 +180,7 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnDismissSignInSheet -> {
                 _state.update { it.copy(showSignInSheet = false) }
             }
+            is FightDetailUiAction.OnSignInSuccess -> { _state.update { it.copy(showSignInSuccess = true) } }
         }
     }
 

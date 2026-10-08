@@ -11,6 +11,7 @@ import com.berkekucuk.mmaapp.core.utils.formatDateOfBirth
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
+import com.berkekucuk.mmaapp.presentation.screens.fight_detail.FighterRadarChart
 import kotlin.time.Clock
 
 @Composable
@@ -52,22 +53,22 @@ fun FighterOverviewContainer(
             )
         }
 
-        if (fighter.hasFinishingStats) {
-            item(key = "finishing_stats_card") {
-                FighterFinishingStatsCard(fighter = fighter)
-            }
-        }
-
-        if (fighter.hasStrikingStats) {
-            item(key = "striking_stats_card") {
-                FighterStrikingStatsCard(fighter = fighter)
-            }
-        }
-
-        if (fighter.hasGrapplingStats) {
-            item(key = "grappling_stats_card") {
-                FighterGrapplingStatsCard(fighter = fighter)
+        if (fighter.hasAnyStats) {
+            item(key = "radar_chart") {
+                FighterRadarChart(fighter = fighter)
             }
         }
     }
 }
+
+private val Fighter.hasFinishingStats: Boolean
+    get() = winRate > 0f || koTkoRate > 0f || submissionRate > 0f
+
+private val Fighter.hasStrikingStats: Boolean
+    get() = slpm > 0f || strAcc > 0f || sapm > 0f || strDef > 0f
+
+private val Fighter.hasGrapplingStats: Boolean
+    get() = tdAvg > 0f || tdAcc > 0f || tdDef > 0f || subAvg > 0f
+
+private val Fighter.hasAnyStats: Boolean
+    get() = hasFinishingStats || hasStrikingStats || hasGrapplingStats

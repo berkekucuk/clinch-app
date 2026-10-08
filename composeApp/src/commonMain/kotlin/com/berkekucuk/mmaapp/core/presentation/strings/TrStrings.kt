@@ -24,9 +24,6 @@ val TrStrings = AppStrings(
     emptyPrelimFights = "Mevcut değil",
     tabFightDetails = "Detaylar",
     tabFightComparison = "Karşılaştırma",
-    radarLabelHeight = "Boy",
-    radarLabelReach = "Kanat Açıklığı",
-    radarLabelOdds = "Oranlar",
     radarLabelWinRate = "Galibiyet %",
     radarLabelKoTkoRate = "KO/TKO %",
     radarLabelSubRate = "Pes Ettirme %",
@@ -36,16 +33,12 @@ val TrStrings = AppStrings(
     radarLabelTdAvg = "TD Ort.",
     radarLabelTdAcc = "TD İsb. %",
     radarLabelTdDef = "TD Sav. %",
-    fightDetailLabelName = "İsim",
     fightDetailLabelAge = "Maçtaki Yaş",
-    fightDetailLabelHometown = "Temsil Ediyor",
     fightDetailLabelHeight = "Boy",
     fightDetailLabelReach = "Kanat Açıklığı",
-    fightDetailLabelResult = "Sonuç",
     fightDetailLabelOdds = "Oranlar",
     fightDetailLabelRecord = "Maç Sonrası Rekor",
     fightDetailLabelRoundsFormat = "Format",
-    fightDetailLabelMethod = "Yöntem",
     fightDetailLabelRoundSummary = "Süre",
     fightDetailLabelReferee = "Hakem",
     statsStrikingHeader = "KAYDA DEĞER VURUŞLAR",
@@ -84,14 +77,9 @@ val TrStrings = AppStrings(
     rankingsTitle = "Sıralamalar",
     tabMens = "Erkekler",
     tabWomens = "Kadınlar",
-    rankingsChampion = "ŞAMPİYON",
-    rankingsVacant = "Boş",
-    contentDescriptionCollapse = "Kapat",
-    contentDescriptionExpand = "Aç",
     rankingsChampionRankLabel = "C",
     tabOverview = "Genel",
     tabFights = "Dövüşler",
-    fighterDetailLabelRecord = "Rekor",
     fighterDetailLabelWeightClass = "Siklet",
     fighterDetailLabelHeight = "Boy",
     fighterDetailLabelReach = "Kanat Açıklığı",
@@ -100,7 +88,6 @@ val TrStrings = AppStrings(
     fighterDetailLabelBorn = "Doğum Yeri",
     fighterDetailLabelFightingOutOf = "Temsil Ediyor",
     fighterDetailValueUnavailable = "—",
-    fighterDetailAgeYears = { age, years -> "$age ($years yaş)" },
     fighterDetailRecordWins = "Galibiyet",
     fighterDetailRecordLosses = "Yenilgi",
     fighterDetailRecordDraws = "Beraberlik",
@@ -109,7 +96,6 @@ val TrStrings = AppStrings(
     fighterDetailResultDraw = "D",
     fighterDetailResultNoContest = "NC",
     fighterDetailResultPending = "–",
-    profileEdit = "Düzenle",
     profileSignOut = "Çıkış Yap",
     profileTabOverview = "Genel",
     profileTabPredictions = "Tahminler",
@@ -207,18 +193,6 @@ val TrStrings = AppStrings(
             "MENS_P4P" -> "Erkekler Pound-for-Pound"
             "WOMENS_P4P" -> "Kadınlar Pound-for-Pound"
             else -> id
-        }
-    },
-    resultDisplayName = { name ->
-        when (name) {
-            "WIN" -> "Galibiyet"
-            "LOSS" -> "Yenilgi"
-            "DRAW" -> "Beraberlik"
-            "NO_CONTEST" -> "Sonuçsuz"
-            "PENDING" -> "Beklemede"
-            "CANCELLED" -> "İptal Edildi"
-            "FIZZLED" -> "Gerçekleşmedi"
-            else -> name.lowercase().replaceFirstChar { it.uppercase() }
         }
     },
     toUpperCase = { str ->

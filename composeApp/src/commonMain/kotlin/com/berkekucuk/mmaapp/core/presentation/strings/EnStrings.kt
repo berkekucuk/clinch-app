@@ -24,9 +24,6 @@ val EnStrings = AppStrings(
     emptyPrelimFights = "No prelim fights available",
     tabFightDetails = "Details",
     tabFightComparison = "Comparison",
-    radarLabelHeight = "Height",
-    radarLabelReach = "Reach",
-    radarLabelOdds = "Odds",
     radarLabelWinRate = "Win %",
     radarLabelKoTkoRate = "KO/TKO %",
     radarLabelSubRate = "Sub %",
@@ -36,16 +33,12 @@ val EnStrings = AppStrings(
     radarLabelTdAvg = "TD Avg.",
     radarLabelTdAcc = "TD Acc. %",
     radarLabelTdDef = "TD Def. %",
-    fightDetailLabelName = "Name",
     fightDetailLabelAge = "Age at Fight",
-    fightDetailLabelHometown = "Fighting out of",
     fightDetailLabelHeight = "Height",
     fightDetailLabelReach = "Reach",
-    fightDetailLabelResult = "Result",
     fightDetailLabelOdds = "Odds",
     fightDetailLabelRecord = "Record After Fight",
     fightDetailLabelRoundsFormat = "Format",
-    fightDetailLabelMethod = "Method",
     fightDetailLabelRoundSummary = "Time",
     fightDetailLabelReferee = "Referee",
     statsStrikingHeader = "SIGNIFICANT STRIKES",
@@ -84,14 +77,9 @@ val EnStrings = AppStrings(
     rankingsTitle = "Rankings",
     tabMens = "Men's",
     tabWomens = "Women's",
-    rankingsChampion = "CHAMPION",
-    rankingsVacant = "Vacant",
-    contentDescriptionCollapse = "Collapse",
-    contentDescriptionExpand = "Expand",
     rankingsChampionRankLabel = "C",
     tabOverview = "Overview",
     tabFights = "Fights",
-    fighterDetailLabelRecord = "Record",
     fighterDetailLabelWeightClass = "Weight Class",
     fighterDetailLabelHeight = "Height",
     fighterDetailLabelReach = "Reach",
@@ -100,7 +88,6 @@ val EnStrings = AppStrings(
     fighterDetailLabelBorn = "Born",
     fighterDetailLabelFightingOutOf = "Fighting Out Of",
     fighterDetailValueUnavailable = "—",
-    fighterDetailAgeYears = { age, years -> "$age ($years yrs)" },
     fighterDetailRecordWins = "Wins",
     fighterDetailRecordLosses = "Losses",
     fighterDetailRecordDraws = "Draws",
@@ -109,7 +96,6 @@ val EnStrings = AppStrings(
     fighterDetailResultDraw = "D",
     fighterDetailResultNoContest = "NC",
     fighterDetailResultPending = "–",
-    profileEdit = "Edit",
     profileSignOut = "Sign Out",
     profileTabOverview = "Overview",
     profileTabPredictions = "Predictions",
@@ -207,18 +193,6 @@ val EnStrings = AppStrings(
             "MENS_P4P" -> "Men's Pound-for-Pound"
             "WOMENS_P4P" -> "Women's Pound-for-Pound"
             else -> id
-        }
-    },
-    resultDisplayName = { name ->
-        when (name) {
-            "WIN" -> "Win"
-            "LOSS" -> "Loss"
-            "DRAW" -> "Draw"
-            "NO_CONTEST" -> "No Contest"
-            "PENDING" -> "Pending"
-            "CANCELLED" -> "Cancelled"
-            "FIZZLED" -> "Fizzled"
-            else -> name.lowercase().replaceFirstChar { it.uppercase() }
         }
     },
     toUpperCase = { it.uppercase() },

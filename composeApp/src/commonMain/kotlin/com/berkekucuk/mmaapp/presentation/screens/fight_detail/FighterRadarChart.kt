@@ -26,12 +26,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
+import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.model.Participant
 import kotlin.math.PI
 import kotlin.math.cos
@@ -45,38 +47,87 @@ private data class RadarData(
 
 @Composable
 fun FighterRadarChart(
-    redCorner: Participant?,
-    blueCorner: Participant?,
     modifier: Modifier = Modifier,
+    fighter: Fighter? = null,
+    redCorner: Participant? = null,
+    blueCorner: Participant? = null,
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val axisLabels = listOf(
-        strings.radarLabelSlpm,
-        strings.radarLabelStrAcc,
-        strings.radarLabelStrDef,
-        strings.radarLabelTdAvg,
-        strings.radarLabelTdAcc,
-        strings.radarLabelTdDef,
-        strings.radarLabelSubRate,
-        strings.radarLabelKoTkoRate,
-        strings.radarLabelWinRate,
-    )
-    val redData = remember(redCorner) {
-        RadarData(
-            values = buildRadarValues(redCorner),
-            color = colors.radarRed,
-            fillColor = colors.radarRedFill,
-        )
-    }
-    val blueData = remember(blueCorner) {
-        RadarData(
-            values = buildRadarValues(blueCorner),
-            color = colors.radarBlue,
-            fillColor = colors.radarBlueFill,
-        )
-    }
     val textMeasurer = rememberTextMeasurer()
+
+    val axisLabels = remember(strings) {
+        listOf(
+            strings.radarLabelSlpm,
+            strings.radarLabelStrAcc,
+            strings.radarLabelStrDef,
+            strings.radarLabelTdAvg,
+            strings.radarLabelTdAcc,
+            strings.radarLabelTdDef,
+            strings.radarLabelSubRate,
+            strings.radarLabelKoTkoRate,
+            strings.radarLabelWinRate,
+        )
+    }
+
+    val isSingleFighter = fighter != null
+
+    val axisValues = remember(fighter) {
+        if (fighter != null) {
+            listOf(
+                formatRadarRate(fighter.slpm),
+                formatRadarPercent(fighter.strAcc),
+                formatRadarPercent(fighter.strDef),
+                formatRadarRate(fighter.tdAvg),
+                formatRadarPercent(fighter.tdAcc),
+                formatRadarPercent(fighter.tdDef),
+                formatRadarPercent(fighter.submissionRate),
+                formatRadarPercent(fighter.koTkoRate),
+                formatRadarPercent(fighter.winRate),
+            )
+        } else {
+            emptyList()
+        }
+    }
+
+    val singleFighterData = remember(fighter, colors) {
+        if (fighter != null) {
+            RadarData(
+                values = buildRadarValues(fighter),
+                color = colors.statSingleBar,
+                fillColor = colors.statSingleBar.copy(alpha = 0.28f),
+            )
+        } else {
+            null
+        }
+    }
+
+    val redData = remember(redCorner, colors) {
+        if (!isSingleFighter) {
+            RadarData(
+                values = buildRadarValues(redCorner?.fighter),
+                color = colors.radarRed,
+                fillColor = colors.radarRedFill,
+            )
+        } else {
+            null
+        }
+    }
+
+    val blueData = remember(blueCorner, colors) {
+        if (!isSingleFighter) {
+            RadarData(
+                values = buildRadarValues(blueCorner?.fighter),
+                color = colors.radarBlue,
+                fillColor = colors.radarBlueFill,
+            )
+        } else {
+            null
+        }
+    }
+
+    val chartAspectRatio = if (isSingleFighter) 1.15f else 1f
+    val radiusRatio = if (isSingleFighter) 0.31f else 0.33f
 
     Column(
         modifier = modifier
@@ -89,13 +140,13 @@ fun FighterRadarChart(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f),
+                .aspectRatio(chartAspectRatio),
             contentAlignment = Alignment.Center,
         ) {
-            Canvas(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
+            Canvas(modifier = Modifier.fillMaxWidth().aspectRatio(chartAspectRatio)) {
                 val centerX = size.width / 2f
                 val centerY = size.height / 2f
-                val radius = size.minDimension * 0.33f
+                val radius = size.minDimension * radiusRatio
 
                 for (level in 1..4) {
                     val r = radius * level / 4f
@@ -117,15 +168,41 @@ fun FighterRadarChart(
                     drawLine(colors.radarGrid, Offset(centerX, centerY), Offset(x, y), strokeWidth = 1f)
                 }
 
-                drawRadarPolygon(this, centerX, centerY, radius, redData)
-                drawRadarPolygon(this, centerX, centerY, radius, blueData)
-                drawRadarLabels(this, textMeasurer, centerX, centerY, radius, axisLabels, colors.radarLabel)
+                if (isSingleFighter && singleFighterData != null) {
+                    drawRadarPolygon(
+                        drawScope = this,
+                        centerX = centerX,
+                        centerY = centerY,
+                        radius = radius,
+                        data = singleFighterData,
+                        drawDots = true,
+                        dotBackgroundColor = colors.fightItemBackground,
+                    )
+                    drawRadarLabelsWithValues(
+                        drawScope = this,
+                        textMeasurer = textMeasurer,
+                        centerX = centerX,
+                        centerY = centerY,
+                        radius = radius,
+                        labels = axisLabels,
+                        values = axisValues,
+                        labelColor = colors.radarLabel,
+                        valueColor = colors.textPrimary,
+                    )
+                } else {
+                    if (redData != null) drawRadarPolygon(this, centerX, centerY, radius, redData)
+                    if (blueData != null) drawRadarPolygon(this, centerX, centerY, radius, blueData)
+                    drawRadarLabels(this, textMeasurer, centerX, centerY, radius, axisLabels, colors.radarLabel)
+                }
             }
         }
-        RadarCornerRow(
-            redName = redCorner?.fighter?.name ?: "Red",
-            blueName = blueCorner?.fighter?.name ?: "Blue",
-        )
+
+        if (!isSingleFighter) {
+            RadarCornerRow(
+                redName = redCorner?.fighter?.name ?: "Red",
+                blueName = blueCorner?.fighter?.name ?: "Blue",
+            )
+        }
     }
 }
 
@@ -168,18 +245,32 @@ private fun drawRadarPolygon(
     centerY: Float,
     radius: Float,
     data: RadarData,
+    drawDots: Boolean = false,
+    dotBackgroundColor: Color = Color.Transparent,
 ) {
     val path = Path()
+    val points = mutableListOf<Offset>()
     data.values.forEachIndexed { i, value ->
         val angle = (2 * PI / RADAR_AXIS_COUNT) * i - PI / 2
-        val r = radius * value
+        val r = radius * value.coerceIn(0.04f, 1f)
         val x = centerX + r * cos(angle).toFloat()
         val y = centerY + r * sin(angle).toFloat()
+        val pt = Offset(x, y)
+        points.add(pt)
         if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
     }
     path.close()
     drawScope.drawPath(path, data.fillColor, style = Fill)
     drawScope.drawPath(path, data.color, style = Stroke(width = 2f))
+
+    if (drawDots) {
+        points.forEach { pt ->
+            drawScope.drawCircle(data.color, radius = 4f, center = pt)
+            if (dotBackgroundColor != Color.Transparent) {
+                drawScope.drawCircle(dotBackgroundColor, radius = 2f, center = pt)
+            }
+        }
+    }
 }
 
 private fun drawRadarLabels(
@@ -195,7 +286,7 @@ private fun drawRadarLabels(
     val style = TextStyle(
         color = labelColor,
         fontSize = 10.sp,
-        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+        fontWeight = FontWeight.Medium,
         textAlign = TextAlign.Center,
     )
     labels.forEachIndexed { i, label ->
@@ -209,6 +300,77 @@ private fun drawRadarLabels(
                 x = x - textLayout.size.width / 2f,
                 y = y - textLayout.size.height / 2f,
             ),
+        )
+    }
+}
+
+private fun drawRadarLabelsWithValues(
+    drawScope: DrawScope,
+    textMeasurer: TextMeasurer,
+    centerX: Float,
+    centerY: Float,
+    radius: Float,
+    labels: List<String>,
+    values: List<String>,
+    labelColor: Color,
+    valueColor: Color,
+) {
+    val labelRadius = radius * 1.20f
+    val labelStyle = TextStyle(
+        color = labelColor,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Medium,
+        textAlign = TextAlign.Center,
+    )
+    val valueStyle = TextStyle(
+        color = valueColor,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+    )
+
+    labels.forEachIndexed { i, label ->
+        val value = values.getOrNull(i) ?: ""
+        val angle = (2 * PI / RADAR_AXIS_COUNT) * i - PI / 2
+        val targetX = centerX + labelRadius * cos(angle).toFloat()
+        val targetY = centerY + labelRadius * sin(angle).toFloat()
+
+        val labelLayout = textMeasurer.measure(label, labelStyle)
+        val valueLayout = textMeasurer.measure(value, valueStyle)
+
+        val totalWidth = maxOf(labelLayout.size.width, valueLayout.size.width).toFloat()
+        val totalHeight = (labelLayout.size.height + valueLayout.size.height + 2).toFloat()
+
+        val cosA = cos(angle).toFloat()
+        val sinA = sin(angle).toFloat()
+
+        val xOffset = when {
+            cosA > 0.35f -> 0f
+            cosA < -0.35f -> -totalWidth
+            else -> -totalWidth / 2f
+        }
+        val yOffset = when {
+            sinA > 0.35f -> 0f
+            sinA < -0.35f -> -totalHeight
+            else -> -totalHeight / 2f
+        }
+
+        val blockX = targetX + xOffset
+        val blockY = targetY + yOffset
+
+        drawScope.drawText(
+            textLayoutResult = labelLayout,
+            topLeft = Offset(
+                x = blockX + (totalWidth - labelLayout.size.width) / 2f,
+                y = blockY
+            )
+        )
+        drawScope.drawText(
+            textLayoutResult = valueLayout,
+            topLeft = Offset(
+                x = blockX + (totalWidth - valueLayout.size.width) / 2f,
+                y = blockY + labelLayout.size.height + 2
+            )
         )
     }
 }

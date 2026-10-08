@@ -33,7 +33,6 @@ fun AppSnackbar(
 ) {
     val colors = LocalAppColors.current
     val backgroundColor = if (isSuccess) colors.winnerFrame else colors.loseColor
-
     val contentColor = colors.white
     val icon = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Warning
 
@@ -42,7 +41,7 @@ fun AppSnackbar(
             .fillMaxWidth()
             .shadow(6.dp, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
+            .background(backgroundColor.copy(alpha = 0.85f))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

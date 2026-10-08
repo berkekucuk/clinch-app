@@ -59,7 +59,11 @@ fun MenuScreenRoot(
         }
     }
 
-    val authHandler = rememberSocialAuthHandler()
+    val authHandler = rememberSocialAuthHandler(
+        onSuccess = {
+            viewModel.onAction(MenuUiAction.OnSignInSuccess)
+        }
+    )
 
     MenuScreen(
         state = state,
@@ -89,11 +93,24 @@ fun MenuScreen(
     // 3. UI Data & Definitions
     val errorMessage = strings.mapError(state.error)
 
+    val isSnackbarSuccess = remember { mutableStateOf(false) }
+    val snackbarMessage = when {
+        state.error != null -> {
+            isSnackbarSuccess.value = false
+            errorMessage
+        }
+        state.showSignInSuccess -> {
+            isSnackbarSuccess.value = true
+            strings.signInSuccess
+        }
+        else -> null
+    }
+
     AppSnackbarEffect(
-        message = errorMessage,
+        message = snackbarMessage,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = { onAction(MenuUiAction.OnErrorShown) },
+        onDismiss = { onAction(MenuUiAction.OnSnackbarDismissed) },
     )
 
     Scaffold(
@@ -106,6 +123,7 @@ fun MenuScreen(
                 snackbar = { snackbarData ->
                     AppSnackbar(
                         snackbarData = snackbarData,
+                        isSuccess = isSnackbarSuccess.value,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }

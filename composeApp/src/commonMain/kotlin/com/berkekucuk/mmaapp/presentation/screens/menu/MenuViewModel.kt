@@ -5,14 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
@@ -35,38 +34,39 @@ class MenuViewModel(
         observeAuthState()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeAuthState() {
         viewModelScope.launch {
             authRepository.authState
-                .flatMapLatest { authState ->
+                .collectLatest { authState ->
                     val userId = (authState as? AuthState.Authenticated)?.userId
-
-                    // 1. First, reflect the Auth state to the UI state
                     _state.update { it.copy(authState = authState, userId = userId) }
 
                     if (userId != null) {
-                        // 2. If user exists, start the sync operations (run in background)
-                        launch { userRepository.syncUser(userId) }
-                        launch { predictionRepository.syncPredictions(userId, limit = 20, offset = 0) }
-                        launch { notificationRepository.syncFightNotifications(userId) }
-
-                        // 3. Return the User Flow (flatMapLatest will start collecting it)
-                        userRepository.getUser(userId)
+                        coroutineScope {
+                            launch { userRepository.syncUser(userId) }
+                            launch { predictionRepository.syncPredictions(userId, limit = 20, offset = 0) }
+                            launch { notificationRepository.syncFightNotifications(userId) }
+                            launch {
+                                userRepository.getUser(userId)
+                                    .collect { user ->
+                                        _state.update { state ->
+                                            state.copy(
+                                                avatarUrl = user?.avatarUrl,
+                                                name = user?.fullName,
+                                                username = user?.username
+                                            )
+                                        }
+                                    }
+                            }
+                        }
                     } else {
-                        // 4. If there is no user, return a flow emitting null and clear the state
-                        _state.update { it.copy(avatarUrl = null, name = null, username = null) }
-                        flowOf(null)
-                    }
-                }
-                .collect { user ->
-                    // 5. Update the UI whenever user data changes (from Local DB)
-                    _state.update { state ->
-                        state.copy(
-                            avatarUrl = user?.avatarUrl,
-                            name = user?.fullName,
-                            username = user?.username
-                        )
+                        _state.update {
+                            it.copy(
+                                avatarUrl = null,
+                                name = null,
+                                username = null
+                            )
+                        }
                     }
                 }
         }
@@ -97,8 +97,11 @@ class MenuViewModel(
             MenuUiAction.OnLeaderboardClicked -> {
                 navigateTo(MenuNavigationEvent.ToLeaderboard)
             }
-            MenuUiAction.OnErrorShown -> {
-                _state.update { it.copy(error = null) }
+            MenuUiAction.OnSnackbarDismissed -> {
+                _state.update { it.copy(error = null, showSignInSuccess = false) }
+            }
+            MenuUiAction.OnSignInSuccess -> {
+                _state.update { it.copy(showSignInSuccess = true) }
             }
         }
     }

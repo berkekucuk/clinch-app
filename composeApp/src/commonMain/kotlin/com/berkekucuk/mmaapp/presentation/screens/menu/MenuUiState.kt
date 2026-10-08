@@ -10,4 +10,5 @@ data class MenuUiState(
     val name: String? = null,
     val username: String? = null,
     val error: AppError? = null,
+    val showSignInSuccess: Boolean = false,
 )

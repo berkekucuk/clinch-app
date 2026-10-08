@@ -6,5 +6,6 @@ sealed interface MenuUiAction {
     data object OnSettingsClicked : MenuUiAction
     data object OnSignOutClicked : MenuUiAction
     data object OnLeaderboardClicked : MenuUiAction
-    data object OnErrorShown : MenuUiAction
+    data object OnSnackbarDismissed : MenuUiAction
+    data object OnSignInSuccess : MenuUiAction
 }

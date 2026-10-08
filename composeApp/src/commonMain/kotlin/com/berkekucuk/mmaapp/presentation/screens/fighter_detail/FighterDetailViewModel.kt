@@ -69,6 +69,7 @@ class FighterDetailViewModel(
             )
             is FighterDetailUiAction.OnBackClicked -> navigateTo(FighterDetailNavigationEvent.Back)
             is FighterDetailUiAction.OnRefresh -> syncFighter(isRefreshing = true)
+            is FighterDetailUiAction.OnSnackbarDismissed -> _state.update { it.copy(error = null) }
         }
     }
 

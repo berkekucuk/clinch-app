@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
@@ -91,8 +92,8 @@ fun FighterDetailScreen(
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        actionLabel = strings.retry,
-        onAction = { onAction(FighterDetailUiAction.OnRefresh) },
+        duration = SnackbarDuration.Short,
+        onDismiss = { onAction(FighterDetailUiAction.OnSnackbarDismissed) },
     )
 
     Scaffold(

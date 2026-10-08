@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -97,6 +98,7 @@ fun ProfileEditScreen(
 
     // 2. Compose Core States
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val showDeleteDialog = remember { mutableStateOf(false) }
 
     // 3. UI Data & Definitions
@@ -158,7 +160,11 @@ fun ProfileEditScreen(
                     actions = {
                         SaveButton(
                             text = strings.profileEditSaveChanges,
-                            onClick = { onAction(ProfileEditUiAction.OnSaveClicked) },
+                            onClick = {
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                                onAction(ProfileEditUiAction.OnSaveClicked)
+                            },
                             isSaving = state.isSaving,
                         )
                     },

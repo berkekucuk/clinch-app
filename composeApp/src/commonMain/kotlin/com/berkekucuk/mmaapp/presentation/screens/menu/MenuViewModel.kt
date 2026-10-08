@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
+import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 
 class MenuViewModel(
     private val authRepository: AuthRepository,
@@ -88,6 +89,9 @@ class MenuViewModel(
             MenuUiAction.OnSignOutClicked -> {
                 viewModelScope.launch {
                     authRepository.signOut()
+                        .onFailure { e ->
+                            _state.update { it.copy(error = AppErrorMapper.map(e)) }
+                        }
                 }
             }
             MenuUiAction.OnLeaderboardClicked -> {

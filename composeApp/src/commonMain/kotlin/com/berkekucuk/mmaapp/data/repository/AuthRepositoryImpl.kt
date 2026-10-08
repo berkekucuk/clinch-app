@@ -7,8 +7,10 @@ import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -23,11 +25,10 @@ class AuthRepositoryImpl(
     init {
         scope.launch {
             supabaseClient.auth.sessionStatus
-                .collect { status ->
-                if (status is SessionStatus.Authenticated) {
-                    registerDeviceToken(status.session.user?.id ?: "")
+                .filter { it !is SessionStatus.Initializing }
+                .collect {
+                    registerDeviceToken()
                 }
-            }
         }
     }
 
@@ -43,30 +44,27 @@ class AuthRepositoryImpl(
             }
         }
 
-    private suspend fun registerDeviceToken(userId: String) {
-        try {
-            val token = deviceTokenProvider.getToken() ?: return
-            deviceTokenRemoteDataSource.upsertToken(token, userId, deviceTokenProvider.platform)
+    private suspend fun registerDeviceToken(): Result<Unit> {
+        return try {
+            val token = deviceTokenProvider.getToken() ?: return Result.success(Unit)
+            deviceTokenRemoteDataSource.upsertToken(token, deviceTokenProvider.platform)
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            println("Token registration failed: ${e.message}")
+            Result.failure(e)
         }
     }
 
-    override suspend fun signOut() {
-        unregisterDeviceToken()
-        try {
+    override suspend fun signOut(): Result<Unit> {
+        return try {
             supabaseClient.auth.signOut()
+            registerDeviceToken().getOrThrow()
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            supabaseClient.auth.clearSession()
-        }
-    }
-
-    private suspend fun unregisterDeviceToken() {
-        try {
-            val token = deviceTokenProvider.getToken() ?: return
-            deviceTokenRemoteDataSource.deleteToken(token)
-        } catch (e: Exception) {
-            println("Token deletion failed: ${e.message}")
+            Result.failure(e)
         }
     }
 

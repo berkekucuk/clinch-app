@@ -9,9 +9,9 @@ class DeviceTokenSupabaseAPI(
     private val client: SupabaseClient
 ) : DeviceTokenRemoteDataSource {
 
-    override suspend fun upsertToken(token: String, userId: String, platform: String) {
+    override suspend fun upsertToken(token: String, platform: String) {
         client.from("user_device_tokens").upsert(
-            DeviceTokenDto(fcmToken = token, userId = userId, platform = platform)
+            DeviceTokenDto(fcmToken = token, platform = platform)
         )
     }
 

@@ -13,4 +13,5 @@ interface EventRepository {
     suspend fun isYearSynced(year: Int): Boolean
     suspend fun syncPendingEvents(): Result<Unit>
     suspend fun hasEventById(eventId: String): Boolean
+    suspend fun getNearestActiveEvent(): Event?
 }

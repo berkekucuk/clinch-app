@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.fcm.DeviceTokenProvider
 import com.berkekucuk.mmaapp.domain.model.AuthState
@@ -38,7 +40,9 @@ class AuthRepositoryImpl(
                 is SessionStatus.Initializing -> AuthState.Loading
                 is SessionStatus.Authenticated -> AuthState.Authenticated(
                     userId = status.session.user?.id ?: "",
-                    email = status.session.user?.email
+                    email = status.session.user?.email,
+                    isAdmin = status.session.user?.appMetadata
+                        ?.get("role")?.jsonPrimitive?.contentOrNull == "admin"
                 )
                 else -> AuthState.Unauthenticated
             }

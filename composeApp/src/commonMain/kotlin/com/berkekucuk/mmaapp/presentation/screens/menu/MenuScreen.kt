@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,6 +45,7 @@ fun MenuScreenRoot(
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToLeaderboard: () -> Unit,
+    onNavigateToSendNotification: () -> Unit,
     viewModel: MenuViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -55,6 +57,7 @@ fun MenuScreenRoot(
                 is MenuNavigationEvent.ToProfileEdit -> onNavigateToProfileEdit()
                 is MenuNavigationEvent.ToSettings -> onNavigateToSettings()
                 is MenuNavigationEvent.ToLeaderboard -> onNavigateToLeaderboard()
+                is MenuNavigationEvent.ToSendNotification -> onNavigateToSendNotification()
             }
         }
     }
@@ -176,6 +179,14 @@ fun MenuScreen(
             )
 
             HorizontalDivider(color = colors.dividerColor)
+            if ((state.authState as? AuthState.Authenticated)?.isAdmin == true) {
+                MenuItemRow(
+                    icon = Icons.Filled.Notifications,
+                    title = "Send Notification",
+                    onClick = { onAction(MenuUiAction.OnSendNotificationClicked) }
+                )
+                HorizontalDivider(color = colors.dividerColor)
+            }
             MenuItemRow(
                 icon = Icons.Filled.Settings,
                 title = strings.menuItemSettings,

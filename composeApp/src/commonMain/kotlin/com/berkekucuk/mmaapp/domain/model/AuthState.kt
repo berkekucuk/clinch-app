@@ -5,6 +5,7 @@ sealed interface AuthState {
     data class Authenticated(
         val userId: String,
         val email: String?,
+        val isAdmin: Boolean = false,
     ) : AuthState
     data object Unauthenticated : AuthState
 }

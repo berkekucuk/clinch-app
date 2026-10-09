@@ -40,6 +40,7 @@ import com.berkekucuk.mmaapp.presentation.screens.fighter_search.FighterSearchSc
 import com.berkekucuk.mmaapp.presentation.screens.interaction_list.InteractionListScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.profile.ProfileScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.send_notification.SendNotificationScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.profile_edit.ProfileEditScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankingDetailScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardScreenRoot
@@ -166,6 +167,9 @@ fun App() {
                     },
                     onNavigateToLeaderboard = {
                         rootNavController.safeNavigate(navigationThrottle, Route.Leaderboard)
+                    },
+                    onNavigateToSendNotification = {
+                        rootNavController.safeNavigate(navigationThrottle, Route.SendNotification)
                     },
                 )
             }
@@ -348,6 +352,17 @@ fun App() {
                     onNavigateToUserSearch = {
                         rootNavController.safeNavigate(navigationThrottle, Route.UserSearch)
                     }
+                )
+            }
+
+            composable<Route.SendNotification>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                SendNotificationScreenRoot(
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 

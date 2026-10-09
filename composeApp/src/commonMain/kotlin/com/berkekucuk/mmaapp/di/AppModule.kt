@@ -74,6 +74,8 @@ import com.berkekucuk.mmaapp.domain.repository.AppVersionRepository
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardViewModel
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsViewModel
 import com.berkekucuk.mmaapp.presentation.screens.user_search.UserSearchViewModel
+import com.berkekucuk.mmaapp.data.remote.supabase.AdminNotificationService
+import com.berkekucuk.mmaapp.presentation.screens.send_notification.SendNotificationViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 
@@ -202,6 +204,10 @@ val appModule = module {
 
     single<AppVersionRemoteDataSource> {
         AppVersionSupabaseAPI(client = get())
+    }
+
+    single {
+        AdminNotificationService(client = get())
     }
 
     single<AppVersionRepository> {
@@ -415,6 +421,14 @@ val appModule = module {
     viewModel {
         BlockedUsersViewModel(
             userRepository = get(),
+            authRepository = get()
+        )
+    }
+
+    viewModel {
+        SendNotificationViewModel(
+            adminNotificationService = get(),
+            eventRepository = get(),
             authRepository = get()
         )
     }

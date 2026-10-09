@@ -21,4 +21,5 @@ sealed interface Route {
     @Serializable data object Settings : Route
     @Serializable data object Leaderboard : Route
     @Serializable data object BlockedUsers : Route
+    @Serializable data object SendNotification : Route
 }

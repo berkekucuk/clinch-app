@@ -5,4 +5,5 @@ sealed interface MenuNavigationEvent {
     data object ToProfileEdit : MenuNavigationEvent
     data object ToSettings : MenuNavigationEvent
     data object ToLeaderboard : MenuNavigationEvent
+    data object ToSendNotification : MenuNavigationEvent
 }

@@ -429,7 +429,8 @@ val appModule = module {
         SendNotificationViewModel(
             adminNotificationService = get(),
             eventRepository = get(),
-            authRepository = get()
+            authRepository = get(),
+            userRepository = get()
         )
     }
 

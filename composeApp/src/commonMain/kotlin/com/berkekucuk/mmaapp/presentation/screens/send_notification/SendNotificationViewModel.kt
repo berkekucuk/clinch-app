@@ -7,11 +7,13 @@ import com.berkekucuk.mmaapp.core.utils.NotificationDefaults
 import com.berkekucuk.mmaapp.data.remote.supabase.AdminNotificationService
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.EventRepository
+import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -19,6 +21,7 @@ class SendNotificationViewModel(
     private val adminNotificationService: AdminNotificationService,
     private val eventRepository: EventRepository,
     private val authRepository: AuthRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SendNotificationUiState())
@@ -34,7 +37,10 @@ class SendNotificationViewModel(
         viewModelScope.launch {
             val currentUserId = authRepository.getAuthenticatedUserId()
             if (!currentUserId.isNullOrBlank()) {
-                _state.update { it.copy(userIds = currentUserId) }
+                val currentUsername = userRepository.getUser(currentUserId).first()?.username
+                if (!currentUsername.isNullOrBlank()) {
+                    _state.update { it.copy(usernames = currentUsername) }
+                }
             }
             val event = eventRepository.getNearestActiveEvent() ?: return@launch
             _state.update {
@@ -52,7 +58,7 @@ class SendNotificationViewModel(
             is SendNotificationUiAction.OnBodyChanged -> _state.update { it.copy(body = action.value) }
             is SendNotificationUiAction.OnEventIdChanged -> _state.update { it.copy(eventId = action.value) }
             is SendNotificationUiAction.OnTargetChanged -> _state.update { it.copy(target = action.value) }
-            is SendNotificationUiAction.OnUserIdsChanged -> _state.update { it.copy(userIds = action.value) }
+            is SendNotificationUiAction.OnUsernamesChanged -> _state.update { it.copy(usernames = action.value) }
             SendNotificationUiAction.OnSendClicked -> _state.update { it.copy(showConfirmDialog = true) }
             SendNotificationUiAction.OnDismissDialog -> _state.update { it.copy(showConfirmDialog = false) }
             SendNotificationUiAction.OnConfirmSend -> sendNotification()
@@ -72,7 +78,7 @@ class SendNotificationViewModel(
                 body = current.body.trim(),
                 eventId = current.eventId.trim().ifEmpty { null },
                 target = current.target,
-                userIds = current.parsedUserIds,
+                usernames = current.parsedUsernames,
             )
                 .onSuccess {
                     _state.update { it.copy(isSending = false) }

@@ -17,14 +17,14 @@ class AdminNotificationService(
         body: String,
         eventId: String?,
         target: NotificationTarget,
-        userIds: List<String>,
+        usernames: List<String>,
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val payload = ManualNotificationDto(
                 title = title,
                 body = body,
                 target = target.value,
-                userIds = if (target == NotificationTarget.USERS) userIds else null,
+                usernames = if (target == NotificationTarget.USERS) usernames else null,
                 data = if (!eventId.isNullOrBlank()) mapOf("event_id" to eventId) else null
             )
             client.functions.invoke(function = "send-notification", body = payload)

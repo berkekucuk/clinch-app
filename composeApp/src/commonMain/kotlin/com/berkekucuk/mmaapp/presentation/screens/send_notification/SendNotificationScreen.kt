@@ -195,9 +195,9 @@ fun SendNotificationScreen(
             if (state.target == NotificationTarget.USERS) {
                 Spacer(modifier = Modifier.height(16.dp))
                 NotificationTextField(
-                    value = state.userIds,
-                    onValueChange = { onAction(SendNotificationUiAction.OnUserIdsChanged(it)) },
-                    label = "User IDs (comma separated)",
+                    value = state.usernames,
+                    onValueChange = { onAction(SendNotificationUiAction.OnUsernamesChanged(it)) },
+                    label = "Usernames (comma separated)",
                     singleLine = false,
                     minLines = 2,
                 )
@@ -211,7 +211,7 @@ fun SendNotificationScreen(
             onConfirmClick = { onAction(SendNotificationUiAction.OnConfirmSend) },
             title = "Send notification?",
             text = "\"${state.title}\"\n${state.body}\n\nTarget: " +
-                if (state.target == NotificationTarget.USERS) "${state.parsedUserIds.size} user(s)" else state.target.label,
+                if (state.target == NotificationTarget.USERS) "${state.parsedUsernames.size} user(s)" else state.target.label,
             confirmText = "Send",
             dismissText = strings.commonCancel,
             isDestructive = false

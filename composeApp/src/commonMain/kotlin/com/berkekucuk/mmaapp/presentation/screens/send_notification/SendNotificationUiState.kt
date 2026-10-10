@@ -9,17 +9,17 @@ data class SendNotificationUiState(
     val body: String = NotificationDefaults.BODY,
     val eventId: String = "",
     val target: NotificationTarget = NotificationTarget.USERS,
-    val userIds: String = "",
+    val usernames: String = "",
     val showConfirmDialog: Boolean = false,
     val isSending: Boolean = false,
     val error: AppError? = null,
 ) {
-    val parsedUserIds: List<String>
-        get() = userIds.split(',', '\n', ' ').map { it.trim() }.filter { it.isNotEmpty() }
+    val parsedUsernames: List<String>
+        get() = usernames.split(',', '\n', ' ').map { it.trim().removePrefix("@") }.filter { it.isNotEmpty() }
 
     val canSend: Boolean
         get() = title.isNotBlank() &&
             body.isNotBlank() &&
-            (target != NotificationTarget.USERS || parsedUserIds.isNotEmpty()) &&
+            (target != NotificationTarget.USERS || parsedUsernames.isNotEmpty()) &&
             !isSending
 }

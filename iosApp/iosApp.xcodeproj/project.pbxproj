@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D4D5960B307A4F9500477438 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D4D5960A307A4F9500477438 /* FirebaseCore */; };
+		D4D5960D307A4F9900477438 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = D4D5960C307A4F9900477438 /* FirebaseMessaging */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D573B89A2B142E5A7D5938EC /* Clinch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Clinch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -41,6 +46,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4D5960D307A4F9900477438 /* FirebaseMessaging in Frameworks */,
+				D4D5960B307A4F9500477438 /* FirebaseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +100,8 @@
 			);
 			name = iosApp;
 			packageProductDependencies = (
+				D4D5960A307A4F9500477438 /* FirebaseCore */,
+				D4D5960C307A4F9900477438 /* FirebaseMessaging */,
 			);
 			productName = iosApp;
 			productReference = D573B89A2B142E5A7D5938EC /* Clinch.app */;
@@ -123,6 +132,7 @@
 			mainGroup = F73109C1828161C04F4B1615;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				D4D595F4307A4D1500477438 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 7BCB599AD78B8A84CFF5FB71 /* Products */;
@@ -403,6 +413,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D4D595F4307A4D1500477438 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D4D5960A307A4F9500477438 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4D595F4307A4D1500477438 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		D4D5960C307A4F9900477438 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4D595F4307A4D1500477438 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6BD44CD25531CDEA6F2985E2 /* Project object */;
 }

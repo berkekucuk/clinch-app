@@ -124,7 +124,6 @@ val EnStrings = AppStrings(
             ReportReason.ABUSIVE_OR_HARASSING_BEHAVIOR -> "Abusive or harassing behavior"
             ReportReason.HATE_SPEECH -> "Hate speech"
             ReportReason.INAPPROPRIATE_CONTENT -> "Inappropriate content"
-            ReportReason.SPOILER -> "Spoiler"
             ReportReason.OTHER -> "Other"
         }
     },
@@ -210,6 +209,7 @@ val EnStrings = AppStrings(
     notificationChannelName = "Fight Reminder",
     notificationChannelDescription = "Get notified before fights start.",
     commonRemove = "Remove",
+    commonDelete = "Delete",
     commonCancel = "Cancel",
     profileRemoveFighterConfirm = { name -> "Remove $name from your list?" },
     interactionLimitReachedTitle = "Limit Reached",

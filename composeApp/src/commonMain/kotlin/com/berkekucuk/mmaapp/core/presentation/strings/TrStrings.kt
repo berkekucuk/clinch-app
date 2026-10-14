@@ -124,7 +124,6 @@ val TrStrings = AppStrings(
             ReportReason.ABUSIVE_OR_HARASSING_BEHAVIOR -> "Taciz edici veya kötüye kullanım"
             ReportReason.HATE_SPEECH -> "Nefret söylemi"
             ReportReason.INAPPROPRIATE_CONTENT -> "Uygunsuz içerik"
-            ReportReason.SPOILER -> "Spoiler"
             ReportReason.OTHER -> "Diğer"
         }
     },
@@ -218,6 +217,7 @@ val TrStrings = AppStrings(
     notificationChannelName = "Dövüş Hatırlatıcı",
     notificationChannelDescription = "Dövüş başlamadan önce bildirim al.",
     commonRemove = "Kaldır",
+    commonDelete = "Sil",
     commonCancel = "Vazgeç",
     profileRemoveFighterConfirm = { name -> "$name listenizden kaldırılsın mı?" },
     interactionLimitReachedTitle = "Limit Doldu",

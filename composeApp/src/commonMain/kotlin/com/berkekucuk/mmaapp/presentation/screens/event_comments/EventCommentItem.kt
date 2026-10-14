@@ -148,7 +148,7 @@ private fun CommentOverflowMenu(
             containerColor = colors.dropdownMenuBackground
         ) {
             if (isOwnComment) {
-                CommentMenuItem(strings.commentDeleteTitle, Icons.Default.Delete) {
+                CommentMenuItem(strings.commonDelete, Icons.Default.Delete) {
                     expanded = false
                     onDeleteClick()
                 }

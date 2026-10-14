@@ -7,7 +7,6 @@ enum class ReportReason {
     ABUSIVE_OR_HARASSING_BEHAVIOR,
     HATE_SPEECH,
     INAPPROPRIATE_CONTENT,
-    SPOILER,
     OTHER;
 
     val dbValue: String
@@ -18,7 +17,6 @@ enum class ReportReason {
             ABUSIVE_OR_HARASSING_BEHAVIOR -> "Abusive or harassing behavior"
             HATE_SPEECH -> "Hate speech"
             INAPPROPRIATE_CONTENT -> "Inappropriate content"
-            SPOILER -> "Spoiler"
             OTHER -> "Other"
         }
 
@@ -36,7 +34,6 @@ enum class ReportReason {
             ABUSIVE_OR_HARASSING_BEHAVIOR,
             HATE_SPEECH,
             INAPPROPRIATE_CONTENT,
-            SPOILER,
             OTHER,
         )
     }

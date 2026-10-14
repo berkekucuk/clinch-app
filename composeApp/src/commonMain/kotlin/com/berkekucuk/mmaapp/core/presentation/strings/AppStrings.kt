@@ -179,6 +179,7 @@ data class AppStrings(
     val notificationChannelName: String,
     val notificationChannelDescription: String,
     val commonRemove: String,
+    val commonDelete: String,
     val commonCancel: String,
     val profileRemoveFighterConfirm: (String) -> String,
     val interactionLimitReachedTitle: String,

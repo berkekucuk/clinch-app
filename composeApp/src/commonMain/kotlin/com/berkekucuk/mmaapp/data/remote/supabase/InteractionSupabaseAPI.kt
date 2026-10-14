@@ -5,17 +5,21 @@ import com.berkekucuk.mmaapp.data.remote.dto.InteractionDto
 import com.berkekucuk.mmaapp.data.remote.dto.FighterInteractionInsertDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class InteractionSupabaseAPI(
     private val client: SupabaseClient
 ) : InteractionRemoteDataSource {
 
     override suspend fun fetchInteractions(userId: String): List<InteractionDto> {
-        return client.from("fighter_interaction_view").select {
-            filter {
-                eq("user_id", userId)
+        return client.postgrest.rpc(
+            function = "get_user_interactions",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
             }
-        }.decodeList<InteractionDto>()
+        ).decodeList<InteractionDto>()
     }
 
     override suspend fun addInteraction(

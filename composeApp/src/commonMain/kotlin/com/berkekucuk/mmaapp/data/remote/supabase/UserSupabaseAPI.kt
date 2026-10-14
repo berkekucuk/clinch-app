@@ -16,11 +16,12 @@ class UserSupabaseAPI(
 ) : UserRemoteDataSource {
 
     override suspend fun fetchUser(userId: String): UserDto {
-        return client.from("profile_view_v6").select {
-            filter {
-                eq("id", userId)
+        return client.postgrest.rpc(
+            function = "get_profile",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
             }
-        }.decodeSingle<UserDto>()
+        ).decodeList<UserDto>().first()
     }
 
     override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String){

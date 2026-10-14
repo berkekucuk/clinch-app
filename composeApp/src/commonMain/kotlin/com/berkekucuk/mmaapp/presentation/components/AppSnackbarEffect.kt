@@ -4,7 +4,10 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 
 @Composable
 fun AppSnackbarEffect(
@@ -15,6 +18,9 @@ fun AppSnackbarEffect(
     onAction: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
+    val currentMessage by rememberUpdatedState(message)
+    val currentOnDismiss by rememberUpdatedState(onDismiss)
+
     LaunchedEffect(message) {
         if (message == null) return@LaunchedEffect
         while (true) {
@@ -35,6 +41,12 @@ fun AppSnackbarEffect(
                     }
                 }
             }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (currentMessage != null) currentOnDismiss?.invoke()
         }
     }
 }

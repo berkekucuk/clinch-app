@@ -63,3 +63,21 @@ fun formatDateOfBirth(dateOfBirth: String?, months: List<String>): String? {
         null
     }
 }
+
+fun Instant.toRelativeTime(
+    now: Instant,
+    justNow: String,
+    minutesAgo: (Int) -> String,
+    hoursAgo: (Int) -> String,
+    daysAgo: (Int) -> String,
+    months: List<String>,
+): String {
+    val elapsed = now - this
+    return when {
+        elapsed.inWholeMinutes < 1 -> justNow
+        elapsed.inWholeHours < 1 -> minutesAgo(elapsed.inWholeMinutes.toInt())
+        elapsed.inWholeDays < 1 -> hoursAgo(elapsed.inWholeHours.toInt())
+        elapsed.inWholeDays < 7 -> daysAgo(elapsed.inWholeDays.toInt())
+        else -> toShortDate(months)
+    }
+}

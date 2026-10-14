@@ -1,0 +1,13 @@
+package com.berkekucuk.mmaapp.domain.repository
+
+import com.berkekucuk.mmaapp.domain.model.EventComment
+import kotlinx.coroutines.flow.Flow
+
+interface EventCommentRepository {
+    fun getComments(eventId: String): Flow<List<EventComment>>
+    suspend fun syncComments(eventId: String): Result<Unit>
+    suspend fun loadOlderComments(eventId: String): Result<Boolean>
+    suspend fun addComment(eventId: String, content: String): Result<Unit>
+    suspend fun deleteComment(eventId: String, commentId: String): Result<Unit>
+    suspend fun listenForCommentChanges(eventId: String): Result<Unit>
+}

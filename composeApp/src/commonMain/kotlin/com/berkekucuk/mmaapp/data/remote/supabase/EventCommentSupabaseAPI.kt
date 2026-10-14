@@ -69,6 +69,26 @@ class EventCommentSupabaseAPI(
         )
     }
 
+    override suspend fun banUser(userId: String, eventId: String?) {
+        client.postgrest.rpc(
+            function = "ban_user_from_comments",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
+                eventId?.let { put("p_event_id", it) }
+            }
+        )
+    }
+
+    override suspend fun unbanUser(userId: String, eventId: String?) {
+        client.postgrest.rpc(
+            function = "unban_user_from_comments",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
+                eventId?.let { put("p_event_id", it) }
+            }
+        )
+    }
+
     override fun observeComments(eventId: String): Flow<EventCommentRealtimeEvent> = channelFlow {
         val channel = client.channel("event_comments:$eventId") {
             isPrivate = true

@@ -54,6 +54,9 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 import com.berkekucuk.mmaapp.core.utils.toRelativeTime
+import com.berkekucuk.mmaapp.domain.enums.BanAction
+import com.berkekucuk.mmaapp.domain.enums.BanScope
+import com.berkekucuk.mmaapp.domain.enums.CommentsSuccessMessage
 import com.berkekucuk.mmaapp.domain.enums.ReportReason
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
@@ -103,7 +106,12 @@ fun EventCommentsScreen(
     var now by remember { mutableStateOf(Clock.System.now()) }
 
     // 3. UI Data & Definitions
-    val message = strings.mapError(state.error) ?: strings.commentReported.takeIf { state.showReportSuccess }
+    val message = strings.mapError(state.error) ?: when (state.successMessage) {
+        CommentsSuccessMessage.REPORT_SENT -> strings.commentReported
+        CommentsSuccessMessage.USER_BANNED -> strings.commentUserBanned
+        CommentsSuccessMessage.USER_UNBANNED -> strings.commentUserUnbanned
+        null -> null
+    }
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -251,9 +259,12 @@ fun EventCommentsScreen(
                         ),
                         canReport = state.currentUserId != null && comment.userId != state.currentUserId,
                         canDelete = state.currentUserId != null && (comment.userId == state.currentUserId || state.canModerate),
+                        canBan = state.canModerate && comment.userId != state.currentUserId,
                         onUserClick = { onAction(EventCommentsUiAction.OnUserClicked(comment.userId)) },
                         onDeleteClick = { onAction(EventCommentsUiAction.OnDeleteClicked(comment.id)) },
                         onReportClick = { onAction(EventCommentsUiAction.OnReportClicked(comment.id)) },
+                        onBanClick = { onAction(EventCommentsUiAction.OnBanClicked(comment.userId)) },
+                        onUnbanClick = { onAction(EventCommentsUiAction.OnUnbanClicked(comment.userId)) },
                         modifier = Modifier.animateItem(),
                     )
                 }
@@ -287,6 +298,54 @@ fun EventCommentsScreen(
             confirmText = strings.dialogAccept,
             dismissText = strings.commonCancel,
             isDestructive = true
+        )
+    }
+
+    if (state.pendingBanAction != null) {
+        val isBan = state.pendingBanAction == BanAction.BAN
+        AppAlertDialog(
+            onDismissRequest = { onAction(EventCommentsUiAction.OnDismissBanDialog) },
+            onConfirmClick = { onAction(EventCommentsUiAction.OnConfirmBan) },
+            title = if (isBan) strings.commentBanTitle else strings.commentUnbanTitle,
+            confirmText = if (isBan) strings.commentBan else strings.commonRemove,
+            dismissText = strings.commonCancel,
+            isConfirmLoading = state.isSubmittingBan,
+            isDestructive = isBan,
+            content = {
+                Column(modifier = Modifier.selectableGroup()) {
+                    BanScope.entries.forEach { scope ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .selectable(
+                                    selected = (scope == state.selectedBanScope),
+                                    onClick = { onAction(EventCommentsUiAction.OnBanScopeChanged(scope)) },
+                                    role = Role.RadioButton
+                                )
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (scope == state.selectedBanScope),
+                                onClick = null,
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = colors.textPrimary,
+                                    unselectedColor = colors.textSecondary
+                                )
+                            )
+                            Text(
+                                text = when (scope) {
+                                    BanScope.THIS_EVENT -> strings.commentBanScopeEvent
+                                    BanScope.ALL_EVENTS -> strings.commentBanScopeAll
+                                },
+                                color = colors.textPrimary,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
         )
     }
 

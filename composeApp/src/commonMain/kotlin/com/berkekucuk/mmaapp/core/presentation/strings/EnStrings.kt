@@ -238,6 +238,8 @@ val EnStrings = AppStrings(
             AppError.INVALID_COMMENT -> "Comments must be between 1 and 500 characters."
             AppError.COMMENT_NOT_FOUND -> "This comment is no longer available."
             AppError.NOT_AUTHORIZED -> "You don't have permission to do this."
+            AppError.COMMENT_BANNED -> "You are banned from commenting."
+            AppError.BAN_NOT_FOUND -> "This user has no ban in this scope."
             AppError.UNKNOWN -> "Something went wrong."
             else -> null
         }
@@ -263,6 +265,14 @@ val EnStrings = AppStrings(
     commentDeleteTitle = "Delete Comment",
     commentDeleteConfirm = "Are you sure you want to delete this comment?",
     commentReported = "Thanks, your report has been received.",
+    commentBan = "Ban",
+    commentUnban = "Unban",
+    commentBanTitle = "Ban User",
+    commentUnbanTitle = "Remove Ban",
+    commentBanScopeEvent = "This event only",
+    commentBanScopeAll = "All events",
+    commentUserBanned = "User has been banned.",
+    commentUserUnbanned = "Ban has been removed.",
     commentJustNow = "now",
     commentMinutesAgo = { minutes -> "${minutes}m" },
     commentHoursAgo = { hours -> "${hours}h" },

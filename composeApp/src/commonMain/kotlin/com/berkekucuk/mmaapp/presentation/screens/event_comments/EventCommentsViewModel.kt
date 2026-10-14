@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import com.berkekucuk.mmaapp.domain.enums.BanAction
+import com.berkekucuk.mmaapp.domain.enums.BanScope
+import com.berkekucuk.mmaapp.domain.enums.CommentsSuccessMessage
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.EventCommentRepository
@@ -106,7 +109,12 @@ class EventCommentsViewModel(
             is EventCommentsUiAction.OnReportReasonChanged -> _state.update { it.copy(selectedReportReason = action.reason) }
             is EventCommentsUiAction.OnSubmitReport -> reportComment()
             is EventCommentsUiAction.OnDismissReportDialog -> _state.update { it.copy(pendingReportCommentId = null, selectedReportReason = null) }
-            is EventCommentsUiAction.OnMessageShown -> _state.update { it.copy(error = null, showReportSuccess = false) }
+            is EventCommentsUiAction.OnBanClicked -> _state.update { it.copy(pendingBanUserId = action.userId, pendingBanAction = BanAction.BAN, selectedBanScope = BanScope.THIS_EVENT) }
+            is EventCommentsUiAction.OnUnbanClicked -> _state.update { it.copy(pendingBanUserId = action.userId, pendingBanAction = BanAction.UNBAN, selectedBanScope = BanScope.THIS_EVENT) }
+            is EventCommentsUiAction.OnBanScopeChanged -> _state.update { it.copy(selectedBanScope = action.scope) }
+            is EventCommentsUiAction.OnConfirmBan -> submitBan()
+            is EventCommentsUiAction.OnDismissBanDialog -> _state.update { it.copy(pendingBanUserId = null, pendingBanAction = null) }
+            is EventCommentsUiAction.OnMessageShown -> _state.update { it.copy(error = null, successMessage = null) }
         }
     }
 
@@ -171,12 +179,42 @@ class EventCommentsViewModel(
             userRepository.reportComment(commentId, reason.dbValue)
                 .onSuccess {
                     _state.update {
-                        it.copy(isReporting = false, pendingReportCommentId = null, selectedReportReason = null, showReportSuccess = true)
+                        it.copy(isReporting = false, pendingReportCommentId = null, selectedReportReason = null, successMessage = CommentsSuccessMessage.REPORT_SENT)
                     }
                 }
                 .onFailure { e ->
                     _state.update {
                         it.copy(isReporting = false, pendingReportCommentId = null, selectedReportReason = null, error = AppErrorMapper.map(e))
+                    }
+                }
+        }
+    }
+
+    private fun submitBan() {
+        val currentState = _state.value
+        val userId = currentState.pendingBanUserId ?: return
+        val action = currentState.pendingBanAction ?: return
+        val banEventId = if (currentState.selectedBanScope == BanScope.THIS_EVENT) eventId else null
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmittingBan = true, error = null) }
+            val result = when (action) {
+                BanAction.BAN -> commentRepository.banUser(userId, banEventId)
+                BanAction.UNBAN -> commentRepository.unbanUser(userId, banEventId)
+            }
+            result
+                .onSuccess {
+                    val message = when (action) {
+                        BanAction.BAN -> CommentsSuccessMessage.USER_BANNED
+                        BanAction.UNBAN -> CommentsSuccessMessage.USER_UNBANNED
+                    }
+                    _state.update {
+                        it.copy(isSubmittingBan = false, pendingBanUserId = null, pendingBanAction = null, successMessage = message)
+                    }
+                }
+                .onFailure { e ->
+                    _state.update {
+                        it.copy(isSubmittingBan = false, pendingBanUserId = null, pendingBanAction = null, error = AppErrorMapper.map(e))
                     }
                 }
         }

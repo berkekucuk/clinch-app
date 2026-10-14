@@ -1,6 +1,9 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_comments
 
 import com.berkekucuk.mmaapp.core.utils.AppError
+import com.berkekucuk.mmaapp.domain.enums.BanAction
+import com.berkekucuk.mmaapp.domain.enums.BanScope
+import com.berkekucuk.mmaapp.domain.enums.CommentsSuccessMessage
 import com.berkekucuk.mmaapp.domain.enums.ReportReason
 import com.berkekucuk.mmaapp.domain.model.EventComment
 
@@ -18,7 +21,11 @@ data class EventCommentsUiState(
     val pendingReportCommentId: String? = null,
     val selectedReportReason: ReportReason? = null,
     val isReporting: Boolean = false,
-    val showReportSuccess: Boolean = false,
+    val pendingBanUserId: String? = null,
+    val pendingBanAction: BanAction? = null,
+    val selectedBanScope: BanScope = BanScope.THIS_EVENT,
+    val isSubmittingBan: Boolean = false,
+    val successMessage: CommentsSuccessMessage? = null,
     val scrollToLatestTrigger: Int = 0,
     val error: AppError? = null,
 )

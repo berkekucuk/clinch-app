@@ -246,6 +246,8 @@ val TrStrings = AppStrings(
             AppError.INVALID_COMMENT -> "Yorum 1 ile 500 karakter arasında olmalıdır."
             AppError.COMMENT_NOT_FOUND -> "Bu yorum artık mevcut değil."
             AppError.NOT_AUTHORIZED -> "Bu işlem için yetkiniz yok."
+            AppError.COMMENT_BANNED -> "Yorum yapmanız engellendi."
+            AppError.BAN_NOT_FOUND -> "Kullanıcının bu kapsamda bir banı yok."
             AppError.UNKNOWN -> "Bir şeyler ters gitti."
             else -> null
         }
@@ -271,6 +273,14 @@ val TrStrings = AppStrings(
     commentDeleteTitle = "Yorumu Sil",
     commentDeleteConfirm = "Bu yorumu silmek istediğinizden emin misiniz?",
     commentReported = "Teşekkürler, şikayetiniz alındı.",
+    commentBan = "Banla",
+    commentUnban = "Banı kaldır",
+    commentBanTitle = "Kullanıcıyı Banla",
+    commentUnbanTitle = "Banı Kaldır",
+    commentBanScopeEvent = "Sadece bu etkinlik",
+    commentBanScopeAll = "Tüm etkinlikler",
+    commentUserBanned = "Kullanıcı banlandı.",
+    commentUserUnbanned = "Ban kaldırıldı.",
     commentJustNow = "şimdi",
     commentMinutesAgo = { minutes -> "$minutes dk" },
     commentHoursAgo = { hours -> "$hours sa" },

@@ -33,7 +33,13 @@ class EventCommentRepositoryImpl(
             .distinctUntilChanged()
     }
 
-    override suspend fun syncComments(eventId: String): Result<Unit> {
+    override suspend fun refreshComments(eventId: String): Result<Unit> {
+        return runSuspendCatching {
+            fetchMutex.withLock { fetchFirstPage(eventId) }
+        }
+    }
+
+    private suspend fun syncNewComments(eventId: String): Result<Unit> {
         return runSuspendCatching {
             fetchMutex.withLock {
                 val newestComment = cache.value[eventId]?.firstOrNull()
@@ -106,7 +112,7 @@ class EventCommentRepositoryImpl(
         return runSuspendCatching {
             remoteDataSource.observeComments(eventId).collect { event ->
                 when (event) {
-                    is EventCommentRealtimeEvent.Subscribed -> syncComments(eventId)
+                    is EventCommentRealtimeEvent.Subscribed -> syncNewComments(eventId)
                     is EventCommentRealtimeEvent.Added -> addToCache(eventId, listOf(event.comment.toDomain()))
                     is EventCommentRealtimeEvent.Deleted -> removeFromCache(eventId, event.commentId)
                 }

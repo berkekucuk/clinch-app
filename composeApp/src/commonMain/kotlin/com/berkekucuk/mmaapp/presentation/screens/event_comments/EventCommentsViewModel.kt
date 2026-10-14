@@ -42,7 +42,7 @@ class EventCommentsViewModel(
     init {
         observeModerationRole()
         observeComments()
-        syncComments()
+        refreshComments()
         listenForCommentChanges()
     }
 
@@ -77,9 +77,9 @@ class EventCommentsViewModel(
         }
     }
 
-    private fun syncComments() {
+    private fun refreshComments() {
         viewModelScope.launch {
-            commentRepository.syncComments(eventId)
+            commentRepository.refreshComments(eventId)
                 .onFailure { e ->
                     val error = if (_state.value.comments.isEmpty()) AppErrorMapper.map(e) else null
                     _state.update { it.copy(error = error) }
@@ -97,7 +97,7 @@ class EventCommentsViewModel(
     fun onAction(action: EventCommentsUiAction) {
         when (action) {
             is EventCommentsUiAction.OnBackClicked -> navigateTo(EventCommentsNavigationEvent.Back)
-            is EventCommentsUiAction.OnRetryClicked -> syncComments()
+            is EventCommentsUiAction.OnRetryClicked -> refreshComments()
             is EventCommentsUiAction.OnLoadOlderComments -> loadOlderComments()
             is EventCommentsUiAction.OnCommentInputChanged -> _state.update { it.copy(commentInput = action.text.take(MAX_COMMENT_LENGTH)) }
             is EventCommentsUiAction.OnSendClicked -> sendComment()

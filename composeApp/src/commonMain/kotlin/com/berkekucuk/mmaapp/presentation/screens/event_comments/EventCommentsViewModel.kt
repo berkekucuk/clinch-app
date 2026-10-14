@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.EventCommentRepository
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -34,9 +37,21 @@ class EventCommentsViewModel(
     val navigation = _navigation.asSharedFlow()
 
     init {
+        observeModerationRole()
         observeComments()
         syncComments()
         listenForCommentChanges()
+    }
+
+    private fun observeModerationRole() {
+        viewModelScope.launch {
+            authRepository.authState
+                .map { (it as? AuthState.Authenticated)?.role?.canModerate == true }
+                .distinctUntilChanged()
+                .collect { canModerate ->
+                    _state.update { it.copy(canModerate = canModerate) }
+                }
+        }
     }
 
     private fun observeComments() {

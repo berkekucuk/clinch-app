@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
+import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
@@ -179,7 +180,7 @@ fun MenuScreen(
             )
 
             HorizontalDivider(color = colors.dividerColor)
-            if ((state.authState as? AuthState.Authenticated)?.isAdmin == true) {
+            if ((state.authState as? AuthState.Authenticated)?.role == UserRole.ADMIN) {
                 MenuItemRow(
                     icon = Icons.Filled.Notifications,
                     title = "Send Notification",

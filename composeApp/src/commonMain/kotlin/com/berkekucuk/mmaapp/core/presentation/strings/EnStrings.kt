@@ -237,6 +237,7 @@ val EnStrings = AppStrings(
             AppError.COMMENT_RATE_LIMITED -> "You are commenting too fast. Please wait a moment."
             AppError.INVALID_COMMENT -> "Comments must be between 1 and 500 characters."
             AppError.COMMENT_NOT_FOUND -> "This comment is no longer available."
+            AppError.NOT_AUTHORIZED -> "You don't have permission to do this."
             AppError.UNKNOWN -> "Something went wrong."
             else -> null
         }

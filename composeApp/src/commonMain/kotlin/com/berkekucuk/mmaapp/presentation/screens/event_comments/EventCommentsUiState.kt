@@ -8,6 +8,7 @@ data class EventCommentsUiState(
     val eventName: String? = null,
     val comments: List<EventComment> = emptyList(),
     val currentUserId: String? = null,
+    val canModerate: Boolean = false,
     val isLoading: Boolean = true,
     val isLoadingOlderComments: Boolean = false,
     val hasOlderComments: Boolean = true,

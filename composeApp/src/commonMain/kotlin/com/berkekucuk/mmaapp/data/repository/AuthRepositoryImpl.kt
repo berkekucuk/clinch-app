@@ -4,6 +4,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.fcm.DeviceTokenProvider
+import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
@@ -42,8 +43,9 @@ class AuthRepositoryImpl(
                 is SessionStatus.Authenticated -> AuthState.Authenticated(
                     userId = status.session.user?.id ?: "",
                     email = status.session.user?.email,
-                    isAdmin = status.session.user?.appMetadata
-                        ?.get("role")?.jsonPrimitive?.contentOrNull == "admin"
+                    role = UserRole.fromString(
+                        status.session.user?.appMetadata?.get("role")?.jsonPrimitive?.contentOrNull
+                    )
                 )
                 else -> AuthState.Unauthenticated
             }

@@ -18,6 +18,7 @@ object AppErrorMapper {
                     message.contains("rate_limited") -> AppError.COMMENT_RATE_LIMITED
                     message.contains("invalid_content") -> AppError.INVALID_COMMENT
                     message.contains("comment_not_found") -> AppError.COMMENT_NOT_FOUND
+                    message.contains("not_authorized") -> AppError.NOT_AUTHORIZED
                     message.contains("odds pending") -> AppError.ODDS_NOT_PUBLISHED
                     message.contains("event already over") -> AppError.EVENT_OVER
                     message.contains("fight already over") -> AppError.FIGHT_OVER
@@ -53,5 +54,6 @@ enum class AppError {
     COMMENT_RATE_LIMITED,
     INVALID_COMMENT,
     COMMENT_NOT_FOUND,
+    NOT_AUTHORIZED,
     UNKNOWN
 }

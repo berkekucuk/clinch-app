@@ -245,6 +245,7 @@ val TrStrings = AppStrings(
             AppError.COMMENT_RATE_LIMITED -> "Çok hızlı yorum yapıyorsunuz. Lütfen biraz bekleyin."
             AppError.INVALID_COMMENT -> "Yorum 1 ile 500 karakter arasında olmalıdır."
             AppError.COMMENT_NOT_FOUND -> "Bu yorum artık mevcut değil."
+            AppError.NOT_AUTHORIZED -> "Bu işlem için yetkiniz yok."
             AppError.UNKNOWN -> "Bir şeyler ters gitti."
             else -> null
         }

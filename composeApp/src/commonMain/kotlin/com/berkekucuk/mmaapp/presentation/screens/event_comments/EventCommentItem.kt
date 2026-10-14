@@ -44,8 +44,8 @@ import com.berkekucuk.mmaapp.presentation.components.appClickable
 fun EventCommentItem(
     comment: EventComment,
     timeText: String,
-    isOwnComment: Boolean,
-    showMenu: Boolean,
+    canReport: Boolean,
+    canDelete: Boolean,
     onUserClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
@@ -53,6 +53,8 @@ fun EventCommentItem(
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
+    val showMenu = canReport || canDelete
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -110,7 +112,8 @@ fun EventCommentItem(
 
         if (showMenu) {
             CommentOverflowMenu(
-                isOwnComment = isOwnComment,
+                canReport = canReport,
+                canDelete = canDelete,
                 contentDescription = strings.contentDescriptionMoreOptions,
                 onDeleteClick = onDeleteClick,
                 onReportClick = onReportClick,
@@ -121,7 +124,8 @@ fun EventCommentItem(
 
 @Composable
 private fun CommentOverflowMenu(
-    isOwnComment: Boolean,
+    canReport: Boolean,
+    canDelete: Boolean,
     contentDescription: String,
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
@@ -147,15 +151,16 @@ private fun CommentOverflowMenu(
             onDismissRequest = { expanded = false },
             containerColor = colors.dropdownMenuBackground
         ) {
-            if (isOwnComment) {
-                CommentMenuItem(strings.commonDelete, Icons.Default.Delete) {
-                    expanded = false
-                    onDeleteClick()
-                }
-            } else {
+            if (canReport) {
                 CommentMenuItem(strings.reportUserTitle, Icons.Default.Report) {
                     expanded = false
                     onReportClick()
+                }
+            }
+            if (canDelete) {
+                CommentMenuItem(strings.commonDelete, Icons.Default.Delete) {
+                    expanded = false
+                    onDeleteClick()
                 }
             }
         }

@@ -13,6 +13,7 @@ import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
+import com.berkekucuk.mmaapp.domain.usecase.SyncUserDataUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,6 +30,7 @@ class FightDetailViewModel(
     private val notificationRepository: NotificationRepository,
     private val predictionRepository: PredictionRepository,
     private val notificationStorage: NotificationStorage,
+    private val syncUserData: SyncUserDataUseCase,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -178,7 +180,12 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnDismissSignInSheet -> {
                 _state.update { it.copy(showSignInSheet = false) }
             }
-            is FightDetailUiAction.OnSignInSuccess -> { _state.update { it.copy(showSignInSuccess = true) } }
+            is FightDetailUiAction.OnSignInSuccess -> {
+                _state.update { it.copy(showSignInSuccess = true) }
+                viewModelScope.launch {
+                    authRepository.getAuthenticatedUserId()?.let { syncUserData(it) }
+                }
+            }
         }
     }
 

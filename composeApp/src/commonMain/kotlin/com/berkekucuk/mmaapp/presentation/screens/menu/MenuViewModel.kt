@@ -13,15 +13,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.berkekucuk.mmaapp.domain.repository.NotificationRepository
-import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
+import com.berkekucuk.mmaapp.domain.usecase.SyncUserDataUseCase
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
 
 class MenuViewModel(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository,
-    private val predictionRepository: PredictionRepository,
-    private val notificationRepository: NotificationRepository
+    private val syncUserData: SyncUserDataUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MenuUiState())
@@ -47,9 +45,7 @@ class MenuViewModel(
 
                     if (userId != null) {
                         coroutineScope {
-                            launch { userRepository.syncUser(userId) }
-                            launch { predictionRepository.syncPredictions(userId, limit = 20, offset = 0) }
-                            launch { notificationRepository.syncFightNotifications(userId) }
+                            launch { syncUserData(userId) }
                             launch {
                                 userRepository.getUser(userId)
                                     .collect { user ->

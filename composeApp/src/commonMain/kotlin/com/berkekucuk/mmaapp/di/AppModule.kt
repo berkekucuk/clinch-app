@@ -59,6 +59,7 @@ import com.berkekucuk.mmaapp.data.remote.supabase.EventCommentSupabaseAPI
 import com.berkekucuk.mmaapp.data.repository.EventCommentRepositoryImpl
 import com.berkekucuk.mmaapp.domain.repository.EventCommentRepository
 import com.berkekucuk.mmaapp.domain.usecase.ObserveBlockedUserIdsUseCase
+import com.berkekucuk.mmaapp.domain.usecase.SyncUserDataUseCase
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.fight_detail.FightDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.menu.MenuViewModel
@@ -338,6 +339,14 @@ val appModule = module {
         )
     }
 
+    factory {
+        SyncUserDataUseCase(
+            userRepository = get(),
+            predictionRepository = get(),
+            notificationRepository = get()
+        )
+    }
+
     // view model
     viewModel {
         HomeViewModel(
@@ -370,6 +379,7 @@ val appModule = module {
             notificationRepository = get(),
             predictionRepository = get(),
             notificationStorage = get(),
+            syncUserData = get(),
             savedStateHandle = get(),
             fightRepository = get()
         )
@@ -423,8 +433,7 @@ val appModule = module {
         MenuViewModel(
             authRepository = get(),
             userRepository = get(),
-            predictionRepository = get(),
-            notificationRepository = get()
+            syncUserData = get()
         )
     }
 

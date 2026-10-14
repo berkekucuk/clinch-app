@@ -10,10 +10,11 @@ object AppErrorMapper {
             is HttpRequestException -> AppError.NETWORK
             is AuthRestException -> AppError.UNAUTHENTICATED
             is PostgrestRestException -> {
-                val message = e.message?.lowercase() ?: ""
+                val message = e.error.lowercase()
                 when {
                     message.contains("profiles_username_key") -> AppError.USERNAME_TAKEN
-                    message.contains("unique_user_fighter_interaction") -> AppError.ALREADY_EXISTS
+                    message.contains("unique_user_fighter_interaction") -> AppError.FIGHTER_ALREADY_IN_LIST
+                    message.contains("unique_user_fight_prediction") -> AppError.ALREADY_PREDICTED
                     message.contains("already_reported") -> AppError.ALREADY_REPORTED
                     message.contains("rate_limited") -> AppError.COMMENT_RATE_LIMITED
                     message.contains("invalid_content") -> AppError.INVALID_COMMENT
@@ -40,6 +41,8 @@ enum class AppError {
     SERVER_ERROR,
     UNAUTHENTICATED,
     ALREADY_EXISTS,
+    FIGHTER_ALREADY_IN_LIST,
+    ALREADY_PREDICTED,
     USERNAME_TAKEN,
     EMPTY_FULLNAME,
     FULLNAME_TOO_SHORT,

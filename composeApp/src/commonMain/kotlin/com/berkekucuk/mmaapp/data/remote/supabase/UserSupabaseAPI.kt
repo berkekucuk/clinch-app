@@ -7,7 +7,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
-import io.github.jan.supabase.postgrest.rpc
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class UserSupabaseAPI(
     private val client: SupabaseClient,
@@ -50,18 +51,20 @@ class UserSupabaseAPI(
     override suspend fun reportUser(reason: String, reportedId: String?, commentId: String?) {
         client.postgrest.rpc(
             function = "report_user",
-            parameters = mapOf(
-                "p_reason" to reason,
-                "p_reported_id" to reportedId,
-                "p_comment_id" to commentId
-            )
+            parameters = buildJsonObject {
+                put("p_reason", reason)
+                reportedId?.let { put("p_reported_id", it) }
+                commentId?.let { put("p_comment_id", it) }
+            }
         )
     }
 
     override suspend fun searchUsers(query: String): List<UserDto> {
         return client.postgrest.rpc(
             function = "search_profiles",
-            parameters = mapOf("search_query" to query)
+            parameters = buildJsonObject {
+                put("search_query", query)
+            }
         ).decodeList<UserDto>()
     }
 }

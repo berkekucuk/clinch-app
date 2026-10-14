@@ -4,7 +4,8 @@ import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.FightDto
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.rpc
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class FightSupabaseAPI(
     private val client: SupabaseClient
@@ -13,7 +14,9 @@ class FightSupabaseAPI(
     override suspend fun fetchFight(fightId: String): FightDto {
         return client.postgrest.rpc(
             function = "get_fight_v4",
-            parameters = mapOf("p_fight_id" to fightId)
+            parameters = buildJsonObject {
+                put("p_fight_id", fightId)
+            }
         ).decodeList<FightDto>().first()
     }
 }

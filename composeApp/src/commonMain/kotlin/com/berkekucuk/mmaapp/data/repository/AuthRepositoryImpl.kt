@@ -1,9 +1,10 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.getAppVersionCode
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
-import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.DeviceRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.fcm.DeviceTokenProvider
 import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class AuthRepositoryImpl(
     private val supabaseClient: SupabaseClient,
-    private val deviceTokenRemoteDataSource: DeviceTokenRemoteDataSource,
+    private val deviceRemoteDataSource: DeviceRemoteDataSource,
     private val deviceTokenProvider: DeviceTokenProvider,
     private val scope: CoroutineScope
 ) : AuthRepository {
@@ -31,7 +32,7 @@ class AuthRepositoryImpl(
             supabaseClient.auth.sessionStatus
                 .filter { it !is SessionStatus.Initializing }
                 .collect {
-                    registerDeviceToken()
+                    registerDevice()
                 }
         }
     }
@@ -56,17 +57,17 @@ class AuthRepositoryImpl(
         .map { (it as? AuthState.Authenticated)?.userId }
         .distinctUntilChanged()
 
-    private suspend fun registerDeviceToken(): Result<Unit> {
+    private suspend fun registerDevice(): Result<Unit> {
         return runSuspendCatching {
             val token = deviceTokenProvider.getToken() ?: return@runSuspendCatching
-            deviceTokenRemoteDataSource.upsertToken(token, deviceTokenProvider.platform)
+            deviceRemoteDataSource.registerDevice(token, deviceTokenProvider.platform, getAppVersionCode())
         }
     }
 
     override suspend fun signOut(): Result<Unit> {
         return runSuspendCatching {
             supabaseClient.auth.signOut()
-            registerDeviceToken().getOrThrow()
+            registerDevice().getOrThrow()
         }
     }
 

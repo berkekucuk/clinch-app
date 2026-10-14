@@ -11,8 +11,8 @@ import com.berkekucuk.mmaapp.core.utils.SystemDateTimeProvider
 import com.berkekucuk.mmaapp.data.local.AppDatabase
 import com.berkekucuk.mmaapp.data.local.getRoomDatabase
 import com.berkekucuk.mmaapp.data.remote.factory.SupabaseClientFactory
-import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
-import com.berkekucuk.mmaapp.data.remote.supabase.DeviceTokenSupabaseAPI
+import com.berkekucuk.mmaapp.data.remote.datasource.DeviceRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.DeviceSupabaseAPI
 import com.berkekucuk.mmaapp.data.remote.datasource.EventRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.supabase.EventSupabaseAPI
 import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
@@ -185,8 +185,8 @@ val appModule = module {
         LeaderboardSupabaseAPI(client = get())
     }
 
-    single<DeviceTokenRemoteDataSource> {
-        DeviceTokenSupabaseAPI(client = get())
+    single<DeviceRemoteDataSource> {
+        DeviceSupabaseAPI(client = get())
     }
 
     single<NotificationRemoteDataSource> {
@@ -268,7 +268,7 @@ val appModule = module {
     single<AuthRepository> {
         AuthRepositoryImpl(
             supabaseClient = get(),
-            deviceTokenRemoteDataSource = get(),
+            deviceRemoteDataSource = get(),
             deviceTokenProvider = get(),
             scope = get(named("applicationScope"))
         )

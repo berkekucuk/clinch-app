@@ -31,7 +31,7 @@ interface UserDao {
     @Query("DELETE FROM users WHERE id = :userId")
     suspend fun deleteUser(userId: String)
 
-    @Query("DELETE FROM users WHERE id NOT IN (:retainedIds) AND id != :currentUserId AND id NOT IN (SELECT user_id FROM weekly_leaderboard)")
+    @Query("DELETE FROM users WHERE id NOT IN (:retainedIds) AND id != :currentUserId AND id NOT IN (SELECT user_id FROM weekly_leaderboard) AND id NOT IN (SELECT blocked_user_id FROM blocked_users)")
     suspend fun deleteUsersExcept(retainedIds: List<String>, currentUserId: String)
 
     @Transaction
@@ -45,6 +45,9 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE id IN (SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId) ORDER BY created_at ASC")
     fun getBlockedUsers(currentUserId: String): Flow<List<UserEntity>>
+
+    @Query("SELECT blocked_user_id FROM blocked_users WHERE blocker_user_id = :currentUserId")
+    fun getBlockedUserIds(currentUserId: String): Flow<List<String>>
 
     @Upsert
     suspend fun upsertBlockedUser(blockedUser: BlockedUserEntity)

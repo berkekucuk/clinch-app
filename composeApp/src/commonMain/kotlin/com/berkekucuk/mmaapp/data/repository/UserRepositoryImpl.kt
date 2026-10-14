@@ -94,6 +94,12 @@ class UserRepositoryImpl(
             .flowOn(Dispatchers.IO)
     }
 
+    override fun getBlockedUserIds(currentUserId: String): Flow<Set<String>> {
+        return dao.getBlockedUserIds(currentUserId)
+            .map { it.toSet() }
+            .distinctUntilChanged()
+    }
+
     override suspend fun reportUser(reportedId: String, reason: String): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {

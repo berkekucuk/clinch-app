@@ -54,6 +54,7 @@ kotlin {
                 implementation(libs.supabase.compose.auth)
                 implementation(libs.supabase.storage)
                 implementation(libs.supabase.functions)
+                implementation(libs.supabase.realtime)
 
                 implementation(libs.ktor.client.core)
 

@@ -122,6 +122,9 @@ val TrStrings = AppStrings(
             ReportReason.INAPPROPRIATE_USERNAME -> "Uygunsuz kullanıcı adı"
             ReportReason.SPAM_OR_BOT -> "Spam veya bot"
             ReportReason.ABUSIVE_OR_HARASSING_BEHAVIOR -> "Taciz edici veya kötüye kullanım"
+            ReportReason.HATE_SPEECH -> "Nefret söylemi"
+            ReportReason.INAPPROPRIATE_CONTENT -> "Uygunsuz içerik"
+            ReportReason.SPOILER -> "Spoiler"
             ReportReason.OTHER -> "Diğer"
         }
     },
@@ -239,6 +242,9 @@ val TrStrings = AppStrings(
             AppError.FIGHT_OVER -> "Bu dövüş zaten tamamlandı."
             AppError.FIGHT_PENDING -> "Sonuç bekleniyor. Tahminler kapandı."
             AppError.ALREADY_REPORTED -> "Bu kullanıcıyı zaten şikayet ettiniz."
+            AppError.COMMENT_RATE_LIMITED -> "Çok hızlı yorum yapıyorsunuz. Lütfen biraz bekleyin."
+            AppError.INVALID_COMMENT -> "Yorum 1 ile 500 karakter arasında olmalıdır."
+            AppError.COMMENT_NOT_FOUND -> "Bu yorum artık mevcut değil."
             AppError.UNKNOWN -> "Bir şeyler ters gitti."
             else -> null
         }
@@ -257,4 +263,18 @@ val TrStrings = AppStrings(
     notificationTypeAlarm = "Alarm",
     titleFightUndisputed = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Kemer Maçı 🏆" else "Kemer Maçı 🏆" },
     titleFightInterim = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Geçici Kemer Maçı 🏆" else "Geçici Kemer Maçı 🏆" },
+    commentsTitle = "Yorumlar",
+    commentsEmpty = "Henüz yorum yok. İlk yorumu sen yaz!",
+    commentInputPlaceholder = "Yorum yaz...",
+    commentLoginRequired = "Sohbete katılmak için giriş yapın.",
+    commentDeleteTitle = "Yorumu Sil",
+    commentDeleteConfirm = "Bu yorumu silmek istediğinizden emin misiniz?",
+    commentReported = "Teşekkürler, şikayetiniz alındı.",
+    commentJustNow = "şimdi",
+    commentMinutesAgo = { minutes -> "$minutes dk" },
+    commentHoursAgo = { hours -> "$hours sa" },
+    commentDaysAgo = { days -> "$days g" },
+    contentDescriptionComments = "Yorumlar",
+    contentDescriptionSendComment = "Yorumu gönder",
+    contentDescriptionMoreOptions = "Diğer seçenekler",
 )

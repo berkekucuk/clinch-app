@@ -193,7 +193,7 @@ class ProfileViewModel(
                 return@launch
             }
 
-            userRepository.reportUser(currentUserId, userId, reasonDbValue)
+            userRepository.reportUser(userId, reasonDbValue)
                 .onSuccess {
                     _state.update {
                         it.copy(isReporting = false, showReportDialog = false, reportReason = null)

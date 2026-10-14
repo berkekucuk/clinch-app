@@ -323,7 +323,7 @@ fun ProfileScreen(
             isDestructive = true,
             content = {
                 Column(modifier = Modifier.selectableGroup()) {
-                    ReportReason.entries.forEach { reason ->
+                    ReportReason.profileReasons.forEach { reason ->
                         val displayName = strings.reportReasonDisplayName(reason)
                         Row(
                             Modifier

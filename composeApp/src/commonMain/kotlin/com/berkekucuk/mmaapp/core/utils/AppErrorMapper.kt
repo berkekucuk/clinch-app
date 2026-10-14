@@ -14,12 +14,15 @@ object AppErrorMapper {
                 when {
                     message.contains("profiles_username_key") -> AppError.USERNAME_TAKEN
                     message.contains("unique_user_fighter_interaction") -> AppError.ALREADY_EXISTS
-                    message.contains("unique_reporter_reported") -> AppError.ALREADY_REPORTED
+                    message.contains("already_reported") -> AppError.ALREADY_REPORTED
+                    message.contains("rate_limited") -> AppError.COMMENT_RATE_LIMITED
+                    message.contains("invalid_content") -> AppError.INVALID_COMMENT
+                    message.contains("comment_not_found") -> AppError.COMMENT_NOT_FOUND
                     message.contains("odds pending") -> AppError.ODDS_NOT_PUBLISHED
                     message.contains("event already over") -> AppError.EVENT_OVER
                     message.contains("fight already over") -> AppError.FIGHT_OVER
                     message.contains("result pending") -> AppError.FIGHT_PENDING
-                    message.contains("not authenticated") || message.contains("unauthenticated") -> AppError.UNAUTHENTICATED
+                    message.contains("not authenticated") || message.contains("not_authenticated") || message.contains("unauthenticated") -> AppError.UNAUTHENTICATED
                     e.code == "23505" -> AppError.ALREADY_EXISTS
                     else -> AppError.SERVER_ERROR
                 }
@@ -47,5 +50,8 @@ enum class AppError {
     FIGHT_OVER,
     FIGHT_PENDING,
     ALREADY_REPORTED,
+    COMMENT_RATE_LIMITED,
+    INVALID_COMMENT,
+    COMMENT_NOT_FOUND,
     UNKNOWN
 }

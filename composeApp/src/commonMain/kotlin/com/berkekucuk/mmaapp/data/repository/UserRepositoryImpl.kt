@@ -94,10 +94,20 @@ class UserRepositoryImpl(
             .flowOn(Dispatchers.IO)
     }
 
-    override suspend fun reportUser(reporterId: String, reportedId: String, reason: String): Result<Unit> {
+    override suspend fun reportUser(reportedId: String, reason: String): Result<Unit> {
         return withContext(Dispatchers.IO) {
             runCatching {
-                remoteDataSource.reportUser(reporterId, reportedId, reason)
+                remoteDataSource.reportUser(reason = reason, reportedId = reportedId)
+            }.onFailure {
+                if (it is CancellationException) throw it
+            }
+        }
+    }
+
+    override suspend fun reportComment(commentId: String, reason: String): Result<Unit> {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                remoteDataSource.reportUser(reason = reason, commentId = commentId)
             }.onFailure {
                 if (it is CancellationException) throw it
             }

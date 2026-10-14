@@ -47,12 +47,13 @@ class UserSupabaseAPI(
         client.postgrest.rpc("delete_my_account")
     }
 
-    override suspend fun reportUser(reporterId: String, reportedId: String, reason: String) {
-        client.from("user_reports").insert(
-            mapOf(
-                "reporter_id" to reporterId,
-                "reported_id" to reportedId,
-                "reason" to reason
+    override suspend fun reportUser(reason: String, reportedId: String?, commentId: String?) {
+        client.postgrest.rpc(
+            function = "report_user",
+            parameters = mapOf(
+                "p_reason" to reason,
+                "p_reported_id" to reportedId,
+                "p_comment_id" to commentId
             )
         )
     }

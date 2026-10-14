@@ -122,6 +122,9 @@ val EnStrings = AppStrings(
             ReportReason.INAPPROPRIATE_USERNAME -> "Inappropriate username"
             ReportReason.SPAM_OR_BOT -> "Spam or bot"
             ReportReason.ABUSIVE_OR_HARASSING_BEHAVIOR -> "Abusive or harassing behavior"
+            ReportReason.HATE_SPEECH -> "Hate speech"
+            ReportReason.INAPPROPRIATE_CONTENT -> "Inappropriate content"
+            ReportReason.SPOILER -> "Spoiler"
             ReportReason.OTHER -> "Other"
         }
     },
@@ -231,6 +234,9 @@ val EnStrings = AppStrings(
             AppError.FIGHT_OVER -> "Fight already over."
             AppError.FIGHT_PENDING -> "Result pending. Predictions locked."
             AppError.ALREADY_REPORTED -> "You have already reported this user."
+            AppError.COMMENT_RATE_LIMITED -> "You are commenting too fast. Please wait a moment."
+            AppError.INVALID_COMMENT -> "Comments must be between 1 and 500 characters."
+            AppError.COMMENT_NOT_FOUND -> "This comment is no longer available."
             AppError.UNKNOWN -> "Something went wrong."
             else -> null
         }
@@ -249,4 +255,18 @@ val EnStrings = AppStrings(
     notificationTypeAlarm = "Alarm",
     titleFightUndisputed = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Title Bout 🏆" else "Title Bout 🏆" },
     titleFightInterim = { weightClass -> if (weightClass.isNotBlank()) "Interim $weightClass Title Bout 🏆" else "Interim Title Bout 🏆" },
+    commentsTitle = "Comments",
+    commentsEmpty = "No comments yet. Be the first to comment!",
+    commentInputPlaceholder = "Write a comment...",
+    commentLoginRequired = "Sign in to join the conversation.",
+    commentDeleteTitle = "Delete Comment",
+    commentDeleteConfirm = "Are you sure you want to delete this comment?",
+    commentReported = "Thanks, your report has been received.",
+    commentJustNow = "now",
+    commentMinutesAgo = { minutes -> "${minutes}m" },
+    commentHoursAgo = { hours -> "${hours}h" },
+    commentDaysAgo = { days -> "${days}d" },
+    contentDescriptionComments = "Comments",
+    contentDescriptionSendComment = "Send comment",
+    contentDescriptionMoreOptions = "More options",
 )

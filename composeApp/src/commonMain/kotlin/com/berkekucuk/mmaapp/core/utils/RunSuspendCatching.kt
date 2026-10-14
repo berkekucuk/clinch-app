@@ -1,10 +1,16 @@
 package com.berkekucuk.mmaapp.core.utils
 
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
-inline fun <T> runSuspendCatching(block: () -> T): Result<T> {
+suspend fun <T> runSuspendCatching(
+    context: CoroutineContext = EmptyCoroutineContext,
+    block: suspend () -> T,
+): Result<T> {
     return try {
-        Result.success(block())
+        Result.success(withContext(context) { block() })
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
@@ -10,7 +11,6 @@ import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,26 +57,16 @@ class AuthRepositoryImpl(
         .distinctUntilChanged()
 
     private suspend fun registerDeviceToken(): Result<Unit> {
-        return try {
-            val token = deviceTokenProvider.getToken() ?: return Result.success(Unit)
+        return runSuspendCatching {
+            val token = deviceTokenProvider.getToken() ?: return@runSuspendCatching
             deviceTokenRemoteDataSource.upsertToken(token, deviceTokenProvider.platform)
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 
     override suspend fun signOut(): Result<Unit> {
-        return try {
+        return runSuspendCatching {
             supabaseClient.auth.signOut()
             registerDeviceToken().getOrThrow()
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 

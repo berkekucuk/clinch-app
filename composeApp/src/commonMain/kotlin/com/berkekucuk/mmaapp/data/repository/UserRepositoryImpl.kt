@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.UserDao
 import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
@@ -10,13 +11,10 @@ import com.berkekucuk.mmaapp.domain.model.User
 import com.berkekucuk.mmaapp.domain.model.UserProfile
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
 
 class UserRepositoryImpl(
     private val remoteDataSource: UserRemoteDataSource,
@@ -30,60 +28,45 @@ class UserRepositoryImpl(
         return dao.getUser(userId)
             .map { entity -> entity?.toDomain() }
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+            .flowOn(Dispatchers.Default)
     }
 
     override fun getUserProfile(userId: String): Flow<UserProfile?> {
         return dao.getUserProfile(userId)
             .map { it?.toDomain() }
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun syncUser(userId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                if (!rateLimiter.shouldFetch(syncUserKey(userId))) {
-                    return@runCatching
-                }
-                val remoteUser = remoteDataSource.fetchUser(userId)
-                dao.upsertUsers(listOf(remoteUser.toEntity()))
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(syncUserKey(userId))
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!rateLimiter.shouldFetch(syncUserKey(userId))) {
+                return@runSuspendCatching
             }
+            val remoteUser = remoteDataSource.fetchUser(userId)
+            dao.upsertUsers(listOf(remoteUser.toEntity()))
+        }.onFailure {
+            rateLimiter.reset(syncUserKey(userId))
         }
     }
 
     override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.updateUser(userId, fullName, username, avatarUrl)
-                dao.updateUser(userId, fullName, username, avatarUrl)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            remoteDataSource.updateUser(userId, fullName, username, avatarUrl)
+            dao.updateUser(userId, fullName, username, avatarUrl)
         }
     }
 
     override suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): Result<String> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.uploadAvatar(userId, imageBytes)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            remoteDataSource.uploadAvatar(userId, imageBytes)
         }
     }
 
     override suspend fun deleteUser(userId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.deleteUser(userId)
-                dao.deleteUser(userId)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            remoteDataSource.deleteUser(userId)
+            dao.deleteUser(userId)
         }
     }
 
@@ -91,63 +74,44 @@ class UserRepositoryImpl(
         return dao.getBlockedUsers(currentUserId)
             .map { entities -> entities.map { it.toDomain() } }
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+            .flowOn(Dispatchers.Default)
     }
 
     override fun getBlockedUserIds(currentUserId: String): Flow<Set<String>> {
         return dao.getBlockedUserIds(currentUserId)
             .map { it.toSet() }
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun reportUser(reportedId: String, reason: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.reportUser(reason = reason, reportedId = reportedId)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            remoteDataSource.reportUser(reason = reason, reportedId = reportedId)
         }
     }
 
     override suspend fun reportComment(commentId: String, reason: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.reportUser(reason = reason, commentId = commentId)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            remoteDataSource.reportUser(reason = reason, commentId = commentId)
         }
     }
 
     override suspend fun blockUser(blockerUserId: String, blockedUserId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                dao.upsertBlockedUser(BlockedUserEntity(blockerUserId, blockedUserId))
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            dao.upsertBlockedUser(BlockedUserEntity(blockerUserId, blockedUserId))
         }
     }
 
     override suspend fun unblockUser(blockerUserId: String, blockedUserId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                dao.unblockUser(blockerUserId, blockedUserId)
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching {
+            dao.unblockUser(blockerUserId, blockedUserId)
         }
     }
 
     override suspend fun searchUsers(query: String): Result<List<User>> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                remoteDataSource.searchUsers(query)
-                    .map { it.toDomain() }
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+        return runSuspendCatching(Dispatchers.Default) {
+            remoteDataSource.searchUsers(query)
+                .map { it.toDomain() }
         }
     }
 }

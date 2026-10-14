@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
@@ -12,14 +13,11 @@ import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
 import com.berkekucuk.mmaapp.data.remote.dto.EventDto
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.filterNotNull
 
 class EventRepositoryImpl(
@@ -31,7 +29,7 @@ class EventRepositoryImpl(
 ) : EventRepository {
 
     private companion object {
-        private const val KEY_REFRESH_PENDING_EVENTS = "refresh_pending_events"
+        const val KEY_REFRESH_PENDING_EVENTS = "refresh_pending_events"
         fun getSyncKey(year: Int) = "sync_events_$year"
         fun getRefreshEventKey(eventId: String) = "refresh_event_$eventId"
     }
@@ -39,98 +37,85 @@ class EventRepositoryImpl(
     override fun getUpcomingEvents(): Flow<List<Event>> {
         return eventDao.getUpcomingEvents()
             .map { entities -> entities.map { it.toDomain() } }
-            .flowOn(Dispatchers.IO)
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 
     override fun getCompletedEventsByYear(year: Int): Flow<List<Event>> {
         return eventDao.getCompletedEventsByYear(year)
             .map { entities -> entities.map { it.toDomain() } }
-            .flowOn(Dispatchers.IO)
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 
     override fun getEventById(eventId: String): Flow<Event> {
         return eventDao.getEventById(eventId)
             .filterNotNull()
             .map { it.toDomain() }
-            .flowOn(Dispatchers.IO)
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun initializeEvents(): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            val currentYear = dateTimeProvider.currentYear
-            if (needsInitialSync(currentYear)) {
-                syncEventsByYear(currentYear).onSuccess {
-                    syncEventsByYear(currentYear + 1)
-                }
-            } else {
-                syncPendingEvents()
+        val currentYear = dateTimeProvider.currentYear
+        return if (needsInitialSync(currentYear)) {
+            syncEventsByYear(currentYear).onSuccess {
+                syncEventsByYear(currentYear + 1)
             }
+        } else {
+            syncPendingEvents()
         }
     }
 
     override suspend fun syncEventById(eventId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            val refreshKey = getRefreshEventKey(eventId)
-            runCatching {
-                if (!rateLimiter.shouldFetch(refreshKey)) {
-                    return@runCatching
-                }
-                val events = remoteDataSource.fetchEventById(eventId)
-                saveEventsAndFights(events)
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(refreshKey)
+        val refreshKey = getRefreshEventKey(eventId)
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!rateLimiter.shouldFetch(refreshKey)) {
+                return@runSuspendCatching
             }
+            val events = remoteDataSource.fetchEventById(eventId)
+            saveEventsAndFights(events)
+        }.onFailure {
+            rateLimiter.reset(refreshKey)
         }
     }
 
     override suspend fun syncEventsByYear(year: Int, forceRefresh: Boolean): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            val syncKey = getSyncKey(year)
-            runCatching {
-                if (!forceRefresh && eventDao.isYearFullySynced(year)) return@runCatching
-                if (!rateLimiter.shouldFetch(syncKey)) return@runCatching
-                val events = remoteDataSource.fetchEventsByYear(year)
-                if (events.isNotEmpty()) {
-                    saveEventsAndFights(events)
-                    eventDao.markYearSynced(SyncedYearEntity(year))
-                }
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(syncKey)
+        val syncKey = getSyncKey(year)
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!forceRefresh && eventDao.isYearFullySynced(year)) return@runSuspendCatching
+            if (!rateLimiter.shouldFetch(syncKey)) return@runSuspendCatching
+            val events = remoteDataSource.fetchEventsByYear(year)
+            if (events.isNotEmpty()) {
+                saveEventsAndFights(events)
+                eventDao.markYearSynced(SyncedYearEntity(year))
             }
+        }.onFailure {
+            rateLimiter.reset(syncKey)
         }
     }
 
     override suspend fun isYearSynced(year: Int): Boolean {
-        return withContext(Dispatchers.IO) { eventDao.isYearFullySynced(year) }
+        return eventDao.isYearFullySynced(year)
     }
 
     override suspend fun syncPendingEvents(): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                if (!rateLimiter.shouldFetch(KEY_REFRESH_PENDING_EVENTS)) return@runCatching
-                val syncAfterDate = eventDao.getOldestPendingEventDate() ?: dateTimeProvider.now
-                val events = remoteDataSource.fetchEventsAfter(syncAfterDate)
-                saveEventsAndFights(events)
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(KEY_REFRESH_PENDING_EVENTS)
-            }
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!rateLimiter.shouldFetch(KEY_REFRESH_PENDING_EVENTS)) return@runSuspendCatching
+            val syncAfterDate = eventDao.getOldestPendingEventDate() ?: dateTimeProvider.now
+            val events = remoteDataSource.fetchEventsAfter(syncAfterDate)
+            saveEventsAndFights(events)
+        }.onFailure {
+            rateLimiter.reset(KEY_REFRESH_PENDING_EVENTS)
         }
     }
 
     override suspend fun hasEventById(eventId: String): Boolean {
-        return withContext(Dispatchers.IO) { eventDao.hasEventById(eventId) }
+        return eventDao.hasEventById(eventId)
     }
 
     override suspend fun getNearestActiveEvent(): Event? {
-        return withContext(Dispatchers.IO) {
-            eventDao.getUpcomingEvents().first().firstOrNull()?.toDomain()
-        }
+        return getUpcomingEvents().first().firstOrNull()
     }
 
     private suspend fun saveEventsAndFights(events: List<EventDto>) {

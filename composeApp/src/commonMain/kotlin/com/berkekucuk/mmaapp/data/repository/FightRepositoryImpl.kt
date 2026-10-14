@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.FightStatDao
@@ -9,15 +10,12 @@ import com.berkekucuk.mmaapp.data.remote.datasource.FightRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.FightDto
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
 class FightRepositoryImpl(
     private val fightDao: FightDao,
@@ -32,23 +30,19 @@ class FightRepositoryImpl(
         return fightDao.getFight(fightId)
             .filterNotNull()
             .map { it.toDomain() }
-            .flowOn(Dispatchers.IO)
             .distinctUntilChanged()
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun syncFight(fightId: String): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                if (!rateLimiter.shouldFetch(syncKey(fightId))) {
-                    return@runCatching
-                }
-
-                val fightDto = remoteDataSource.fetchFight(fightId)
-                saveFightAndStats(fightDto)
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(syncKey(fightId))
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!rateLimiter.shouldFetch(syncKey(fightId))) {
+                return@runSuspendCatching
             }
+            val fightDto = remoteDataSource.fetchFight(fightId)
+            saveFightAndStats(fightDto)
+        }.onFailure {
+            rateLimiter.reset(syncKey(fightId))
         }
     }
 

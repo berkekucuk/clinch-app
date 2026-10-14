@@ -1,13 +1,12 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
 import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
 import com.berkekucuk.mmaapp.data.remote.datasource.PredictionRemoteDataSource
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
 import com.berkekucuk.mmaapp.domain.model.Prediction
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 class PredictionRepositoryImpl(
     private val predictionDao: PredictionDao,
@@ -29,7 +27,6 @@ class PredictionRepositoryImpl(
     override fun getPredictedWinnerId(fightId: String, userId: String): Flow<String?> {
         return predictionDao.getPredictedWinnerId(fightId, userId)
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
     }
 
     override fun getPredictions(userId: String, limit: Int, offset: Int): Flow<List<Prediction>> {
@@ -38,30 +35,27 @@ class PredictionRepositoryImpl(
                 entities.map { it.toDomain() }
             }
             .distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+            .flowOn(Dispatchers.Default)
     }
 
     override suspend fun syncPredictions(userId: String, limit: Int, offset: Int): Result<Unit> {
         val key = syncKey(userId, limit, offset)
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                if (!rateLimiter.shouldFetch(key)) {
-                    return@runCatching
-                }
-
-                val remotePredictions = remoteDataSource.fetchPredictions(userId, limit, offset)
-
-                if (remotePredictions.isNotEmpty()) {
-                    val remoteFights = remotePredictions.mapNotNull { it.fight }
-                    if (remoteFights.isNotEmpty()) {
-                        fightDao.insertFightsIfNotExist(remoteFights.map { it.toEntity() })
-                    }
-                    predictionDao.upsertPredictions(remotePredictions.map { it.toEntity() })
-                }
-            }.onFailure {
-                if (it is CancellationException) throw it
-                rateLimiter.reset(key)
+        return runSuspendCatching(Dispatchers.Default) {
+            if (!rateLimiter.shouldFetch(key)) {
+                return@runSuspendCatching
             }
+
+            val remotePredictions = remoteDataSource.fetchPredictions(userId, limit, offset)
+
+            if (remotePredictions.isNotEmpty()) {
+                val remoteFights = remotePredictions.mapNotNull { it.fight }
+                if (remoteFights.isNotEmpty()) {
+                    fightDao.insertFightsIfNotExist(remoteFights.map { it.toEntity() })
+                }
+                predictionDao.upsertPredictions(remotePredictions.map { it.toEntity() })
+            }
+        }.onFailure {
+            rateLimiter.reset(key)
         }
     }
 
@@ -72,14 +66,10 @@ class PredictionRepositoryImpl(
         lockedOdds: Int,
         selectedRisk: Int
     ): Result<Unit> {
-        return withContext(Dispatchers.IO) {
-            runCatching {
-                val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds, selectedRisk)
+        return runSuspendCatching(Dispatchers.Default) {
+            val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds, selectedRisk)
 
-                predictionDao.upsertPredictions(listOf(remotePrediction.toEntity()))
-            }.onFailure {
-                if (it is CancellationException) throw it
-            }
+            predictionDao.upsertPredictions(listOf(remotePrediction.toEntity()))
         }
     }
 }

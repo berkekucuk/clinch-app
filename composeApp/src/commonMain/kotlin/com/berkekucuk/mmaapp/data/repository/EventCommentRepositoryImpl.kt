@@ -13,19 +13,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Dispatchers
 
 class EventCommentRepositoryImpl(
     private val remoteDataSource: EventCommentRemoteDataSource
 ) : EventCommentRepository {
-
-    private val cache = MutableStateFlow<Map<String, List<EventComment>>>(emptyMap())
-    private val fetchMutex = Mutex()
 
     private companion object {
         const val PAGE_SIZE = 50
         const val MAX_PAGE_SIZE = 100
         val NEWEST_FIRST = compareByDescending<EventComment> { it.createdAt }.thenByDescending { it.id }
     }
+
+    private val cache = MutableStateFlow<Map<String, List<EventComment>>>(emptyMap())
+    private val fetchMutex = Mutex()
 
     override fun getComments(eventId: String): Flow<List<EventComment>> {
         return cache
@@ -34,13 +35,13 @@ class EventCommentRepositoryImpl(
     }
 
     override suspend fun refreshComments(eventId: String): Result<Unit> {
-        return runSuspendCatching {
+        return runSuspendCatching(Dispatchers.Default) {
             fetchMutex.withLock { fetchFirstPage(eventId) }
         }
     }
 
     private suspend fun syncNewComments(eventId: String): Result<Unit> {
-        return runSuspendCatching {
+        return runSuspendCatching(Dispatchers.Default) {
             fetchMutex.withLock {
                 val newestComment = cache.value[eventId]?.firstOrNull()
                 if (newestComment == null) {
@@ -65,7 +66,7 @@ class EventCommentRepositoryImpl(
     }
 
     override suspend fun loadOlderComments(eventId: String): Result<Boolean> {
-        return runSuspendCatching {
+        return runSuspendCatching(Dispatchers.Default) {
             fetchMutex.withLock {
                 val oldestComment = cache.value[eventId]?.lastOrNull() ?: return@withLock false
 
@@ -83,7 +84,7 @@ class EventCommentRepositoryImpl(
     }
 
     override suspend fun addComment(eventId: String, content: String): Result<Unit> {
-        return runSuspendCatching {
+        return runSuspendCatching(Dispatchers.Default) {
             val comment = remoteDataSource.addComment(eventId, content)
             addToCache(eventId, listOf(comment.toDomain()))
         }
@@ -109,7 +110,7 @@ class EventCommentRepositoryImpl(
     }
 
     override suspend fun listenForCommentChanges(eventId: String): Result<Unit> {
-        return runSuspendCatching {
+        return runSuspendCatching(Dispatchers.Default) {
             remoteDataSource.observeComments(eventId).collect { event ->
                 when (event) {
                     is EventCommentRealtimeEvent.Subscribed -> syncNewComments(eventId)

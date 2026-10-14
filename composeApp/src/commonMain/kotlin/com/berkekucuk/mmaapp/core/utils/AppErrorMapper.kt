@@ -22,7 +22,7 @@ object AppErrorMapper {
                     message.contains("event already over") -> AppError.EVENT_OVER
                     message.contains("fight already over") -> AppError.FIGHT_OVER
                     message.contains("result pending") -> AppError.FIGHT_PENDING
-                    message.contains("not authenticated") || message.contains("not_authenticated") || message.contains("unauthenticated") -> AppError.UNAUTHENTICATED
+                    message.contains("not authenticated") || message.contains("not_authenticated") || message.contains("unauthenticated") || message.contains("permission denied for function") -> AppError.UNAUTHENTICATED
                     e.code == "23505" -> AppError.ALREADY_EXISTS
                     else -> AppError.SERVER_ERROR
                 }

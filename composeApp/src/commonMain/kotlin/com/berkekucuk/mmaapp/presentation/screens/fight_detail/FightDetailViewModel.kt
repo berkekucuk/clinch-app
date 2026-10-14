@@ -13,7 +13,6 @@ import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
 import com.berkekucuk.mmaapp.domain.model.Fight
 import com.berkekucuk.mmaapp.domain.repository.FightRepository
-import com.berkekucuk.mmaapp.domain.model.AuthState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -52,9 +51,8 @@ class FightDetailViewModel(
 
     private fun observeAuthState() {
         viewModelScope.launch {
-            authRepository.authState
-                .collectLatest { authState ->
-                    val userId = (authState as? AuthState.Authenticated)?.userId
+            authRepository.currentUserId
+                .collectLatest { userId ->
                     currentUserId = userId
 
                     if (userId != null) {

@@ -185,14 +185,6 @@ class ProfileViewModel(
 
         viewModelScope.launch {
             _state.update { it.copy(isReporting = true, error = null) }
-            val currentUserId = authRepository.getAuthenticatedUserId()
-            if (currentUserId == null) {
-                _state.update {
-                    it.copy(isReporting = false, showReportDialog = false, reportReason = null, error = AppError.UNAUTHENTICATED)
-                }
-                return@launch
-            }
-
             userRepository.reportUser(userId, reasonDbValue)
                 .onSuccess {
                     _state.update {

@@ -12,6 +12,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -48,6 +49,11 @@ class AuthRepositoryImpl(
             }
         }
 
+    override val currentUserId: Flow<String?> = authState
+        .filter { it !is AuthState.Loading }
+        .map { (it as? AuthState.Authenticated)?.userId }
+        .distinctUntilChanged()
+
     private suspend fun registerDeviceToken(): Result<Unit> {
         return try {
             val token = deviceTokenProvider.getToken() ?: return Result.success(Unit)
@@ -73,8 +79,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun getAuthenticatedUserId(): String? {
-        val state = authState.first { it !is AuthState.Loading }
-        return if (state is AuthState.Authenticated) state.userId else null
+        return currentUserId.first()
     }
 
     override suspend fun getAuthenticatedUserEmail(): String? {

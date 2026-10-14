@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
-import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -53,11 +52,10 @@ class InteractionListViewModel(
 
     private fun observeAuthState() {
         viewModelScope.launch {
-            authRepository.authState
-                .collect { authState ->
-                val isOwner = authState is AuthState.Authenticated && authState.userId == userId
-                _state.update { it.copy(isOwner = isOwner) }
-            }
+            authRepository.currentUserId
+                .collect { currentUserId ->
+                    _state.update { it.copy(isOwner = currentUserId == userId) }
+                }
         }
     }
 

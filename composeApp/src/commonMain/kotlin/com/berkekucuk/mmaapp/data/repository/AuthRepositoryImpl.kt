@@ -1,7 +1,10 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import com.berkekucuk.mmaapp.data.remote.datasource.DeviceTokenRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.fcm.DeviceTokenProvider
+import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import io.github.jan.supabase.SupabaseClient
@@ -10,6 +13,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -38,11 +42,19 @@ class AuthRepositoryImpl(
                 is SessionStatus.Initializing -> AuthState.Loading
                 is SessionStatus.Authenticated -> AuthState.Authenticated(
                     userId = status.session.user?.id ?: "",
-                    email = status.session.user?.email
+                    email = status.session.user?.email,
+                    role = UserRole.fromString(
+                        status.session.user?.appMetadata?.get("role")?.jsonPrimitive?.contentOrNull
+                    )
                 )
                 else -> AuthState.Unauthenticated
             }
         }
+
+    override val currentUserId: Flow<String?> = authState
+        .filter { it !is AuthState.Loading }
+        .map { (it as? AuthState.Authenticated)?.userId }
+        .distinctUntilChanged()
 
     private suspend fun registerDeviceToken(): Result<Unit> {
         return try {
@@ -69,8 +81,7 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun getAuthenticatedUserId(): String? {
-        val state = authState.first { it !is AuthState.Loading }
-        return if (state is AuthState.Authenticated) state.userId else null
+        return currentUserId.first()
     }
 
     override suspend fun getAuthenticatedUserEmail(): String? {

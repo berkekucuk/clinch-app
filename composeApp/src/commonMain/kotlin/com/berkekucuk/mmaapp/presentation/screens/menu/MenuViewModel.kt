@@ -2,7 +2,6 @@ package com.berkekucuk.mmaapp.presentation.screens.menu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import kotlinx.coroutines.coroutineScope
@@ -37,9 +36,14 @@ class MenuViewModel(
     private fun observeAuthState() {
         viewModelScope.launch {
             authRepository.authState
-                .collectLatest { authState ->
-                    val userId = (authState as? AuthState.Authenticated)?.userId
-                    _state.update { it.copy(authState = authState, userId = userId) }
+                .collect { authState ->
+                    _state.update { it.copy(authState = authState) }
+                }
+        }
+        viewModelScope.launch {
+            authRepository.currentUserId
+                .collectLatest { userId ->
+                    _state.update { it.copy(userId = userId) }
 
                     if (userId != null) {
                         coroutineScope {
@@ -96,6 +100,9 @@ class MenuViewModel(
             }
             MenuUiAction.OnLeaderboardClicked -> {
                 navigateTo(MenuNavigationEvent.ToLeaderboard)
+            }
+            MenuUiAction.OnSendNotificationClicked -> {
+                navigateTo(MenuNavigationEvent.ToSendNotification)
             }
             MenuUiAction.OnSnackbarDismissed -> {
                 _state.update { it.copy(error = null, showSignInSuccess = false) }

@@ -13,7 +13,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -53,6 +55,7 @@ import kotlinx.coroutines.launch
 fun EventDetailScreenRoot(
     viewModel: EventDetailViewModel = koinViewModel(),
     onNavigateToFightDetail: (fightId: String) -> Unit,
+    onNavigateToComments: (eventId: String, eventName: String?) -> Unit,
     onNavigateBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -62,6 +65,7 @@ fun EventDetailScreenRoot(
             when (event) {
                 is EventDetailNavigationEvent.ToFightDetail -> onNavigateToFightDetail(event.fightId)
                 is EventDetailNavigationEvent.Back -> onNavigateBack()
+                is EventDetailNavigationEvent.ToComments -> onNavigateToComments(event.eventId, event.eventName)
             }
         }
     }
@@ -90,6 +94,7 @@ fun EventDetailScreen(
     val mainCardListState = rememberLazyListState()
     val prelimsListState = rememberLazyListState()
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val listBottomPadding = navBarBottomPadding + 72.dp
 
     // 3. UI Data & Definitions
     val tabs = listOf(strings.tabMainCard, strings.tabPrelims)
@@ -115,6 +120,19 @@ fun EventDetailScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { onAction(EventDetailUiAction.OnCommentsClicked) },
+                containerColor = colors.ufcRed,
+                contentColor = colors.white,
+                modifier = Modifier.padding(bottom = navBarBottomPadding),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Comment,
+                    contentDescription = strings.contentDescriptionComments,
+                )
+            }
+        },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
@@ -203,7 +221,7 @@ fun EventDetailScreen(
                             ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
                         eventVenueAndLocation = listOfNotNull(state.event?.venue, state.event?.location).joinToString(", ").ifEmpty { null },
                         isLive = state.event?.status == EventStatus.LIVE,
-                        extraBottomPadding = navBarBottomPadding,
+                        extraBottomPadding = listBottomPadding,
                     )
                     1 -> FightsContainer(
                         fights = state.event?.prelimFights ?: emptyList(),
@@ -215,7 +233,7 @@ fun EventDetailScreen(
                         eventDate = state.event?.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
                         eventVenueAndLocation = listOfNotNull(state.event?.venue, state.event?.location).joinToString(", ").ifEmpty { null },
                         isLive = state.event?.status == EventStatus.LIVE,
-                        extraBottomPadding = navBarBottomPadding,
+                        extraBottomPadding = listBottomPadding,
                     )
                 }
             }

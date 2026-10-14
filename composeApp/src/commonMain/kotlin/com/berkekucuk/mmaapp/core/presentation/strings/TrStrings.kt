@@ -122,6 +122,8 @@ val TrStrings = AppStrings(
             ReportReason.INAPPROPRIATE_USERNAME -> "Uygunsuz kullanıcı adı"
             ReportReason.SPAM_OR_BOT -> "Spam veya bot"
             ReportReason.ABUSIVE_OR_HARASSING_BEHAVIOR -> "Taciz edici veya kötüye kullanım"
+            ReportReason.HATE_SPEECH -> "Nefret söylemi"
+            ReportReason.INAPPROPRIATE_CONTENT -> "Uygunsuz içerik"
             ReportReason.OTHER -> "Diğer"
         }
     },
@@ -215,6 +217,7 @@ val TrStrings = AppStrings(
     notificationChannelName = "Dövüş Hatırlatıcı",
     notificationChannelDescription = "Dövüş başlamadan önce bildirim al.",
     commonRemove = "Kaldır",
+    commonDelete = "Sil",
     commonCancel = "Vazgeç",
     profileRemoveFighterConfirm = { name -> "$name listenizden kaldırılsın mı?" },
     interactionLimitReachedTitle = "Limit Doldu",
@@ -239,6 +242,12 @@ val TrStrings = AppStrings(
             AppError.FIGHT_OVER -> "Bu dövüş zaten tamamlandı."
             AppError.FIGHT_PENDING -> "Sonuç bekleniyor. Tahminler kapandı."
             AppError.ALREADY_REPORTED -> "Bu kullanıcıyı zaten şikayet ettiniz."
+            AppError.COMMENT_RATE_LIMITED -> "Çok hızlı yorum yapıyorsunuz. Lütfen biraz bekleyin."
+            AppError.INVALID_COMMENT -> "Yorum 1 ile 500 karakter arasında olmalıdır."
+            AppError.COMMENT_NOT_FOUND -> "Bu yorum artık mevcut değil."
+            AppError.NOT_AUTHORIZED -> "Bu işlem için yetkiniz yok."
+            AppError.COMMENT_BANNED -> "Yorum yapmanız engellendi."
+            AppError.BAN_NOT_FOUND -> "Kullanıcının bu kapsamda bir banı yok."
             AppError.UNKNOWN -> "Bir şeyler ters gitti."
             else -> null
         }
@@ -257,4 +266,26 @@ val TrStrings = AppStrings(
     notificationTypeAlarm = "Alarm",
     titleFightUndisputed = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Kemer Maçı 🏆" else "Kemer Maçı 🏆" },
     titleFightInterim = { weightClass -> if (weightClass.isNotBlank()) "$weightClass Geçici Kemer Maçı 🏆" else "Geçici Kemer Maçı 🏆" },
+    commentsTitle = "Yorumlar",
+    commentsEmpty = "Henüz yorum yok. İlk yorumu sen yaz!",
+    commentInputPlaceholder = "Yorum yaz...",
+    commentLoginRequired = "Sohbete katılmak için giriş yapın.",
+    commentDeleteTitle = "Yorumu Sil",
+    commentDeleteConfirm = "Bu yorumu silmek istediğinizden emin misiniz?",
+    commentReported = "Teşekkürler, şikayetiniz alındı.",
+    commentBan = "Banla",
+    commentUnban = "Banı kaldır",
+    commentBanTitle = "Kullanıcıyı Banla",
+    commentUnbanTitle = "Banı Kaldır",
+    commentBanScopeEvent = "Sadece bu etkinlik",
+    commentBanScopeAll = "Tüm etkinlikler",
+    commentUserBanned = "Kullanıcı banlandı.",
+    commentUserUnbanned = "Ban kaldırıldı.",
+    commentJustNow = "şimdi",
+    commentMinutesAgo = { minutes -> "$minutes dk" },
+    commentHoursAgo = { hours -> "$hours sa" },
+    commentDaysAgo = { days -> "$days g" },
+    contentDescriptionComments = "Yorumlar",
+    contentDescriptionSendComment = "Yorumu gönder",
+    contentDescriptionMoreOptions = "Diğer seçenekler",
 )

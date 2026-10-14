@@ -35,6 +35,7 @@ fun MainScreenWrapper(
     onNavigateToFighterSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToLeaderboard: () -> Unit,
+    onNavigateToSendNotification: () -> Unit,
 ) {
     val bottomNavController = rememberNavController()
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
@@ -135,6 +136,7 @@ fun MainScreenWrapper(
                     onNavigateToProfileEdit = onNavigateToProfileEdit,
                     onNavigateToSettings = onNavigateToSettings,
                     onNavigateToLeaderboard = onNavigateToLeaderboard,
+                    onNavigateToSendNotification = onNavigateToSendNotification,
                 )
             }
         }

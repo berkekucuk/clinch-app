@@ -34,12 +34,14 @@ import com.berkekucuk.mmaapp.core.storage.ThemeStorage
 import com.berkekucuk.mmaapp.core.utils.SetStatusBarAppearance
 import org.koin.compose.koinInject
 import com.berkekucuk.mmaapp.presentation.screens.event_detail.EventDetailScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.event_comments.EventCommentsScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.fight_detail.FightDetailScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterDetailScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.fighter_search.FighterSearchScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.interaction_list.InteractionListScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.profile.ProfileScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.send_notification.SendNotificationScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.profile_edit.ProfileEditScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankingDetailScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardScreenRoot
@@ -167,6 +169,9 @@ fun App() {
                     onNavigateToLeaderboard = {
                         rootNavController.safeNavigate(navigationThrottle, Route.Leaderboard)
                     },
+                    onNavigateToSendNotification = {
+                        rootNavController.safeNavigate(navigationThrottle, Route.SendNotification)
+                    },
                 )
             }
 
@@ -186,7 +191,27 @@ fun App() {
                             )
                         )
                     },
+                    onNavigateToComments = { eventId, eventName ->
+                        rootNavController.safeNavigate(
+                            navigationThrottle,
+                            Route.EventComments(eventId = eventId, eventName = eventName)
+                        )
+                    },
                     onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
+                )
+            }
+
+            composable<Route.EventComments>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                EventCommentsScreenRoot(
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
+                    onNavigateToProfile = { userId ->
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
+                    }
                 )
             }
 
@@ -348,6 +373,17 @@ fun App() {
                     onNavigateToUserSearch = {
                         rootNavController.safeNavigate(navigationThrottle, Route.UserSearch)
                     }
+                )
+            }
+
+            composable<Route.SendNotification>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                SendNotificationScreenRoot(
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }
 

@@ -52,6 +52,7 @@ class EventDetailViewModel(
             is EventDetailUiAction.OnFightClicked -> navigateTo(EventDetailNavigationEvent.ToFightDetail(action.fightId))
             is EventDetailUiAction.OnBackClicked -> navigateTo(EventDetailNavigationEvent.Back)
             is EventDetailUiAction.OnRefresh -> syncEvent(isRefreshing = true)
+            is EventDetailUiAction.OnCommentsClicked -> navigateTo(EventDetailNavigationEvent.ToComments(eventId, _state.value.event?.name))
         }
     }
 

@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -124,6 +125,12 @@ class EventRepositoryImpl(
 
     override suspend fun hasEventById(eventId: String): Boolean {
         return withContext(Dispatchers.IO) { eventDao.hasEventById(eventId) }
+    }
+
+    override suspend fun getNearestActiveEvent(): Event? {
+        return withContext(Dispatchers.IO) {
+            eventDao.getUpcomingEvents().first().firstOrNull()?.toDomain()
+        }
     }
 
     private suspend fun saveEventsAndFights(events: List<EventDto>) {

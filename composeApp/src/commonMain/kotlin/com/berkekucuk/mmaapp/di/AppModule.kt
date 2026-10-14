@@ -53,6 +53,12 @@ import com.berkekucuk.mmaapp.domain.repository.LeaderboardRepository
 import com.berkekucuk.mmaapp.data.repository.LeaderboardRepositoryImpl
 import com.berkekucuk.mmaapp.presentation.screens.blocked_users.BlockedUsersViewModel
 import com.berkekucuk.mmaapp.presentation.screens.event_detail.EventDetailViewModel
+import com.berkekucuk.mmaapp.presentation.screens.event_comments.EventCommentsViewModel
+import com.berkekucuk.mmaapp.data.remote.datasource.EventCommentRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.EventCommentSupabaseAPI
+import com.berkekucuk.mmaapp.data.repository.EventCommentRepositoryImpl
+import com.berkekucuk.mmaapp.domain.repository.EventCommentRepository
+import com.berkekucuk.mmaapp.domain.usecase.ObserveBlockedUserIdsUseCase
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.fight_detail.FightDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.menu.MenuViewModel
@@ -74,6 +80,8 @@ import com.berkekucuk.mmaapp.domain.repository.AppVersionRepository
 import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardViewModel
 import com.berkekucuk.mmaapp.presentation.screens.settings.SettingsViewModel
 import com.berkekucuk.mmaapp.presentation.screens.user_search.UserSearchViewModel
+import com.berkekucuk.mmaapp.data.remote.supabase.AdminNotificationService
+import com.berkekucuk.mmaapp.presentation.screens.send_notification.SendNotificationViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.qualifier.named
 
@@ -192,6 +200,10 @@ val appModule = module {
         FightSupabaseAPI(client = get())
     }
 
+    single<EventCommentRemoteDataSource> {
+        EventCommentSupabaseAPI(client = get())
+    }
+
     single<InteractionRemoteDataSource> {
         InteractionSupabaseAPI(client = get())
     }
@@ -202,6 +214,10 @@ val appModule = module {
 
     single<AppVersionRemoteDataSource> {
         AppVersionSupabaseAPI(client = get())
+    }
+
+    single {
+        AdminNotificationService(client = get())
     }
 
     single<AppVersionRepository> {
@@ -300,11 +316,25 @@ val appModule = module {
         )
     }
 
+    single<EventCommentRepository> {
+        EventCommentRepositoryImpl(
+            remoteDataSource = get()
+        )
+    }
+
     single<AppConfigRepository> {
         AppConfigRepositoryImpl(
             remoteDataSource = get(),
             configDao = get(),
             rateLimiter = get()
+        )
+    }
+
+    // use case
+    factory {
+        ObserveBlockedUserIdsUseCase(
+            authRepository = get(),
+            userRepository = get()
         )
     }
 
@@ -320,6 +350,16 @@ val appModule = module {
     viewModel {
         EventDetailViewModel(
             eventRepository = get(),
+            savedStateHandle = get()
+        )
+    }
+
+    viewModel {
+        EventCommentsViewModel(
+            commentRepository = get(),
+            userRepository = get(),
+            authRepository = get(),
+            observeBlockedUserIds = get(),
             savedStateHandle = get()
         )
     }
@@ -416,6 +456,15 @@ val appModule = module {
         BlockedUsersViewModel(
             userRepository = get(),
             authRepository = get()
+        )
+    }
+
+    viewModel {
+        SendNotificationViewModel(
+            adminNotificationService = get(),
+            eventRepository = get(),
+            authRepository = get(),
+            userRepository = get()
         )
     }
 

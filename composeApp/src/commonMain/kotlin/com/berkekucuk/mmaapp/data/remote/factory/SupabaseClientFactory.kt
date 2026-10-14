@@ -6,7 +6,9 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.appleNativeLogin
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.storage.Storage
 import kotlinx.serialization.json.Json
@@ -28,6 +30,8 @@ object SupabaseClientFactory {
                 appleNativeLogin()
             }
             install(Storage)
+            install(Functions)
+            install(Realtime)
             defaultSerializer = KotlinXSerializer(
                 Json {
                     ignoreUnknownKeys = true

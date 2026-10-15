@@ -60,6 +60,24 @@ class UserSupabaseAPI(
         )
     }
 
+    override suspend fun banUserFromComments(userId: String) {
+        client.postgrest.rpc(
+            function = "ban_user_from_comments",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
+            }
+        )
+    }
+
+    override suspend fun unbanUserFromComments(userId: String) {
+        client.postgrest.rpc(
+            function = "unban_user_from_comments",
+            parameters = buildJsonObject {
+                put("p_user_id", userId)
+            }
+        )
+    }
+
     override suspend fun searchUsers(query: String): List<UserDto> {
         return client.postgrest.rpc(
             function = "search_profiles",

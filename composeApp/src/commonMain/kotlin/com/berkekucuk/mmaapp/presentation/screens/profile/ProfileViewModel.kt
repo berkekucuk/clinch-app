@@ -7,6 +7,9 @@ import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import com.berkekucuk.mmaapp.domain.enums.BanAction
+import com.berkekucuk.mmaapp.domain.enums.ProfileSuccessMessage
+import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.InteractionRepository
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
@@ -18,7 +21,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
@@ -45,9 +50,21 @@ class ProfileViewModel(
     private var syncJob: Job? = null
 
     init {
+        observeModerationRole()
         observeProfile()
         observePredictions()
         syncProfile()
+    }
+
+    private fun observeModerationRole() {
+        viewModelScope.launch {
+            authRepository.authState
+                .map { (it as? AuthState.Authenticated)?.role?.canModerate == true }
+                .distinctUntilChanged()
+                .collect { canModerate ->
+                    _state.update { it.copy(canModerate = canModerate) }
+                }
+        }
     }
 
     private fun observeProfile() {
@@ -130,7 +147,7 @@ class ProfileViewModel(
             is ProfileUiAction.OnRefresh -> syncProfile(isRefreshing = true)
             is ProfileUiAction.OnInteractionListClicked -> navigateTo(ProfileNavigationEvent.ToInteractionList(userId, action.type))
             is ProfileUiAction.OnPredictionClicked -> navigateTo(ProfileNavigationEvent.ToFightDetail(action.fightId))
-            is ProfileUiAction.OnErrorDismissed -> _state.update { it.copy(error = null) }
+            is ProfileUiAction.OnMessageShown -> _state.update { it.copy(error = null, successMessage = null) }
             
             is ProfileUiAction.OnReportClicked -> _state.update { it.copy(showReportDialog = true) }
             is ProfileUiAction.OnReportReasonChanged -> _state.update { it.copy(reportReason = action.reason) }
@@ -140,6 +157,11 @@ class ProfileViewModel(
             is ProfileUiAction.OnBlockClicked -> _state.update { it.copy(showBlockDialog = true) }
             is ProfileUiAction.OnDismissBlockDialog -> _state.update { it.copy(showBlockDialog = false) }
             is ProfileUiAction.OnConfirmBlock -> blockUser()
+
+            is ProfileUiAction.OnBanClicked -> _state.update { it.copy(pendingBanAction = BanAction.BAN) }
+            is ProfileUiAction.OnUnbanClicked -> _state.update { it.copy(pendingBanAction = BanAction.UNBAN) }
+            is ProfileUiAction.OnDismissBanDialog -> _state.update { it.copy(pendingBanAction = null) }
+            is ProfileUiAction.OnConfirmBan -> submitBan()
 
             is ProfileUiAction.OnNextPage -> nextPage()
             is ProfileUiAction.OnPreviousPage -> previousPage()
@@ -214,6 +236,29 @@ class ProfileViewModel(
                 }
                 .onFailure { e ->
                     _state.update { it.copy(error = AppErrorMapper.map(e)) }
+                }
+        }
+    }
+
+    private fun submitBan() {
+        val action = _state.value.pendingBanAction ?: return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmittingBan = true, error = null) }
+            val result = when (action) {
+                BanAction.BAN -> userRepository.banUserFromComments(userId)
+                BanAction.UNBAN -> userRepository.unbanUserFromComments(userId)
+            }
+            result
+                .onSuccess {
+                    val message = when (action) {
+                        BanAction.BAN -> ProfileSuccessMessage.USER_BANNED
+                        BanAction.UNBAN -> ProfileSuccessMessage.USER_UNBANNED
+                    }
+                    _state.update { it.copy(isSubmittingBan = false, pendingBanAction = null, successMessage = message) }
+                }
+                .onFailure { e ->
+                    _state.update { it.copy(isSubmittingBan = false, pendingBanAction = null, error = AppErrorMapper.map(e)) }
                 }
         }
     }

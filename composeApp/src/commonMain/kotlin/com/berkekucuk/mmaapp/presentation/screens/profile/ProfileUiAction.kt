@@ -7,7 +7,7 @@ sealed interface ProfileUiAction {
     data object OnRefresh : ProfileUiAction
     data class OnInteractionListClicked(val type: String) : ProfileUiAction
     data class OnPredictionClicked(val fightId: String) : ProfileUiAction
-    data object OnErrorDismissed : ProfileUiAction
+    data object OnMessageShown : ProfileUiAction
     
     data object OnReportClicked : ProfileUiAction
     data class OnReportReasonChanged(val reason: ReportReason) : ProfileUiAction
@@ -17,6 +17,11 @@ sealed interface ProfileUiAction {
     data object OnBlockClicked : ProfileUiAction
     data object OnDismissBlockDialog : ProfileUiAction
     data object OnConfirmBlock : ProfileUiAction
+
+    data object OnBanClicked : ProfileUiAction
+    data object OnUnbanClicked : ProfileUiAction
+    data object OnConfirmBan : ProfileUiAction
+    data object OnDismissBanDialog : ProfileUiAction
     
     data object OnNextPage : ProfileUiAction
     data object OnPreviousPage : ProfileUiAction

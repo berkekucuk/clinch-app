@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material3.DropdownMenu
@@ -48,17 +46,14 @@ fun EventCommentItem(
     timeText: String,
     canReport: Boolean,
     canDelete: Boolean,
-    canBan: Boolean,
     onUserClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
-    onBanClick: () -> Unit,
-    onUnbanClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
-    val showMenu = canReport || canDelete || canBan
+    val showMenu = canReport || canDelete
 
     Row(
         modifier = modifier
@@ -119,12 +114,9 @@ fun EventCommentItem(
             CommentOverflowMenu(
                 canReport = canReport,
                 canDelete = canDelete,
-                canBan = canBan,
                 contentDescription = strings.contentDescriptionMoreOptions,
                 onDeleteClick = onDeleteClick,
                 onReportClick = onReportClick,
-                onBanClick = onBanClick,
-                onUnbanClick = onUnbanClick,
             )
         }
     }
@@ -134,12 +126,9 @@ fun EventCommentItem(
 private fun CommentOverflowMenu(
     canReport: Boolean,
     canDelete: Boolean,
-    canBan: Boolean,
     contentDescription: String,
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
-    onBanClick: () -> Unit,
-    onUnbanClick: () -> Unit,
 ) {
     val strings = LocalAppStrings.current
     val colors = LocalAppColors.current
@@ -172,16 +161,6 @@ private fun CommentOverflowMenu(
                 CommentMenuItem(strings.commonDelete, Icons.Default.Delete) {
                     expanded = false
                     onDeleteClick()
-                }
-            }
-            if (canBan) {
-                CommentMenuItem(strings.commentBan, Icons.Default.Block) {
-                    expanded = false
-                    onBanClick()
-                }
-                CommentMenuItem(strings.commentUnban, Icons.Default.LockOpen) {
-                    expanded = false
-                    onUnbanClick()
                 }
             }
         }

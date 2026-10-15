@@ -108,18 +108,6 @@ class EventCommentRepositoryImpl(
         }
     }
 
-    override suspend fun banUser(userId: String, eventId: String?): Result<Unit> {
-        return runSuspendCatching {
-            remoteDataSource.banUser(userId, eventId)
-        }
-    }
-
-    override suspend fun unbanUser(userId: String, eventId: String?): Result<Unit> {
-        return runSuspendCatching {
-            remoteDataSource.unbanUser(userId, eventId)
-        }
-    }
-
     override suspend fun listenForCommentChanges(eventId: String): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
             remoteDataSource.observeComments(eventId).collect { event ->

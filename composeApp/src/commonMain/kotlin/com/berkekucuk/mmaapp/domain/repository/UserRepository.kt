@@ -13,6 +13,8 @@ interface UserRepository {
     suspend fun deleteUser(userId: String): Result<Unit>
     suspend fun reportUser(reportedId: String, reason: String): Result<Unit>
     suspend fun reportComment(commentId: String, reason: String): Result<Unit>
+    suspend fun banUserFromComments(userId: String): Result<Unit>
+    suspend fun unbanUserFromComments(userId: String): Result<Unit>
     fun getBlockedUsers(currentUserId: String): Flow<List<User>>
     fun getBlockedUserIds(currentUserId: String): Flow<Set<String>>
     suspend fun blockUser(blockerUserId: String, blockedUserId: String): Result<Unit>

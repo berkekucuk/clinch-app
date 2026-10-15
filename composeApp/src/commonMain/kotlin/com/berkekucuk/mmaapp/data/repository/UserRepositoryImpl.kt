@@ -96,6 +96,18 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun banUserFromComments(userId: String): Result<Unit> {
+        return runSuspendCatching {
+            remoteDataSource.banUserFromComments(userId)
+        }
+    }
+
+    override suspend fun unbanUserFromComments(userId: String): Result<Unit> {
+        return runSuspendCatching {
+            remoteDataSource.unbanUserFromComments(userId)
+        }
+    }
+
     override suspend fun blockUser(blockerUserId: String, blockedUserId: String): Result<Unit> {
         return runSuspendCatching {
             dao.upsertBlockedUser(BlockedUserEntity(blockerUserId, blockedUserId))

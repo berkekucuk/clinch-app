@@ -9,7 +9,5 @@ interface EventCommentRepository {
     suspend fun loadOlderComments(eventId: String): Result<Boolean>
     suspend fun addComment(eventId: String, content: String): Result<Unit>
     suspend fun deleteComment(eventId: String, commentId: String): Result<Unit>
-    suspend fun banUser(userId: String, eventId: String?): Result<Unit>
-    suspend fun unbanUser(userId: String, eventId: String?): Result<Unit>
     suspend fun listenForCommentChanges(eventId: String): Result<Unit>
 }

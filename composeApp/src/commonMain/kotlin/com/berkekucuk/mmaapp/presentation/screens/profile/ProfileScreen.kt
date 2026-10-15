@@ -20,7 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.SpeakerNotesOff
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -56,6 +58,8 @@ import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import com.berkekucuk.mmaapp.domain.enums.BanAction
+import com.berkekucuk.mmaapp.domain.enums.ProfileSuccessMessage
 import com.berkekucuk.mmaapp.domain.enums.ReportReason
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
 import com.berkekucuk.mmaapp.presentation.screens.fighter_detail.FighterTopBarTitle
@@ -114,13 +118,17 @@ fun ProfileScreen(
     // 3. UI Data & Definitions
     val tabs = listOf(strings.profileTabOverview, strings.profileTabPredictions)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
+    val message = strings.mapError(state.error) ?: when (state.successMessage) {
+        ProfileSuccessMessage.USER_BANNED -> strings.commentUserBanned
+        ProfileSuccessMessage.USER_UNBANNED -> strings.commentUserUnbanned
+        null -> null
+    }
 
     AppSnackbarEffect(
-        message = errorMessage,
+        message = message,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        onDismiss = { onAction(ProfileUiAction.OnErrorDismissed) }
+        onDismiss = { onAction(ProfileUiAction.OnMessageShown) }
     )
 
     Scaffold(
@@ -240,6 +248,38 @@ fun ProfileScreen(
                                             onAction(ProfileUiAction.OnBlockClicked)
                                         }
                                     )
+
+                                    if (state.canModerate) {
+                                        DropdownMenuItem(
+                                            text = { Text(strings.commentBan, color = colors.textPrimary) },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.SpeakerNotesOff,
+                                                    contentDescription = strings.commentBan,
+                                                    tint = colors.textPrimary
+                                                )
+                                            },
+                                            onClick = {
+                                                showOverflowMenu = false
+                                                onAction(ProfileUiAction.OnBanClicked)
+                                            }
+                                        )
+
+                                        DropdownMenuItem(
+                                            text = { Text(strings.commentUnban, color = colors.textPrimary) },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.LockOpen,
+                                                    contentDescription = strings.commentUnban,
+                                                    tint = colors.textPrimary
+                                                )
+                                            },
+                                            onClick = {
+                                                showOverflowMenu = false
+                                                onAction(ProfileUiAction.OnUnbanClicked)
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -308,6 +348,20 @@ fun ProfileScreen(
             confirmText = strings.dialogAccept,
             dismissText = strings.commonCancel,
             isDestructive = true
+        )
+    }
+
+    if (state.pendingBanAction != null) {
+        val isBan = state.pendingBanAction == BanAction.BAN
+        AppAlertDialog(
+            onDismissRequest = { onAction(ProfileUiAction.OnDismissBanDialog) },
+            onConfirmClick = { onAction(ProfileUiAction.OnConfirmBan) },
+            title = if (isBan) strings.commentBanTitle else strings.commentUnbanTitle,
+            text = if (isBan) strings.commentBanConfirm else strings.commentUnbanConfirm,
+            confirmText = if (isBan) strings.commentBan else strings.commonRemove,
+            dismissText = strings.commonCancel,
+            isConfirmLoading = state.isSubmittingBan,
+            isDestructive = isBan
         )
     }
 

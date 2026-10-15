@@ -139,7 +139,7 @@ fun FightDetailScreen(
     val displayTitle = state.fight?.eventName
     val fight = state.fight
     val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || !fight.roundSummary.isNullOrBlank() || fight.weightClassLbs != null || !fight.referee.isNullOrBlank())
-    val tabs = listOf(strings.tabFightDetails, strings.tabFightComparison)
+    val tabs = listOf(strings.tabFight, strings.tabFightCareer)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     val selectedRisk = remember { mutableStateOf(50) }
     val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
@@ -292,18 +292,9 @@ fun FightDetailScreen(
                             FightMetaCard(fight = fight)
                         }
                     }
-                    if (fight != null) {
-                        if (fight.stats.isNotEmpty()) {
-                            item(contentType = "FightMatchStats") {
-                                FightMatchStatsCard(fight = fight)
-                            }
-                        } else {
-                            item(contentType = "FighterCareerStats") {
-                                FighterCareerStatsSection(
-                                    redFighter = fight.redCorner?.fighter,
-                                    blueFighter = fight.blueCorner?.fighter,
-                                )
-                            }
+                    if (fight != null && fight.stats.isNotEmpty()) {
+                        item(contentType = "FightMatchStats") {
+                            FightMatchStatsCard(fight = fight)
                         }
                     }
                     if (!eventId.isNullOrBlank() && displayTitle != null) {
@@ -328,6 +319,12 @@ fun FightDetailScreen(
                             FighterRadarChart(
                                 redCorner = fight.redCorner,
                                 blueCorner = fight.blueCorner,
+                            )
+                        }
+                        item(contentType = "FighterCareerStats") {
+                            FighterCareerStatsSection(
+                                redFighter = fight.redCorner?.fighter,
+                                blueFighter = fight.blueCorner?.fighter,
                             )
                         }
                     }

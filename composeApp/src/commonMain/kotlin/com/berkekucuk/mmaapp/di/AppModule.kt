@@ -319,7 +319,8 @@ val appModule = module {
 
     single<EventCommentRepository> {
         EventCommentRepositoryImpl(
-            remoteDataSource = get()
+            remoteDataSource = get(),
+            rateLimiter = get()
         )
     }
 

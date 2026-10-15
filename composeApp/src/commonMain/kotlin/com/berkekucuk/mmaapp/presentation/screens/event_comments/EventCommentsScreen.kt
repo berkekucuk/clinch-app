@@ -226,7 +226,16 @@ fun EventCommentsScreen(
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom),
         ) {
-            if (state.comments.isEmpty() && !state.isLoading) {
+            if (state.comments.isEmpty() && state.isLoading) {
+                item(contentType = "Loading") {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = colors.ufcRed)
+                    }
+                }
+            } else if (state.comments.isEmpty()) {
                 item(contentType = "EmptyState") {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),

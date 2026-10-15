@@ -14,7 +14,7 @@ data class EventCommentsUiState(
     val canModerate: Boolean = false,
     val isLoading: Boolean = true,
     val isLoadingOlderComments: Boolean = false,
-    val hasOlderComments: Boolean = true,
+    val hasOlderComments: Boolean = false,
     val commentInput: String = "",
     val isSending: Boolean = false,
     val pendingDeleteCommentId: String? = null,

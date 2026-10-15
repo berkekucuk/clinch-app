@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface EventCommentRepository {
     fun getComments(eventId: String): Flow<List<EventComment>>
-    suspend fun refreshComments(eventId: String): Result<Unit>
+    suspend fun refreshComments(eventId: String, force: Boolean = false): Result<Boolean>
     suspend fun loadOlderComments(eventId: String): Result<Boolean>
     suspend fun addComment(eventId: String, content: String): Result<Unit>
     suspend fun deleteComment(eventId: String, commentId: String): Result<Unit>

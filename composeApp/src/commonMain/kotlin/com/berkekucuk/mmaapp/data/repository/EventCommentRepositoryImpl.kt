@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.remote.datasource.EventCommentRealtimeEvent
@@ -16,7 +17,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.Dispatchers
 
 class EventCommentRepositoryImpl(
-    private val remoteDataSource: EventCommentRemoteDataSource
+    private val remoteDataSource: EventCommentRemoteDataSource,
+    private val rateLimiter: RateLimiter
 ) : EventCommentRepository {
 
     private companion object {
@@ -28,15 +30,24 @@ class EventCommentRepositoryImpl(
     private val cache = MutableStateFlow<Map<String, List<EventComment>>>(emptyMap())
     private val fetchMutex = Mutex()
 
+    private fun refreshKey(eventId: String) = "refresh_comments_$eventId"
+
     override fun getComments(eventId: String): Flow<List<EventComment>> {
         return cache
             .map { it[eventId].orEmpty() }
             .distinctUntilChanged()
     }
 
-    override suspend fun refreshComments(eventId: String): Result<Unit> {
+    override suspend fun refreshComments(eventId: String, force: Boolean): Result<Boolean> {
+        val key = refreshKey(eventId)
         return runSuspendCatching(Dispatchers.Default) {
+            val canFetch = rateLimiter.shouldFetch(key)
+            val cachedComments = cache.value[eventId]
+            if (!force && cachedComments != null && !canFetch) return@runSuspendCatching cachedComments.size >= PAGE_SIZE
+
             fetchMutex.withLock { fetchFirstPage(eventId) }
+        }.onFailure {
+            rateLimiter.reset(key)
         }
     }
 
@@ -121,9 +132,10 @@ class EventCommentRepositoryImpl(
         }
     }
 
-    private suspend fun fetchFirstPage(eventId: String) {
+    private suspend fun fetchFirstPage(eventId: String): Boolean {
         val comments = remoteDataSource.fetchComments(eventId = eventId, limit = PAGE_SIZE)
         cache.update { it + (eventId to comments.map { comment -> comment.toDomain() }) }
+        return comments.size == PAGE_SIZE
     }
 
     private fun addToCache(eventId: String, newComments: List<EventComment>) {

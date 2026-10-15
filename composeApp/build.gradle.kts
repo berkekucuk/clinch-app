@@ -134,8 +134,8 @@ android {
         applicationId = "com.berkekucuk.mmaapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 37
-        versionName = "1.5.1"
+        versionCode = 38
+        versionName = "1.6.0"
     }
     packaging {
         resources {

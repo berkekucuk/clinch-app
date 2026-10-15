@@ -3,7 +3,7 @@ package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import kotlin.math.roundToInt
 
-const val RADAR_AXIS_COUNT = 9
+const val RADAR_AXIS_COUNT = 7
 
 fun buildRadarValues(fighter: Fighter?): List<Float> {
     return listOf(
@@ -13,9 +13,7 @@ fun buildRadarValues(fighter: Fighter?): List<Float> {
         normalizeValue(fighter?.tdAvg, 4.5f),
         normalizePercent(fighter?.tdAcc),
         normalizePercent(fighter?.tdDef),
-        normalizePercent(fighter?.submissionRate),
-        normalizePercent(fighter?.koTkoRate),
-        normalizePercent(fighter?.winRate)
+        normalizeValue(fighter?.subAvg, 3f),
     )
 }
 

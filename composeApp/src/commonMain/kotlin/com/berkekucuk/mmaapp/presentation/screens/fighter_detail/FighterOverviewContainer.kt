@@ -58,11 +58,20 @@ fun FighterOverviewContainer(
                 FighterRadarChart(fighter = fighter)
             }
         }
+
+        if (fighter.hasFinishRates) {
+            item(key = "finish_rates_card") {
+                FighterFinishRatesCard(
+                    koTkoRate = fighter.koTkoRate,
+                    submissionRate = fighter.submissionRate,
+                )
+            }
+        }
     }
 }
 
-private val Fighter.hasFinishingStats: Boolean
-    get() = winRate > 0f || koTkoRate > 0f || submissionRate > 0f
+private val Fighter.hasFinishRates: Boolean
+    get() = koTkoRate > 0f || submissionRate > 0f
 
 private val Fighter.hasStrikingStats: Boolean
     get() = slpm > 0f || strAcc > 0f || sapm > 0f || strDef > 0f
@@ -71,4 +80,4 @@ private val Fighter.hasGrapplingStats: Boolean
     get() = tdAvg > 0f || tdAcc > 0f || tdDef > 0f || subAvg > 0f
 
 private val Fighter.hasAnyStats: Boolean
-    get() = hasFinishingStats || hasStrikingStats || hasGrapplingStats
+    get() = hasStrikingStats || hasGrapplingStats

@@ -64,9 +64,7 @@ fun FighterRadarChart(
             strings.radarLabelTdAvg,
             strings.radarLabelTdAcc,
             strings.radarLabelTdDef,
-            strings.radarLabelSubRate,
-            strings.radarLabelKoTkoRate,
-            strings.radarLabelWinRate,
+            strings.radarLabelSubAvg,
         )
     }
 
@@ -81,9 +79,7 @@ fun FighterRadarChart(
                 formatRadarRate(fighter.tdAvg),
                 formatRadarPercent(fighter.tdAcc),
                 formatRadarPercent(fighter.tdDef),
-                formatRadarPercent(fighter.submissionRate),
-                formatRadarPercent(fighter.koTkoRate),
-                formatRadarPercent(fighter.winRate),
+                formatRadarRate(fighter.subAvg),
             )
         } else {
             emptyList()

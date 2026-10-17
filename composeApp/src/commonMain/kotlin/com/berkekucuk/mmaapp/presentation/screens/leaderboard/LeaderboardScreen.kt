@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -34,8 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
@@ -74,24 +73,20 @@ fun LeaderboardScreen(
     state: LeaderboardUiState,
     onAction: (LeaderboardUiAction) -> Unit
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.tabWeekly, strings.tabOverall)
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
     val showInfoDialog = remember { mutableStateOf(false) }
     val weeklyListState = rememberLazyListState()
     val overallListState = rememberLazyListState()
     var overallLastScrolledPage by rememberSaveable { mutableStateOf(-1) }
+
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.tabWeekly, AppTheme.strings.tabOverall)
+    val pagerState = rememberPagerState(pageCount = { tabs.size })
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     LaunchedEffect(state.overallLeaderboard) {
         if (overallLastScrolledPage != state.currentPage) {
@@ -103,7 +98,7 @@ fun LeaderboardScreen(
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        actionLabel = strings.retry,
+        actionLabel = AppTheme.strings.retry,
         onAction = { onAction(LeaderboardUiAction.OnRefresh) },
     )
 
@@ -111,7 +106,7 @@ fun LeaderboardScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -127,12 +122,12 @@ fun LeaderboardScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.menuItemLeaderboard,
+                            text = AppTheme.strings.menuItemLeaderboard,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                         )
@@ -141,7 +136,7 @@ fun LeaderboardScreen(
                         IconButton(onClick = { onAction(LeaderboardUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack
+                                contentDescription = AppTheme.strings.contentDescriptionBack
                             )
                         }
                     },
@@ -155,16 +150,16 @@ fun LeaderboardScreen(
                         IconButton(onClick = { showInfoDialog.value = true }) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = strings.contentDescriptionInfo,
+                                contentDescription = AppTheme.strings.contentDescriptionInfo,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
-                        actionIconContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
+                        actionIconContentColor = AppTheme.colors.textPrimary,
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -182,7 +177,7 @@ fun LeaderboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(colors.pagerBackground),
+                .background(AppTheme.colors.pagerBackground),
             beyondViewportPageCount = 1
         ) { page ->
             when (page) {
@@ -195,8 +190,7 @@ fun LeaderboardScreen(
                     currentUserId = state.currentUserId,
                     listState = weeklyListState,
                     onAction = onAction,
-                    navBarBottomPadding = navBarBottomPadding,
-                    colors = colors
+                    navBarBottomPadding = navBarBottomPadding
                 )
                 1 -> LeaderboardContainer(
                     isOverall = true,
@@ -207,8 +201,7 @@ fun LeaderboardScreen(
                     currentUserId = state.currentUserId,
                     listState = overallListState,
                     onAction = onAction,
-                    navBarBottomPadding = navBarBottomPadding,
-                    colors = colors
+                    navBarBottomPadding = navBarBottomPadding
                 )
             }
         }
@@ -218,9 +211,9 @@ fun LeaderboardScreen(
         AppAlertDialog(
             onDismissRequest = { showInfoDialog.value = false },
             onConfirmClick = { showInfoDialog.value = false },
-            title = strings.leaderboardInfoTitle,
+            title = AppTheme.strings.leaderboardInfoTitle,
             text = state.infoText ?: "",
-            confirmText = strings.leaderboardInfoClose
+            confirmText = AppTheme.strings.leaderboardInfoClose
         )
     }
 }

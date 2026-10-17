@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 
@@ -45,7 +45,7 @@ fun FighterHistoryContainer(
                     )
                     if (index < fights.lastIndex) {
                         HorizontalDivider(
-                            color = LocalAppColors.current.dividerColor,
+                            color = AppTheme.colors.dividerColor,
                             thickness = 0.8.dp,
                         )
                     }

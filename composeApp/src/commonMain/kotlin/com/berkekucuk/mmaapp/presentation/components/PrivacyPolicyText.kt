@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,16 +12,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun PrivacyPolicyText(modifier: Modifier = Modifier) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
-    val termsText = strings.menuSignInTerms
-    val privacyStr = strings.menuSignInPrivacyPolicy
+    val termsText = AppTheme.strings.menuSignInTerms
+    val privacyStr = AppTheme.strings.menuSignInPrivacyPolicy
 
     val annotatedString = buildAnnotatedString {
         val startIndex = termsText.indexOf(privacyStr)
@@ -36,7 +33,7 @@ fun PrivacyPolicyText(modifier: Modifier = Modifier) {
             )
             withStyle(
                 style = SpanStyle(
-                    color = colors.textPrimary,
+                    color = AppTheme.colors.textPrimary,
                     textDecoration = TextDecoration.Underline
                 )
             ) {
@@ -52,7 +49,7 @@ fun PrivacyPolicyText(modifier: Modifier = Modifier) {
 
     Text(
         text = annotatedString,
-        color = colors.textSecondary,
+        color = AppTheme.colors.textSecondary,
         fontSize = 13.sp,
         textAlign = TextAlign.Center,
         modifier = modifier.fillMaxWidth()

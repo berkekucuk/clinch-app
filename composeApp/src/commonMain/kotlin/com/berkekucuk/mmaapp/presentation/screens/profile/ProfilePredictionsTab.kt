@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.PaginationControls
 
@@ -33,8 +32,6 @@ fun ProfilePredictionsTab(
     navBarBottomPadding: Dp,
     modifier: Modifier = Modifier
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     val predictions = state.predictions
     val activePredictions = remember(predictions) {
@@ -64,9 +61,9 @@ fun ProfilePredictionsTab(
                     modifier = Modifier.fillParentMaxSize()
                 ) {
                     Text(
-                        text = strings.emptyPredictionList,
+                        text = AppTheme.strings.emptyPredictionList,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = colors.textSecondary,
+                        color = AppTheme.colors.textSecondary,
                         modifier = Modifier.align(Alignment.Center)
                     )
 

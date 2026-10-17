@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
 
 @Composable
@@ -32,8 +31,6 @@ fun AuthenticatedSection(
     onProfileClick: () -> Unit,
     onProfileEditClick: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val interactionSource = remember { MutableInteractionSource() }
     
     Column {
@@ -42,7 +39,7 @@ fun AuthenticatedSection(
                 .fillMaxWidth()
                 .clickable(
                     interactionSource = interactionSource,
-                    indication = ripple(color = colors.white),
+                    indication = ripple(color = AppTheme.colors.white),
                     onClick = onProfileClick
                 )
                 .padding(horizontal = 20.dp, vertical = 14.dp),
@@ -63,16 +60,16 @@ fun AuthenticatedSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = colors.textSecondary,
+                tint = AppTheme.colors.textSecondary,
                 modifier = Modifier.size(24.dp)
             )
         }
 
-        HorizontalDivider(color = colors.dividerColor)
+        HorizontalDivider(color = AppTheme.colors.dividerColor)
 
         MenuItemRow(
             icon = Icons.Filled.Edit,
-            title = strings.menuProfileSettings,
+            title = AppTheme.strings.menuProfileSettings,
             onClick = onProfileEditClick,
         )
     }

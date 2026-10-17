@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_comments
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,8 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.EventComment
 import com.berkekucuk.mmaapp.presentation.components.FighterImage
 import com.berkekucuk.mmaapp.presentation.components.appClickable
@@ -51,15 +50,13 @@ fun EventCommentItem(
     onReportClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val showMenu = canReport || canDelete
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (showMenu) 0.dp else 12.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -84,7 +81,7 @@ fun EventCommentItem(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "@${comment.username}",
-                    color = colors.textPrimary,
+                    color = AppTheme.colors.textPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -95,7 +92,7 @@ fun EventCommentItem(
                 )
                 Text(
                     text = timeText,
-                    color = colors.textSecondary,
+                    color = AppTheme.colors.textSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -104,7 +101,7 @@ fun EventCommentItem(
             }
             Text(
                 text = comment.content,
-                color = colors.textPrimary,
+                color = AppTheme.colors.textPrimary,
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
             )
@@ -114,7 +111,7 @@ fun EventCommentItem(
             CommentOverflowMenu(
                 canReport = canReport,
                 canDelete = canDelete,
-                contentDescription = strings.contentDescriptionMoreOptions,
+                contentDescription = AppTheme.strings.contentDescriptionMoreOptions,
                 onDeleteClick = onDeleteClick,
                 onReportClick = onReportClick,
             )
@@ -130,8 +127,6 @@ private fun CommentOverflowMenu(
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     var expanded by remember { mutableStateOf(false) }
 
     Box {
@@ -142,23 +137,23 @@ private fun CommentOverflowMenu(
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = contentDescription,
-                tint = colors.textSecondary,
+                tint = AppTheme.colors.textSecondary,
                 modifier = Modifier.size(18.dp)
             )
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            containerColor = colors.dropdownMenuBackground
+            containerColor = AppTheme.colors.dropdownMenuBackground
         ) {
             if (canReport) {
-                CommentMenuItem(strings.reportUserTitle, Icons.Default.Report) {
+                CommentMenuItem(AppTheme.strings.reportUserTitle, Icons.Default.Report) {
                     expanded = false
                     onReportClick()
                 }
             }
             if (canDelete) {
-                CommentMenuItem(strings.commonDelete, Icons.Default.Delete) {
+                CommentMenuItem(AppTheme.strings.commonDelete, Icons.Default.Delete) {
                     expanded = false
                     onDeleteClick()
                 }
@@ -173,15 +168,14 @@ private fun CommentMenuItem(
     icon: ImageVector,
     onClick: () -> Unit,
 ) {
-    val colors = LocalAppColors.current
 
     DropdownMenuItem(
-        text = { Text(text, color = colors.textPrimary) },
+        text = { Text(text, color = AppTheme.colors.textPrimary) },
         leadingIcon = {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                tint = colors.textPrimary
+                tint = AppTheme.colors.textPrimary
             )
         },
         onClick = onClick

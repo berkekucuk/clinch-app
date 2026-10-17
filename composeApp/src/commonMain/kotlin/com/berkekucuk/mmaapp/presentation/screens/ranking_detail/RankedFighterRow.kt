@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.ranking_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Box
@@ -19,8 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
 
 @Composable
@@ -34,9 +33,7 @@ fun RankedFighterRow(
     trailingContent: @Composable (() -> Unit)? = null,
     onFighterClicked: () -> Unit
 ) {
-    val colors = LocalAppColors.current
-    val strings = LocalAppStrings.current
-    val rankLabel = if (isChampion) strings.rankingsChampionRankLabel else rankNumber.toString()
+    val rankLabel = if (isChampion) AppTheme.strings.rankingsChampionRankLabel else rankNumber.toString()
 
     Row(
         modifier = Modifier
@@ -54,12 +51,12 @@ fun RankedFighterRow(
                     modifier = Modifier
                         .size(26.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(colors.rankingChampionBadge),
+                        .background(AppTheme.colors.rankingChampionBadge),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = rankLabel,
-                        color = colors.pagerBackground,
+                        color = AppTheme.colors.pagerBackground,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -69,7 +66,7 @@ fun RankedFighterRow(
             } else {
                 Text(
                     text = rankLabel,
-                    color = colors.textSecondary,
+                    color = AppTheme.colors.textSecondary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,

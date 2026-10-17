@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,8 +32,6 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.domain.model.Participant
 import kotlin.math.PI
@@ -52,8 +51,8 @@ fun FighterRadarChart(
     redCorner: Participant? = null,
     blueCorner: Participant? = null,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
+    val strings = AppTheme.strings
+    val colors = AppTheme.colors
     val textMeasurer = rememberTextMeasurer()
 
     val axisLabels = remember(strings) {
@@ -204,7 +203,6 @@ fun FighterRadarChart(
 
 @Composable
 private fun RadarCornerRow(redName: String, blueName: String) {
-    val colors = LocalAppColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -212,14 +210,13 @@ private fun RadarCornerRow(redName: String, blueName: String) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RadarCornerItem(color = colors.radarRed, name = redName)
-        RadarCornerItem(color = colors.radarBlue, name = blueName)
+        RadarCornerItem(color = AppTheme.colors.radarRed, name = redName)
+        RadarCornerItem(color = AppTheme.colors.radarBlue, name = blueName)
     }
 }
 
 @Composable
 private fun RadarCornerItem(color: Color, name: String) {
-    val colors = LocalAppColors.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -229,7 +226,7 @@ private fun RadarCornerItem(color: Color, name: String) {
         }
         Text(
             text = name,
-            color = colors.textSecondary,
+            color = AppTheme.colors.textSecondary,
             fontSize = 11.sp,
         )
     }

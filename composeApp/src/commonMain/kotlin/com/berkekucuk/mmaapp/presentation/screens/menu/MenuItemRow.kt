@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,17 +17,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun MenuItemRow(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    tint: Color = LocalAppColors.current.textPrimary,
+    tint: Color = AppTheme.colors.textPrimary,
     onClick: () -> Unit,
 ) {
-    val colors = LocalAppColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,7 +52,7 @@ fun MenuItemRow(
             if (subtitle != null) {
                 Text(
                     text = subtitle,
-                    color = colors.textSecondary,
+                    color = AppTheme.colors.textSecondary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
                 )

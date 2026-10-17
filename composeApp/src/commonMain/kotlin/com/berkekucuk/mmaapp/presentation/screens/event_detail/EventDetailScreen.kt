@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,8 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.enums.EventStatus
 import com.berkekucuk.mmaapp.core.utils.toUserFriendlyDate
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
@@ -82,12 +81,10 @@ fun EventDetailScreen(
     state: EventDetailUiState,
     onAction: (EventDetailUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
+    // Theme & Resources
     val dateStrings = rememberLocalizedDateStrings()
 
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,10 +93,10 @@ fun EventDetailScreen(
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val listBottomPadding = navBarBottomPadding + 72.dp
 
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.tabMainCard, strings.tabPrelims)
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.tabMainCard, AppTheme.strings.tabPrelims)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
+    val errorMessage = AppTheme.strings.mapError(state.error)
     val eventTitleLine = remember(state.event?.name) {
         (state.event?.name ?: "").split(":", limit = 2)[0].trim()
     }
@@ -110,7 +107,7 @@ fun EventDetailScreen(
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        actionLabel = strings.retry,
+        actionLabel = AppTheme.strings.retry,
         onAction = { onAction(EventDetailUiAction.OnRefresh) },
     )
 
@@ -118,18 +115,18 @@ fun EventDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onAction(EventDetailUiAction.OnCommentsClicked) },
-                containerColor = colors.ufcRed,
-                contentColor = colors.white,
+                containerColor = AppTheme.colors.ufcRed,
+                contentColor = AppTheme.colors.white,
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Comment,
-                    contentDescription = strings.contentDescriptionComments,
+                    contentDescription = AppTheme.strings.contentDescriptionComments,
                 )
             }
         },
@@ -147,13 +144,13 @@ fun EventDetailScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.eventDetailTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Column(verticalArrangement = Arrangement.Center) {
                             Text(
-                                text = eventTitleLine.ifEmpty { strings.eventDetailsFallback },
+                                text = eventTitleLine.ifEmpty { AppTheme.strings.eventDetailsFallback },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 fontSize = 22.sp,
@@ -165,7 +162,7 @@ fun EventDetailScreen(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontSize = 14.sp,
-                                    color = colors.textSecondary,
+                                    color = AppTheme.colors.textSecondary,
                                 )
                             }
                         }
@@ -174,15 +171,15 @@ fun EventDetailScreen(
                         IconButton(onClick = { onAction(EventDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -206,7 +203,7 @@ fun EventDetailScreen(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.pagerBackground),
+                    .background(AppTheme.colors.pagerBackground),
                 beyondViewportPageCount = 1
             ) { page ->
                 when (page) {
@@ -215,7 +212,7 @@ fun EventDetailScreen(
                         isRefreshing = state.isRefreshing,
                         onRefresh = { onAction(EventDetailUiAction.OnRefresh) },
                         onFightClick = { fightId -> onAction(EventDetailUiAction.OnFightClicked(fightId)) },
-                        emptyMessage = strings.emptyMainCardFights,
+                        emptyMessage = AppTheme.strings.emptyMainCardFights,
                         listState = mainCardListState,
                         eventDate = (state.event?.datetimeUtcMain ?: state.event?.datetimeUtc)
                             ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
@@ -228,7 +225,7 @@ fun EventDetailScreen(
                         isRefreshing = state.isRefreshing,
                         onRefresh = { onAction(EventDetailUiAction.OnRefresh) },
                         onFightClick = { fightId -> onAction(EventDetailUiAction.OnFightClicked(fightId)) },
-                        emptyMessage = strings.emptyPrelimFights,
+                        emptyMessage = AppTheme.strings.emptyPrelimFights,
                         listState = prelimsListState,
                         eventDate = state.event?.datetimeUtc?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek),
                         eventVenueAndLocation = listOfNotNull(state.event?.venue, state.event?.location).joinToString(", ").ifEmpty { null },

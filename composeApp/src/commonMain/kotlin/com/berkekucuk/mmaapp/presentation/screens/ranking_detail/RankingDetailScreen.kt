@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.ranking_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,8 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.abs
 
@@ -73,25 +72,21 @@ fun RankingDetailScreen(
     state: RankingDetailUiState,
     onAction: (RankingDetailUiAction) -> Unit
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             Column(
-                modifier = Modifier.background(colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.toUpperCase(strings.weightClassDisplayName(state.weightClassId)),
+                            text = AppTheme.strings.toUpperCase(AppTheme.strings.weightClassDisplayName(state.weightClassId)),
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                         )
@@ -100,15 +95,15 @@ fun RankingDetailScreen(
                         IconButton(onClick = { onAction(RankingDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack
+                                contentDescription = AppTheme.strings.contentDescriptionBack
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary
                     )
                 )
             }
@@ -127,7 +122,7 @@ fun RankingDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(colors.fightItemBackground)
+                        .background(AppTheme.colors.fightItemBackground)
                 ) {
                     state.rankedFighters.forEachIndexed { index, ranking ->
                         ranking.fighter?.let { fighter ->
@@ -154,12 +149,12 @@ fun RankingDetailScreen(
                                                 Icon(
                                                     imageVector = if (rankChange > 0) Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown,
                                                     contentDescription = null,
-                                                    tint = if (rankChange > 0) colors.winnerFrame else colors.loseColor,
+                                                    tint = if (rankChange > 0) AppTheme.colors.winnerFrame else AppTheme.colors.loseColor,
                                                     modifier = Modifier.size(24.dp)
                                                 )
                                                 Text(
                                                     text = abs(rankChange).toString(),
-                                                    color = if (rankChange > 0) colors.winnerFrame else colors.loseColor,
+                                                    color = if (rankChange > 0) AppTheme.colors.winnerFrame else AppTheme.colors.loseColor,
                                                     fontSize = 13.sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
@@ -172,7 +167,7 @@ fun RankingDetailScreen(
                                             ) {
                                                 Text(
                                                     text = "NR",
-                                                    color = colors.textSecondary,
+                                                    color = AppTheme.colors.textSecondary,
                                                     fontSize = 13.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     fontStyle = FontStyle.Italic
@@ -184,7 +179,7 @@ fun RankingDetailScreen(
 
                                 if (index < state.rankedFighters.lastIndex) {
                                     HorizontalDivider(
-                                        color = colors.dividerColor,
+                                        color = AppTheme.colors.dividerColor,
                                         thickness = 0.8.dp,
                                     )
                                 }

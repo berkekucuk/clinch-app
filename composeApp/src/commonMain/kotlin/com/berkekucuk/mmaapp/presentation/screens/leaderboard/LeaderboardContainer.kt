@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.AppColors
 import com.berkekucuk.mmaapp.domain.model.User
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.PaginationControls
@@ -34,7 +34,6 @@ fun LeaderboardContainer(
     listState: LazyListState,
     onAction: (LeaderboardUiAction) -> Unit,
     navBarBottomPadding: Dp,
-    colors: AppColors
 ) {
     ListContainer(
         isRefreshing = isRefreshing,
@@ -66,7 +65,7 @@ fun LeaderboardContainer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(colors.fightItemBackground)
+                        .background(AppTheme.colors.fightItemBackground)
                 ) {
                     leaderboard.forEachIndexed { index, user ->
                         val isCurrentUser = user.id == currentUserId
@@ -74,7 +73,7 @@ fun LeaderboardContainer(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .then(if (isCurrentUser) Modifier.background(colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
+                                .then(if (isCurrentUser) Modifier.background(AppTheme.colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
                                 .padding(horizontal = 12.dp)
                         ) {
                             RankedFighterRow(
@@ -90,7 +89,7 @@ fun LeaderboardContainer(
                                     ) {
                                         Text(
                                             text = user.points.toString(),
-                                            color = colors.winnerFrame,
+                                            color = AppTheme.colors.winnerFrame,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 16.sp
                                         )
@@ -98,7 +97,7 @@ fun LeaderboardContainer(
                                         Icon(
                                             imageVector = Icons.Default.EmojiEvents,
                                             contentDescription = null,
-                                            tint = colors.winnerFrame,
+                                            tint = AppTheme.colors.winnerFrame,
                                             modifier = Modifier.size(18.dp)
                                         )
                                     }
@@ -108,7 +107,7 @@ fun LeaderboardContainer(
 
                             if (index < leaderboard.lastIndex) {
                                 HorizontalDivider(
-                                    color = colors.dividerColor,
+                                    color = AppTheme.colors.dividerColor,
                                     thickness = 0.8.dp,
                                 )
                             }

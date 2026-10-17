@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_comments
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,8 +29,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun CommentInputBar(
@@ -39,22 +38,20 @@ fun CommentInputBar(
     onInputChanged: (String) -> Unit,
     onSendClick: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val canSend = input.isNotBlank() && !isSending
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.pagerBackground)
+            .background(AppTheme.colors.pagerBackground)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
     ) {
-        HorizontalDivider(color = colors.dividerColor, thickness = 0.8.dp)
+        HorizontalDivider(color = AppTheme.colors.dividerColor, thickness = 0.8.dp)
 
         if (!isAuthenticated) {
             Text(
-                text = strings.commentLoginRequired,
-                color = colors.textSecondary,
+                text = AppTheme.strings.commentLoginRequired,
+                color = AppTheme.colors.textSecondary,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
@@ -73,23 +70,23 @@ fun CommentInputBar(
             OutlinedTextField(
                 value = input,
                 onValueChange = onInputChanged,
-                placeholder = { Text(strings.commentInputPlaceholder, fontSize = 14.sp) },
+                placeholder = { Text(AppTheme.strings.commentInputPlaceholder, fontSize = 14.sp) },
                 textStyle = TextStyle(fontSize = 14.sp),
                 maxLines = 4,
                 shape = RoundedCornerShape(20.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = colors.textPrimary,
-                    unfocusedTextColor = colors.textPrimary,
-                    focusedBorderColor = colors.cardBorder,
-                    unfocusedBorderColor = colors.cardBorder,
-                    focusedPlaceholderColor = colors.textSecondary,
-                    unfocusedPlaceholderColor = colors.textSecondary,
-                    focusedContainerColor = colors.fightItemBackground,
-                    unfocusedContainerColor = colors.fightItemBackground,
-                    cursorColor = colors.textPrimary,
+                    focusedTextColor = AppTheme.colors.textPrimary,
+                    unfocusedTextColor = AppTheme.colors.textPrimary,
+                    focusedBorderColor = AppTheme.colors.cardBorder,
+                    unfocusedBorderColor = AppTheme.colors.cardBorder,
+                    focusedPlaceholderColor = AppTheme.colors.textSecondary,
+                    unfocusedPlaceholderColor = AppTheme.colors.textSecondary,
+                    focusedContainerColor = AppTheme.colors.fightItemBackground,
+                    unfocusedContainerColor = AppTheme.colors.fightItemBackground,
+                    cursorColor = AppTheme.colors.textPrimary,
                 ),
                 supportingText = if (input.length > COUNTER_VISIBLE_FROM) {
-                    { Text("${input.length}/${EventCommentsViewModel.MAX_COMMENT_LENGTH}", color = colors.textSecondary) }
+                    { Text("${input.length}/${EventCommentsViewModel.MAX_COMMENT_LENGTH}", color = AppTheme.colors.textSecondary) }
                 } else null,
                 modifier = Modifier.weight(1f)
             )
@@ -100,15 +97,15 @@ fun CommentInputBar(
             ) {
                 if (isSending) {
                     CircularProgressIndicator(
-                        color = colors.ufcRed,
+                        color = AppTheme.colors.ufcRed,
                         strokeWidth = 2.dp,
                         modifier = Modifier.size(20.dp)
                     )
                 } else {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = strings.contentDescriptionSendComment,
-                        tint = if (canSend) colors.ufcRed else colors.textSecondary,
+                        contentDescription = AppTheme.strings.contentDescriptionSendComment,
+                        tint = if (canSend) AppTheme.colors.ufcRed else AppTheme.colors.textSecondary,
                     )
                 }
             }

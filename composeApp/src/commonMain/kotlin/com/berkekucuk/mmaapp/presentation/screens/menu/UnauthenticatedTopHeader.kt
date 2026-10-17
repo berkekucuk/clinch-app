@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,13 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun UnauthenticatedTopHeader(onSignInClick: () -> Unit) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     Row(
         modifier = Modifier
@@ -37,26 +34,26 @@ fun UnauthenticatedTopHeader(onSignInClick: () -> Unit) {
         Icon(
             imageVector = Icons.Filled.AccountCircle,
             contentDescription = null,
-            tint = colors.textPrimary,
+            tint = AppTheme.colors.textPrimary,
             modifier = Modifier.size(28.dp).padding(top = 4.dp)
         )
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(
-                text = strings.menuSignInPrompt,
-                color = colors.textPrimary,
+                text = AppTheme.strings.menuSignInPrompt,
+                color = AppTheme.colors.textPrimary,
                 fontSize = 15.sp,
                 lineHeight = 22.sp,
             )
             Button(
                 onClick = onSignInClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colors.signInButton,
-                    contentColor = colors.black
+                    containerColor = AppTheme.colors.signInButton,
+                    contentColor = AppTheme.colors.black
                 ),
                 shape = RoundedCornerShape(24.dp)
             ) {
                 Text(
-                    text = strings.menuSignInButton,
+                    text = AppTheme.strings.menuSignInButton,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
                     modifier = Modifier.padding(horizontal = 8.dp)

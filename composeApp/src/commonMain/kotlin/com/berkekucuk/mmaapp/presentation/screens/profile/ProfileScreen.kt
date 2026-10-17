@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,8 +55,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.domain.enums.BanAction
@@ -104,23 +103,19 @@ fun ProfileScreen(
     state: ProfileUiState,
     onAction: (ProfileUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     var showOverflowMenu by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.profileTabOverview, strings.profileTabPredictions)
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.profileTabOverview, AppTheme.strings.profileTabPredictions)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val message = strings.mapError(state.error) ?: when (state.successMessage) {
-        ProfileSuccessMessage.USER_BANNED -> strings.commentUserBanned
-        ProfileSuccessMessage.USER_UNBANNED -> strings.commentUserUnbanned
+    val message = AppTheme.strings.mapError(state.error) ?: when (state.successMessage) {
+        ProfileSuccessMessage.USER_BANNED -> AppTheme.strings.commentUserBanned
+        ProfileSuccessMessage.USER_UNBANNED -> AppTheme.strings.commentUserUnbanned
         null -> null
     }
 
@@ -135,7 +130,7 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(
@@ -151,14 +146,14 @@ fun ProfileScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.fighterDetailTopBar)
+                modifier = Modifier.background(AppTheme.colors.fighterDetailTopBar)
             ) {
                 MediumTopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { onAction(ProfileUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack
+                                contentDescription = AppTheme.strings.contentDescriptionBack
                             )
                         }
                     },
@@ -179,12 +174,12 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .padding(end = if (state.isOwner) 8.dp else 0.dp)
                                     .background(
-                                        color = colors.winnerFrame.copy(alpha = 0.15f),
+                                        color = AppTheme.colors.winnerFrame.copy(alpha = 0.15f),
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = colors.winnerFrame,
+                                        color = AppTheme.colors.winnerFrame,
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -192,7 +187,7 @@ fun ProfileScreen(
                             ) {
                                 Text(
                                     text = user.points.toString(),
-                                    color = colors.winnerFrame,
+                                    color = AppTheme.colors.winnerFrame,
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -200,7 +195,7 @@ fun ProfileScreen(
                                 Icon(
                                     imageVector = Icons.Default.EmojiEvents,
                                     contentDescription = null,
-                                    tint = colors.winnerFrame,
+                                    tint = AppTheme.colors.winnerFrame,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -217,15 +212,15 @@ fun ProfileScreen(
                                 DropdownMenu(
                                     expanded = showOverflowMenu,
                                     onDismissRequest = { showOverflowMenu = false },
-                                    containerColor = colors.dropdownMenuBackground
+                                    containerColor = AppTheme.colors.dropdownMenuBackground
                                 ) {
                                     DropdownMenuItem(
-                                        text = { Text(strings.reportUserTitle, color = colors.textPrimary) },
+                                        text = { Text(AppTheme.strings.reportUserTitle, color = AppTheme.colors.textPrimary) },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Report,
-                                                contentDescription = strings.reportUserTitle,
-                                                tint = colors.textPrimary
+                                                contentDescription = AppTheme.strings.reportUserTitle,
+                                                tint = AppTheme.colors.textPrimary
                                             )
                                         },
                                         onClick = {
@@ -235,12 +230,12 @@ fun ProfileScreen(
                                     )
 
                                     DropdownMenuItem(
-                                        text = { Text(strings.blockUserTitle, color = colors.textPrimary) },
+                                        text = { Text(AppTheme.strings.blockUserTitle, color = AppTheme.colors.textPrimary) },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Default.Block,
-                                                contentDescription = strings.blockUserTitle,
-                                                tint = colors.textPrimary
+                                                contentDescription = AppTheme.strings.blockUserTitle,
+                                                tint = AppTheme.colors.textPrimary
                                             )
                                         },
                                         onClick = {
@@ -251,12 +246,12 @@ fun ProfileScreen(
 
                                     if (state.canModerate) {
                                         DropdownMenuItem(
-                                            text = { Text(strings.commentBan, color = colors.textPrimary) },
+                                            text = { Text(AppTheme.strings.commentBan, color = AppTheme.colors.textPrimary) },
                                             leadingIcon = {
                                                 Icon(
                                                     imageVector = Icons.Default.SpeakerNotesOff,
-                                                    contentDescription = strings.commentBan,
-                                                    tint = colors.textPrimary
+                                                    contentDescription = AppTheme.strings.commentBan,
+                                                    tint = AppTheme.colors.textPrimary
                                                 )
                                             },
                                             onClick = {
@@ -266,12 +261,12 @@ fun ProfileScreen(
                                         )
 
                                         DropdownMenuItem(
-                                            text = { Text(strings.commentUnban, color = colors.textPrimary) },
+                                            text = { Text(AppTheme.strings.commentUnban, color = AppTheme.colors.textPrimary) },
                                             leadingIcon = {
                                                 Icon(
                                                     imageVector = Icons.Default.LockOpen,
-                                                    contentDescription = strings.commentUnban,
-                                                    tint = colors.textPrimary
+                                                    contentDescription = AppTheme.strings.commentUnban,
+                                                    tint = AppTheme.colors.textPrimary
                                                 )
                                             },
                                             onClick = {
@@ -287,9 +282,9 @@ fun ProfileScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
-                        actionIconContentColor = colors.textPrimary
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
+                        actionIconContentColor = AppTheme.colors.textPrimary
                     ),
                     scrollBehavior = scrollBehavior,
                 )
@@ -312,7 +307,7 @@ fun ProfileScreen(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.pagerBackground),
+                    .background(AppTheme.colors.pagerBackground),
                 beyondViewportPageCount = 1
             ) { page ->
                 when (page) {
@@ -343,10 +338,10 @@ fun ProfileScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(ProfileUiAction.OnDismissBlockDialog) },
             onConfirmClick = { onAction(ProfileUiAction.OnConfirmBlock) },
-            title = strings.blockUserTitle,
-            text = strings.blockUserConfirm,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.commonCancel,
+            title = AppTheme.strings.blockUserTitle,
+            text = AppTheme.strings.blockUserConfirm,
+            confirmText = AppTheme.strings.dialogAccept,
+            dismissText = AppTheme.strings.commonCancel,
             isDestructive = true
         )
     }
@@ -356,10 +351,10 @@ fun ProfileScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(ProfileUiAction.OnDismissBanDialog) },
             onConfirmClick = { onAction(ProfileUiAction.OnConfirmBan) },
-            title = if (isBan) strings.commentBanTitle else strings.commentUnbanTitle,
-            text = if (isBan) strings.commentBanConfirm else strings.commentUnbanConfirm,
-            confirmText = if (isBan) strings.commentBan else strings.commonRemove,
-            dismissText = strings.commonCancel,
+            title = if (isBan) AppTheme.strings.commentBanTitle else AppTheme.strings.commentUnbanTitle,
+            text = if (isBan) AppTheme.strings.commentBanConfirm else AppTheme.strings.commentUnbanConfirm,
+            confirmText = if (isBan) AppTheme.strings.commentBan else AppTheme.strings.commonRemove,
+            dismissText = AppTheme.strings.commonCancel,
             isConfirmLoading = state.isSubmittingBan,
             isDestructive = isBan
         )
@@ -369,16 +364,16 @@ fun ProfileScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(ProfileUiAction.OnDismissReportDialog) },
             onConfirmClick = { onAction(ProfileUiAction.OnSubmitReport) },
-            title = strings.reportUserTitle,
-            confirmText = strings.reportUserSubmit,
-            dismissText = strings.commonCancel,
+            title = AppTheme.strings.reportUserTitle,
+            confirmText = AppTheme.strings.reportUserSubmit,
+            dismissText = AppTheme.strings.commonCancel,
             confirmEnabled = state.reportReason != null,
             isConfirmLoading = state.isReporting,
             isDestructive = true,
             content = {
                 Column(modifier = Modifier.selectableGroup()) {
                     ReportReason.profileReasons.forEach { reason ->
-                        val displayName = strings.reportReasonDisplayName(reason)
+                        val displayName = AppTheme.strings.reportReasonDisplayName(reason)
                         Row(
                             Modifier
                                 .fillMaxWidth()
@@ -395,13 +390,13 @@ fun ProfileScreen(
                                 selected = (reason == state.reportReason),
                                 onClick = null,
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.textPrimary,
-                                    unselectedColor = colors.textSecondary
+                                    selectedColor = AppTheme.colors.textPrimary,
+                                    unselectedColor = AppTheme.colors.textSecondary
                                 )
                             )
                             Text(
                                 text = displayName,
-                                color = colors.textPrimary,
+                                color = AppTheme.colors.textPrimary,
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         }

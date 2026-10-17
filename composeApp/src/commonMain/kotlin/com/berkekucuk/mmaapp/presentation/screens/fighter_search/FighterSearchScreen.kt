@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_search
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,8 +41,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -73,15 +72,10 @@ fun FighterSearchScreen(
     state: FighterSearchUiState,
     onAction: (FighterSearchUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val focusRequester = remember { FocusRequester() }
     var textFieldValue by remember { mutableStateOf(TextFieldValue(state.query, TextRange(state.query.length))) }
 
-    // 3. UI Data & Definitions
     LaunchedEffect(state.query) {
         if (textFieldValue.text != state.query) {
             textFieldValue = TextFieldValue(state.query, TextRange(state.query.length))
@@ -93,19 +87,19 @@ fun FighterSearchScreen(
     }
 
     Scaffold(
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             Column(
-                modifier = Modifier.background(colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
             ){
                 TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { onAction(FighterSearchUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
-                                tint = colors.textPrimary,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
+                                tint = AppTheme.colors.textPrimary,
                             )
                         }
                     },
@@ -118,17 +112,17 @@ fun FighterSearchScreen(
                             },
                             singleLine = true,
                             textStyle = TextStyle(
-                                color = colors.textPrimary,
+                                color = AppTheme.colors.textPrimary,
                                 fontSize = 18.sp,
                             ),
-                            cursorBrush = SolidColor(colors.ufcRed),
+                            cursorBrush = SolidColor(AppTheme.colors.ufcRed),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             decorationBox = { innerTextField ->
                                 Box {
                                     if (state.query.isEmpty()) {
                                         Text(
-                                            text = strings.fighterSearchPlaceholder,
-                                            color = colors.textSecondary,
+                                            text = AppTheme.strings.fighterSearchPlaceholder,
+                                            color = AppTheme.colors.textSecondary,
                                             fontSize = 18.sp,
                                         )
                                     }
@@ -146,7 +140,7 @@ fun FighterSearchScreen(
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = null,
-                                    tint = colors.textSecondary,
+                                    tint = AppTheme.colors.textSecondary,
                                 )
                             }
                         }
@@ -154,8 +148,8 @@ fun FighterSearchScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary
                     ),
                 )
             }
@@ -169,7 +163,7 @@ fun FighterSearchScreen(
         ) {
             when {
                 state.error != null -> {
-                    strings.mapError(state.error)?.let { errorMessage ->
+                    AppTheme.strings.mapError(state.error)?.let { errorMessage ->
                         ErrorBox(
                             message = errorMessage,
                             modifier = Modifier
@@ -187,7 +181,7 @@ fun FighterSearchScreen(
                 }
                 state.query.length >= 2 -> {
                     ErrorBox(
-                        message = strings.fighterSearchEmpty,
+                        message = AppTheme.strings.fighterSearchEmpty,
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(horizontal = 16.dp, vertical = 12.dp)

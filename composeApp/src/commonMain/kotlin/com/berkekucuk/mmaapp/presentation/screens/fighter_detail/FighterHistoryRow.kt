@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Box
@@ -19,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.toShortDate
 import com.berkekucuk.mmaapp.core.utils.toYear
 import com.berkekucuk.mmaapp.domain.enums.Result
@@ -34,8 +33,6 @@ fun FightHistoryRow(
     fighterId: String,
     onClick: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val dateStrings = rememberLocalizedDateStrings()
     val fighter = fight.participants.find { it.fighter.fighterId == fighterId }
     val opponent = fight.participants.find { it.fighter.fighterId != fighterId }
@@ -43,29 +40,29 @@ fun FightHistoryRow(
     val result = fighter?.result
 
     val badgeColor = when (result) {
-        Result.PENDING -> colors.upcomingColor
-        Result.WIN -> colors.winColor
-        Result.LOSS -> colors.loseColor
-        Result.DRAW -> colors.drawColor
-        Result.NO_CONTEST -> colors.noContestColor
-        else -> colors.cardBorder
+        Result.PENDING -> AppTheme.colors.upcomingColor
+        Result.WIN -> AppTheme.colors.winColor
+        Result.LOSS -> AppTheme.colors.loseColor
+        Result.DRAW -> AppTheme.colors.drawColor
+        Result.NO_CONTEST -> AppTheme.colors.noContestColor
+        else -> AppTheme.colors.cardBorder
     }
 
     val badgeScriptColor = when(result) {
-        Result.PENDING -> colors.upcomingColor2
-        Result.WIN -> colors.winColor2
-        Result.LOSS -> colors.loseColor2
-        Result.DRAW -> colors.drawColor2
-        Result.NO_CONTEST -> colors.noContestColor2
-        else -> colors.cardBorder
+        Result.PENDING -> AppTheme.colors.upcomingColor2
+        Result.WIN -> AppTheme.colors.winColor2
+        Result.LOSS -> AppTheme.colors.loseColor2
+        Result.DRAW -> AppTheme.colors.drawColor2
+        Result.NO_CONTEST -> AppTheme.colors.noContestColor2
+        else -> AppTheme.colors.cardBorder
     }
 
     val resultLetter = when (result) {
-        Result.WIN -> strings.fighterDetailResultWin
-        Result.LOSS -> strings.fighterDetailResultLoss
-        Result.DRAW -> strings.fighterDetailResultDraw
-        Result.NO_CONTEST -> strings.fighterDetailResultNoContest
-        else -> strings.fighterDetailResultPending
+        Result.WIN -> AppTheme.strings.fighterDetailResultWin
+        Result.LOSS -> AppTheme.strings.fighterDetailResultLoss
+        Result.DRAW -> AppTheme.strings.fighterDetailResultDraw
+        Result.NO_CONTEST -> AppTheme.strings.fighterDetailResultNoContest
+        else -> AppTheme.strings.fighterDetailResultPending
     }
 
     val methodAbbr = abbreviateMethod(fight.methodType)
@@ -106,7 +103,7 @@ fun FightHistoryRow(
 
         Row(
             modifier = Modifier
-                .background(color = colors.fightItemBackground)
+                .background(color = AppTheme.colors.fightItemBackground)
                 .fillMaxHeight()
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -128,14 +125,14 @@ fun FightHistoryRow(
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = year ?: "",
-                    color = colors.textPrimary,
+                    color = AppTheme.colors.textPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                 )
                 if (shortDate != null) {
                     Text(
                         text = shortDate,
-                        color = colors.textSecondary,
+                        color = AppTheme.colors.textSecondary,
                         fontSize = 12.sp,
                     )
                 }

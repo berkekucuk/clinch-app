@@ -1,11 +1,11 @@
 package com.berkekucuk.mmaapp.presentation.screens.rankings
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.berkekucuk.mmaapp.domain.model.WeightClass
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 
 @Composable
@@ -16,7 +16,6 @@ fun RankingContainer(
     onWeightClassClicked: (String) -> Unit,
     listState: LazyListState
 ) {
-    val strings = LocalAppStrings.current
 
     ListContainer(
         isRefreshing = isRefreshing,
@@ -27,10 +26,9 @@ fun RankingContainer(
     ) {
         weightClasses.forEach { weightClass ->
             val champion = weightClass.rankings.minByOrNull { it.rankNumber }
-            val displayName = strings.toUpperCase(strings.weightClassDisplayName(weightClass.id))
             item(key = "header_${weightClass.id}") {
                 WeightClassCard(
-                    weightClassName = displayName,
+                    weightClassName = AppTheme.strings.toUpperCase(AppTheme.strings.weightClassDisplayName(weightClass.id)),
                     weightLimit = weightClass.weightLimit,
                     champion = champion,
                     onWeightClassClicked = { onWeightClassClicked(weightClass.id) }

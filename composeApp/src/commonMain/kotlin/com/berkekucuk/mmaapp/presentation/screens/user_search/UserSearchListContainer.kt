@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.user_search
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.domain.model.User
 import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
@@ -34,7 +34,6 @@ fun UserSearchListContainer(
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
-    val colors = LocalAppColors.current
 
     LaunchedEffect(listState.isScrollInProgress) {
         if (listState.isScrollInProgress) {
@@ -55,7 +54,7 @@ fun UserSearchListContainer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(colors.fightItemBackground)
+                    .background(AppTheme.colors.fightItemBackground)
             ) {
                 users.forEachIndexed { index, user ->
                     Column(
@@ -87,7 +86,7 @@ fun UserSearchListContainer(
 
                         if (index < users.lastIndex) {
                             HorizontalDivider(
-                                color = colors.dividerColor,
+                                color = AppTheme.colors.dividerColor,
                                 thickness = 0.8.dp,
                             )
                         }

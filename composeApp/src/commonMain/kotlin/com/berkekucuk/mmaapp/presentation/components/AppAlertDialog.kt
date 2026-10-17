@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun AppAlertDialog(
@@ -24,7 +24,6 @@ fun AppAlertDialog(
     confirmEnabled: Boolean = true,
     isConfirmLoading: Boolean = false,
 ) {
-    val colors = LocalAppColors.current
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
@@ -32,7 +31,7 @@ fun AppAlertDialog(
             {
                 Text(
                     text = it,
-                    color = colors.textPrimary
+                    color = AppTheme.colors.textPrimary
                 )
             }
         },
@@ -42,7 +41,7 @@ fun AppAlertDialog(
             } else if (text != null) {
                 Text(
                     text = text,
-                    color = colors.textSecondary
+                    color = AppTheme.colors.textSecondary
                 )
             }
         },
@@ -55,12 +54,12 @@ fun AppAlertDialog(
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp), 
                         strokeWidth = 2.dp, 
-                        color = if (isDestructive) colors.ufcRed else colors.winnerFrame
+                        color = if (isDestructive) AppTheme.colors.ufcRed else AppTheme.colors.winnerFrame
                     )
                 } else {
                     Text(
                         text = confirmText,
-                        color = if (!confirmEnabled) colors.textSecondary.copy(alpha = 0.5f) else if (isDestructive) colors.ufcRed else colors.winnerFrame
+                        color = if (!confirmEnabled) AppTheme.colors.textSecondary.copy(alpha = 0.5f) else if (isDestructive) AppTheme.colors.ufcRed else AppTheme.colors.winnerFrame
                     )
                 }
             }
@@ -68,10 +67,10 @@ fun AppAlertDialog(
         dismissButton = dismissText?.let {
             {
                 TextButton(onClick = onDismissClick ?: onDismissRequest) {
-                    Text(text = it, color = colors.textSecondary)
+                    Text(text = it, color = AppTheme.colors.textSecondary)
                 }
             }
         },
-        containerColor = colors.fightItemBackground,
+        containerColor = AppTheme.colors.fightItemBackground,
     )
 }

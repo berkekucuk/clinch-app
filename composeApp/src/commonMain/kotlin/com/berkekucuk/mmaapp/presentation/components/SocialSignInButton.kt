@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -28,10 +28,9 @@ fun SocialSignInButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
 
-    val borderModifier = if (!colors.isDark) {
-        Modifier.border(1.dp, colors.dividerColor, RoundedCornerShape(14.dp))
+    val borderModifier = if (!AppTheme.colors.isDark) {
+        Modifier.border(1.dp, AppTheme.colors.dividerColor, RoundedCornerShape(14.dp))
     } else {
         Modifier
     }
@@ -39,7 +38,7 @@ fun SocialSignInButton(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(colors.white)
+            .background(AppTheme.colors.white)
             .then(borderModifier)
             .clickable { onClick() }
             .padding(horizontal = 28.dp, vertical = 16.dp),
@@ -53,7 +52,7 @@ fun SocialSignInButton(
         )
         Text(
             text = text,
-            color = colors.black,
+            color = AppTheme.colors.black,
             fontSize = 17.sp,
             fontWeight = FontWeight.Medium,
         )

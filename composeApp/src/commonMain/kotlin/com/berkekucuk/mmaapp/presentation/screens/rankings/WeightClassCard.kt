@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.rankings
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.domain.model.RankedFighter
 import com.berkekucuk.mmaapp.presentation.components.FighterPortrait
 
@@ -36,7 +36,6 @@ fun WeightClassCard(
     champion: RankedFighter? = null,
     onWeightClassClicked: () -> Unit
 ) {
-    val colors = LocalAppColors.current
     val titleText = remember(weightClassName, weightLimit) {
         if (weightLimit != null) "$weightClassName ($weightLimit lbs)" else weightClassName
     }
@@ -45,7 +44,7 @@ fun WeightClassCard(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .appClickable { onWeightClassClicked() }
             .padding(16.dp)
     ) {
@@ -55,7 +54,7 @@ fun WeightClassCard(
                 .width(3.dp)
                 .height(48.dp)
                 .clip(RoundedCornerShape(2.dp))
-                .background(colors.rankingWeightClassAccent)
+                .background(AppTheme.colors.rankingWeightClassAccent)
         )
 
         Row(
@@ -72,7 +71,7 @@ fun WeightClassCard(
                     text = titleText,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colors.textSecondary,
+                    color = AppTheme.colors.textSecondary,
                 )
 
                 if (champion?.fighter != null) {
@@ -90,14 +89,14 @@ fun WeightClassCard(
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(4.dp))
-                                        .background(colors.rankingChampionBadge)
+                                        .background(AppTheme.colors.rankingChampionBadge)
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Text(
                                         text = "C",
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = colors.pagerBackground
+                                        color = AppTheme.colors.pagerBackground
                                     )
                                 }
                             }
@@ -109,7 +108,7 @@ fun WeightClassCard(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = colors.textSecondary,
+                tint = AppTheme.colors.textSecondary,
                 modifier = Modifier.size(22.dp)
             )
         }

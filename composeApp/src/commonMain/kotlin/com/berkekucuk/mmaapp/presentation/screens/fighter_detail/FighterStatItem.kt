@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
@@ -10,7 +11,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 internal fun FighterStatItem(
@@ -34,7 +34,7 @@ internal fun FighterStatItem(
             text = label,
             style = labelStyle,
             fontWeight = FontWeight.SemiBold,
-            color = LocalAppColors.current.textSecondary,
+            color = AppTheme.colors.textSecondary,
         )
     }
 }

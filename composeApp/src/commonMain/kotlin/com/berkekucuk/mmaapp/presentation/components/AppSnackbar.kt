@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun AppSnackbar(
@@ -31,9 +31,8 @@ fun AppSnackbar(
     modifier: Modifier = Modifier,
     isSuccess: Boolean = false,
 ) {
-    val colors = LocalAppColors.current
-    val backgroundColor = if (isSuccess) colors.winnerFrame else colors.loseColor
-    val contentColor = colors.white
+    val backgroundColor = if (isSuccess) AppTheme.colors.winnerFrame else AppTheme.colors.loseColor
+    val contentColor = AppTheme.colors.white
     val icon = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Warning
 
     Row(

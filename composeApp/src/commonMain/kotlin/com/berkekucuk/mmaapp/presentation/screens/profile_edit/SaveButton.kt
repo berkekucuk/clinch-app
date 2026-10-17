@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile_edit
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -12,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun SaveButton(
@@ -22,7 +22,6 @@ fun SaveButton(
     isSaving: Boolean = false,
     enabled: Boolean = true,
 ) {
-    val colors = LocalAppColors.current
 
     TextButton(
         onClick = onClick,
@@ -36,14 +35,14 @@ fun SaveButton(
             if (isSaving) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(14.dp),
-                    color = colors.winnerFrame,
+                    color = AppTheme.colors.winnerFrame,
                     strokeWidth = 2.dp,
                 )
             }
 
             Text(
                 text = text,
-                color = colors.winnerFrame,
+                color = AppTheme.colors.winnerFrame,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium
             )

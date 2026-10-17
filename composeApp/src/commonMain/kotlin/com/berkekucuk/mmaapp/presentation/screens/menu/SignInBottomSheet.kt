@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.utils.isIos
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.PrivacyPolicyText
 import com.berkekucuk.mmaapp.presentation.components.SocialSignInButton
 import mmaapp.composeapp.generated.resources.Res
@@ -31,14 +30,12 @@ fun SignInBottomSheet(
     onStartGoogleSignIn: () -> Unit,
     onStartAppleSignIn: () -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = colors.dropdownMenuBackground
+        containerColor = AppTheme.colors.dropdownMenuBackground
     ) {
         Column(
             modifier = Modifier
@@ -47,8 +44,8 @@ fun SignInBottomSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = strings.menuSignInButton,
-                color = colors.textPrimary,
+                text = AppTheme.strings.menuSignInButton,
+                color = AppTheme.colors.textPrimary,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -56,14 +53,14 @@ fun SignInBottomSheet(
 
             if (!isIos) {
                 SocialSignInButton(
-                    text = strings.menuSignInWithGoogle,
+                    text = AppTheme.strings.menuSignInWithGoogle,
                     icon = Res.drawable.ic_google_logo,
                     onClick = onStartGoogleSignIn,
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
                 SocialSignInButton(
-                    text = strings.menuSignInWithApple,
+                    text = AppTheme.strings.menuSignInWithApple,
                     icon = Res.drawable.apple_logo,
                     onClick = onStartAppleSignIn,
                     modifier = Modifier.fillMaxWidth()

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.presentation.components.FighterImage
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -40,7 +40,6 @@ fun FighterTopBarTitle(
     nickname: String?,
     showQuotes: Boolean = true,
 ) {
-    val colors = LocalAppColors.current
 
     var showFullImage by remember { mutableStateOf(false) }
 
@@ -64,7 +63,7 @@ fun FighterTopBarTitle(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleLarge,
-                color = colors.textPrimary,
+                color = AppTheme.colors.textPrimary,
             )
             if (!nickname.isNullOrBlank()) {
                 Text(
@@ -72,7 +71,7 @@ fun FighterTopBarTitle(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.textSecondary,
+                    color = AppTheme.colors.textSecondary,
                 )
             }
         }

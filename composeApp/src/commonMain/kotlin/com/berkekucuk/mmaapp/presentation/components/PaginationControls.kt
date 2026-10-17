@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun PaginationControls(
@@ -26,7 +26,6 @@ fun PaginationControls(
     onPreviousPage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -41,7 +40,7 @@ fun PaginationControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous Page",
-                tint = if (currentPage > 0 && !isRefreshing) colors.textPrimary else colors.textSecondary
+                tint = if (currentPage > 0 && !isRefreshing) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
             )
         }
 
@@ -53,7 +52,7 @@ fun PaginationControls(
             Text(
                 text = "${currentPage + 1}",
                 style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
+                color = AppTheme.colors.textPrimary
             )
         }
 
@@ -64,7 +63,7 @@ fun PaginationControls(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next Page",
-                tint = if (canGoNext && !isRefreshing) colors.textPrimary else colors.textSecondary
+                tint = if (canGoNext && !isRefreshing) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
             )
         }
     }

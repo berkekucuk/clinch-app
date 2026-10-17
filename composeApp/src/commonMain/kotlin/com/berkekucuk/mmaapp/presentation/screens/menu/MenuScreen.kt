@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,8 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
@@ -85,19 +84,14 @@ fun MenuScreen(
     onStartGoogleSignIn: () -> Unit,
     onStartAppleSignIn: () -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val showSignInSheet = remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // 3. UI Data & Definitions
-    val errorMessage = strings.mapError(state.error)
-
     val isSnackbarSuccess = remember { mutableStateOf(false) }
+
+    // UI Data & Definitions
+    val errorMessage = AppTheme.strings.mapError(state.error)
     val snackbarMessage = when {
         state.error != null -> {
             isSnackbarSuccess.value = false
@@ -105,7 +99,7 @@ fun MenuScreen(
         }
         state.showSignInSuccess -> {
             isSnackbarSuccess.value = true
-            strings.signInSuccess
+            AppTheme.strings.signInSuccess
         }
         else -> null
     }
@@ -119,7 +113,7 @@ fun MenuScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(
@@ -137,14 +131,14 @@ fun MenuScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = strings.menuTitle,
+                        text = AppTheme.strings.menuTitle,
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colors.topBarBackground,
-                    titleContentColor = colors.textPrimary,
+                    containerColor = AppTheme.colors.topBarBackground,
+                    titleContentColor = AppTheme.colors.textPrimary,
                 )
             )
         }
@@ -172,37 +166,37 @@ fun MenuScreen(
                 }
             }
 
-            HorizontalDivider(color = colors.dividerColor)
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
             MenuItemRow(
                 icon = Icons.Filled.Leaderboard,
-                title = strings.menuItemLeaderboard,
+                title = AppTheme.strings.menuItemLeaderboard,
                 onClick = { onAction(MenuUiAction.OnLeaderboardClicked) }
             )
 
-            HorizontalDivider(color = colors.dividerColor)
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
             if ((state.authState as? AuthState.Authenticated)?.role == UserRole.ADMIN) {
                 MenuItemRow(
                     icon = Icons.Filled.Notifications,
                     title = "Send Notification",
                     onClick = { onAction(MenuUiAction.OnSendNotificationClicked) }
                 )
-                HorizontalDivider(color = colors.dividerColor)
+                HorizontalDivider(color = AppTheme.colors.dividerColor)
             }
             MenuItemRow(
                 icon = Icons.Filled.Settings,
-                title = strings.menuItemSettings,
+                title = AppTheme.strings.menuItemSettings,
                 onClick = { onAction(MenuUiAction.OnSettingsClicked) }
             )
-            HorizontalDivider(color = colors.dividerColor)
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
 
             Spacer(modifier = Modifier.weight(1f))
 
             if (state.authState is AuthState.Authenticated) {
-                HorizontalDivider(color = colors.dividerColor)
+                HorizontalDivider(color = AppTheme.colors.dividerColor)
                 MenuItemRow(
                     icon = Icons.AutoMirrored.Filled.Logout,
-                    title = strings.profileSignOut,
-                    tint = colors.loseColor,
+                    title = AppTheme.strings.profileSignOut,
+                    tint = AppTheme.colors.loseColor,
                     onClick = { onAction(MenuUiAction.OnSignOutClicked) },
                 )
             }

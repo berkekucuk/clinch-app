@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,8 +23,6 @@ import com.berkekucuk.mmaapp.core.presentation.LocalMeasurementUnit
 import com.berkekucuk.mmaapp.core.presentation.LocalOddsFormat
 import com.berkekucuk.mmaapp.core.presentation.MeasurementUnit
 import com.berkekucuk.mmaapp.core.presentation.OddsFormat
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.presentation.toAmericanOdds
 import com.berkekucuk.mmaapp.core.presentation.toDecimalOdds
 import com.berkekucuk.mmaapp.core.utils.calculateAgeAtDate
@@ -47,42 +46,40 @@ fun FightDetailContainer(
         calculateAgeAtDate(blueFighter?.dateOfBirth, eventDate)
     }
 
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val measurementUnit = LocalMeasurementUnit.current
     val oddsFormat = LocalOddsFormat.current
     val showRecord = redCorner?.recordAfterFight != null || blueCorner?.recordAfterFight != null
     val rows = buildList {
-        add(Triple(redFighterAge, strings.fightDetailLabelAge, blueFighterAge))
+        add(Triple(redFighterAge, AppTheme.strings.fightDetailLabelAge, blueFighterAge))
         add(Triple(
             when (measurementUnit) {
-                MeasurementUnit.METRIC -> redFighter?.height?.metric?.let { strings.heightCm(it.toString()) }
+                MeasurementUnit.METRIC -> redFighter?.height?.metric?.let { AppTheme.strings.heightCm(it.toString()) }
                 MeasurementUnit.IMPERIAL -> redFighter?.height?.imperial?.ifBlank { null }
             },
-            strings.fightDetailLabelHeight,
+            AppTheme.strings.fightDetailLabelHeight,
             when (measurementUnit) {
-                MeasurementUnit.METRIC -> blueFighter?.height?.metric?.let { strings.heightCm(it.toString()) }
+                MeasurementUnit.METRIC -> blueFighter?.height?.metric?.let { AppTheme.strings.heightCm(it.toString()) }
                 MeasurementUnit.IMPERIAL -> blueFighter?.height?.imperial?.ifBlank { null }
             },
         ))
         add(Triple(
             when (measurementUnit) {
-                MeasurementUnit.METRIC -> redFighter?.reach?.metric?.let { strings.heightCm(it.toString()) }
+                MeasurementUnit.METRIC -> redFighter?.reach?.metric?.let { AppTheme.strings.heightCm(it.toString()) }
                 MeasurementUnit.IMPERIAL -> redFighter?.reach?.imperial?.ifBlank { null }
             },
-            strings.fightDetailLabelReach,
+            AppTheme.strings.fightDetailLabelReach,
             when (measurementUnit) {
-                MeasurementUnit.METRIC -> blueFighter?.reach?.metric?.let { strings.heightCm(it.toString()) }
+                MeasurementUnit.METRIC -> blueFighter?.reach?.metric?.let { AppTheme.strings.heightCm(it.toString()) }
                 MeasurementUnit.IMPERIAL -> blueFighter?.reach?.imperial?.ifBlank { null }
             },
         ))
         add(Triple(
             redCorner?.oddsValue?.let { if (oddsFormat == OddsFormat.DECIMAL) it.toDecimalOdds() else it.toAmericanOdds() },
-            strings.fightDetailLabelOdds,
+            AppTheme.strings.fightDetailLabelOdds,
             blueCorner?.oddsValue?.let { if (oddsFormat == OddsFormat.DECIMAL) it.toDecimalOdds() else it.toAmericanOdds() },
         ))
         if (showRecord) {
-            add(Triple(redCorner?.recordAfterFight?.toString(), strings.fightDetailLabelRecord, blueCorner?.recordAfterFight?.toString()))
+            add(Triple(redCorner?.recordAfterFight?.toString(), AppTheme.strings.fightDetailLabelRecord, blueCorner?.recordAfterFight?.toString()))
         }
     }
 
@@ -90,7 +87,7 @@ fun FightDetailContainer(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
     ) {
         Column {
             rows.forEachIndexed { index, (leftValue, label, rightValue) ->
@@ -101,7 +98,7 @@ fun FightDetailContainer(
                 )
                 if (index < rows.lastIndex) {
                     HorizontalDivider(
-                        color = colors.dividerColor,
+                        color = AppTheme.colors.dividerColor,
                         thickness = 1.dp,
                         modifier = Modifier.padding(horizontal = 12.dp),
                     )
@@ -117,7 +114,6 @@ private fun StatRow(
     label: String,
     rightValue: String,
 ) {
-    val colors = LocalAppColors.current
 
     Row(
         modifier = Modifier
@@ -129,7 +125,7 @@ private fun StatRow(
         Text(
             text = leftValue,
             style = MaterialTheme.typography.bodyMedium,
-            color = colors.textPrimary,
+            color = AppTheme.colors.textPrimary,
             textAlign = TextAlign.Start,
             modifier = Modifier.weight(1f),
         )
@@ -137,7 +133,7 @@ private fun StatRow(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = colors.textSecondary,
+            color = AppTheme.colors.textSecondary,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1.5f),
         )
@@ -145,7 +141,7 @@ private fun StatRow(
         Text(
             text = rightValue,
             style = MaterialTheme.typography.bodyMedium,
-            color = colors.textPrimary,
+            color = AppTheme.colors.textPrimary,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(1f),
         )

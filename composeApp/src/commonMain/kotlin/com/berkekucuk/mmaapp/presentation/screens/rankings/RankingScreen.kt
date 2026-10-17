@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.rankings
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -28,8 +29,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
@@ -63,26 +62,22 @@ fun RankingScreen(
     state: RankingUiState,
     onAction: (RankingUiAction) -> Unit
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val mensListState = rememberLazyListState()
     val womensListState = rememberLazyListState()
 
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.tabMens, strings.tabWomens)
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.tabMens, AppTheme.strings.tabWomens)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        actionLabel = strings.retry,
+        actionLabel = AppTheme.strings.retry,
         onAction = { onAction(RankingUiAction.OnRefresh) },
     )
 
@@ -90,7 +85,7 @@ fun RankingScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(
@@ -105,12 +100,12 @@ fun RankingScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.eventsTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventsTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.rankingsTitle.uppercase(),
+                            text = AppTheme.strings.rankingsTitle.uppercase(),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -118,7 +113,7 @@ fun RankingScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        titleContentColor = colors.textPrimary
+                        titleContentColor = AppTheme.colors.textPrimary
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -137,7 +132,7 @@ fun RankingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(colors.pagerBackground),
+                .background(AppTheme.colors.pagerBackground),
             beyondViewportPageCount = 1
         ) { page ->
             when (page) {

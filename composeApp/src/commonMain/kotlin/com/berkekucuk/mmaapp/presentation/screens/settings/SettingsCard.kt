@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.settings
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun SettingsCard(
@@ -30,12 +30,11 @@ fun SettingsCard(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    val colors = LocalAppColors.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .appClickable { onClick() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -43,21 +42,21 @@ fun SettingsCard(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = colors.textSecondary,
+            tint = AppTheme.colors.textSecondary,
             modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(16.dp))
         Column {
             Text(
                 text = title,
-                color = colors.textPrimary,
+                color = AppTheme.colors.textPrimary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = subtitle,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 fontSize = 14.sp
             )
         }

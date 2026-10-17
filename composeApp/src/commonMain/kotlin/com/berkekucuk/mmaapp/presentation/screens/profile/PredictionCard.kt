@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,8 +33,6 @@ import com.berkekucuk.mmaapp.core.presentation.LocalOddsFormat
 import com.berkekucuk.mmaapp.core.presentation.OddsFormat
 import com.berkekucuk.mmaapp.core.presentation.toAmericanOdds
 import com.berkekucuk.mmaapp.core.presentation.toDecimalOdds
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Prediction
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 
@@ -43,8 +42,6 @@ fun PredictionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
-    val strings = LocalAppStrings.current
     val fight = prediction.fight ?: return
 
     val redCorner = fight.redCorner
@@ -66,19 +63,19 @@ fun PredictionCard(
         }
     }
     val circleBgColor = when (prediction.isCorrect) {
-        true -> colors.winnerFrame
-        false -> colors.loseColor
-        null -> colors.upcomingColor
+        true -> AppTheme.colors.winnerFrame
+        false -> AppTheme.colors.loseColor
+        null -> AppTheme.colors.upcomingColor
     }
     val circleTextColor = when (prediction.isCorrect) {
-        true -> colors.winColor2
-        false -> colors.loseColor2
-        null -> colors.upcomingColor2
+        true -> AppTheme.colors.winColor2
+        false -> AppTheme.colors.loseColor2
+        null -> AppTheme.colors.upcomingColor2
     }
     val oddsTextColor = when (prediction.isCorrect) {
-        true -> colors.winnerFrame
-        false -> colors.loseColor
-        null -> colors.upcomingColor2
+        true -> AppTheme.colors.winnerFrame
+        false -> AppTheme.colors.loseColor
+        null -> AppTheme.colors.upcomingColor2
     }
 
     Card(
@@ -87,7 +84,7 @@ fun PredictionCard(
             .appClickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colors.fightItemBackground
+            containerColor = AppTheme.colors.fightItemBackground
         )
     ) {
         Column {
@@ -100,7 +97,7 @@ fun PredictionCard(
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 0.8.dp,
-                color = colors.dividerColor.copy(alpha = 0.5f)
+                color = AppTheme.colors.dividerColor.copy(alpha = 0.5f)
             )
 
             Box(
@@ -109,8 +106,8 @@ fun PredictionCard(
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = strings.predictionQuestionTitle,
-                    color = colors.textPrimary,
+                    text = AppTheme.strings.predictionQuestionTitle,
+                    color = AppTheme.colors.textPrimary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.CenterStart)
@@ -124,7 +121,7 @@ fun PredictionCard(
                         val sign = if (prediction.pointsEarned > 0) "+" else ""
                         Text(
                             text = "$sign${prediction.pointsEarned}",
-                            color = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
+                            color = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -132,7 +129,7 @@ fun PredictionCard(
                         Icon(
                             imageVector = Icons.Default.EmojiEvents,
                             contentDescription = null,
-                            tint = if (prediction.isCorrect) colors.winnerFrame else colors.ufcRed,
+                            tint = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
                             modifier = Modifier.size(14.dp)
                         )
                     }

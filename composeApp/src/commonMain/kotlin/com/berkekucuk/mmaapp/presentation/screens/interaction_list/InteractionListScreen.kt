@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.interaction_list
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,8 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
@@ -81,16 +80,12 @@ fun InteractionListScreen(
     state: InteractionListUiState,
     onAction: (InteractionListUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // 3. UI Data & Definitions
-    val errorMessage = strings.mapError(state.error)
+    // UI Data & Definitions
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     AppSnackbarEffect(
         message = errorMessage,
@@ -101,7 +96,7 @@ fun InteractionListScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -116,17 +111,17 @@ fun InteractionListScreen(
             )
         },
         topBar = {
-            Column(modifier = Modifier.background(colors.rankingTopBar)) {
+            Column(modifier = Modifier.background(AppTheme.colors.rankingTopBar)) {
                 TopAppBar(
                     title = {
                         val title = when (state.type) {
-                            "favorite" -> strings.profileFavoriteFighters
-                            "goat" -> strings.profileGoatFighters
-                            "hated" -> strings.profileHatedFighters
+                            "favorite" -> AppTheme.strings.profileFavoriteFighters
+                            "goat" -> AppTheme.strings.profileGoatFighters
+                            "hated" -> AppTheme.strings.profileHatedFighters
                             else -> ""
                         }
                         Text(
-                            text = strings.toUpperCase(title),
+                            text = AppTheme.strings.toUpperCase(title),
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                         )
@@ -135,7 +130,7 @@ fun InteractionListScreen(
                         IconButton(onClick = { onAction(InteractionListUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
@@ -152,9 +147,9 @@ fun InteractionListScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
-                        actionIconContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
+                        actionIconContentColor = AppTheme.colors.textPrimary,
                     ),
                 )
             }
@@ -175,9 +170,9 @@ fun InteractionListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = strings.emptyInteractionList,
+                            text = AppTheme.strings.emptyInteractionList,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = colors.textSecondary
+                            color = AppTheme.colors.textSecondary
                         )
                     }
                 }
@@ -187,7 +182,7 @@ fun InteractionListScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(colors.fightItemBackground)
+                            .background(AppTheme.colors.fightItemBackground)
                     ) {
                         state.interactions.forEachIndexed { index, interaction ->
                             interaction.fighter?.let { fighter ->
@@ -215,7 +210,7 @@ fun InteractionListScreen(
                                                 Icon(
                                                     imageVector = Icons.Default.Remove,
                                                     contentDescription = null,
-                                                    tint = colors.textSecondary,
+                                                    tint = AppTheme.colors.textSecondary,
                                                 )
                                             }
                                         }
@@ -223,7 +218,7 @@ fun InteractionListScreen(
 
                                     if (index < state.interactions.lastIndex) {
                                         HorizontalDivider(
-                                            color = colors.dividerColor,
+                                            color = AppTheme.colors.dividerColor,
                                             thickness = 0.8.dp,
                                         )
                                     }
@@ -242,9 +237,9 @@ fun InteractionListScreen(
             onDismissRequest = { onAction(InteractionListUiAction.OnDismissRemove) },
             onConfirmClick = { onAction(InteractionListUiAction.OnConfirmRemove) },
             onDismissClick = { onAction(InteractionListUiAction.OnDismissRemove) },
-            text = strings.profileRemoveFighterConfirm(fighterName),
-            confirmText = strings.commonRemove,
-            dismissText = strings.commonCancel,
+            text = AppTheme.strings.profileRemoveFighterConfirm(fighterName),
+            confirmText = AppTheme.strings.commonRemove,
+            dismissText = AppTheme.strings.commonCancel,
         )
     }
 
@@ -252,9 +247,9 @@ fun InteractionListScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(InteractionListUiAction.OnDismissLimitAlert) },
             onConfirmClick = { onAction(InteractionListUiAction.OnDismissLimitAlert) },
-            title = strings.interactionLimitReachedTitle,
-            text = strings.interactionLimitReachedText,
-            confirmText = strings.dialogOkay,
+            title = AppTheme.strings.interactionLimitReachedTitle,
+            text = AppTheme.strings.interactionLimitReachedText,
+            confirmText = AppTheme.strings.dialogOkay,
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.blocked_users
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,8 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
@@ -66,16 +65,12 @@ fun BlockedUsersScreen(
     state: BlockedUsersUiState,
     onAction: (BlockedUsersUiAction) -> Unit
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    // 3. UI Data & Definitions
-    val errorMessage = strings.mapError(state.error)
+    // UI Data & Definitions
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     AppSnackbarEffect(
         message = errorMessage,
@@ -86,7 +81,7 @@ fun BlockedUsersScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -102,12 +97,12 @@ fun BlockedUsersScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.settingsSectionBlockedUsers,
+                            text = AppTheme.strings.settingsSectionBlockedUsers,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                         )
@@ -116,15 +111,15 @@ fun BlockedUsersScreen(
                         IconButton(onClick = { onAction(BlockedUsersUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack
+                                contentDescription = AppTheme.strings.contentDescriptionBack
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     )
                 )
             }
@@ -145,8 +140,8 @@ fun BlockedUsersScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = strings.blockedUsersEmpty,
-                            color = colors.textSecondary,
+                            text = AppTheme.strings.blockedUsersEmpty,
+                            color = AppTheme.colors.textSecondary,
                             fontSize = 16.sp
                         )
                     }
@@ -157,7 +152,7 @@ fun BlockedUsersScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(colors.fightItemBackground)
+                            .background(AppTheme.colors.fightItemBackground)
                     ) {
                         state.blockedUsers.forEachIndexed { index, user ->
                             Column(
@@ -176,8 +171,8 @@ fun BlockedUsersScreen(
                                             onClick = { onAction(BlockedUsersUiAction.OnUnblockClicked(user.id)) }
                                         ) {
                                             Text(
-                                                text = strings.unblockUser,
-                                                color = colors.winnerFrame,
+                                                text = AppTheme.strings.unblockUser,
+                                                color = AppTheme.colors.winnerFrame,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 14.sp
                                             )
@@ -188,7 +183,7 @@ fun BlockedUsersScreen(
 
                                 if (index < state.blockedUsers.lastIndex) {
                                     HorizontalDivider(
-                                        color = colors.dividerColor,
+                                        color = AppTheme.colors.dividerColor,
                                         thickness = 0.8.dp,
                                     )
                                 }

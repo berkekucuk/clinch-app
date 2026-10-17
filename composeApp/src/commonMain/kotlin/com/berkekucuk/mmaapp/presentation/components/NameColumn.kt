@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -25,8 +26,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun NameColumn(
@@ -39,8 +38,6 @@ fun NameColumn(
     nameFontSize: TextUnit = 14.sp,
     nameTrailingContent: @Composable (() -> Unit)? = null,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     val textMeasurer = rememberTextMeasurer()
     val nameStyle = TextStyle(fontSize = nameFontSize)
@@ -49,14 +46,14 @@ fun NameColumn(
     val resultUpper = result?.uppercase()
 
     val nameColor = when (result?.uppercase()) {
-        "WIN" -> colors.textPrimary
-        "LOSS" -> colors.textSecondary
-        else -> colors.textPrimary
+        "WIN" -> AppTheme.colors.textPrimary
+        "LOSS" -> AppTheme.colors.textSecondary
+        else -> AppTheme.colors.textPrimary
     }
 
     val recordColor = when (resultUpper) {
-        "WIN" -> colors.winnerFrame
-        else -> colors.textSecondary
+        "WIN" -> AppTheme.colors.winnerFrame
+        else -> AppTheme.colors.textSecondary
     }
 
     val recordIcon: ImageVector? = when (resultUpper) {
@@ -66,8 +63,8 @@ fun NameColumn(
     }
 
     val recordIconContentDescription: String? = when (resultUpper) {
-        "WIN" -> strings.contentDescriptionWin
-        "LOSS" -> strings.contentDescriptionLoss
+        "WIN" -> AppTheme.strings.contentDescriptionWin
+        "LOSS" -> AppTheme.strings.contentDescriptionLoss
         else -> null
     }
 

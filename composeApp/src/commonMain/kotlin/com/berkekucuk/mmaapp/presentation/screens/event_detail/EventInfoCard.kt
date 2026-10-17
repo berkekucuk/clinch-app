@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -32,18 +33,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun EventInfoCard(
     date: String?,
     venueAndLocation: String?,
+    modifier: Modifier = Modifier,
     isLive: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val infiniteTransition = rememberInfiniteTransition()
     val dotAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -57,7 +54,7 @@ fun EventInfoCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -67,13 +64,13 @@ fun EventInfoCard(
             Icon(
                 imageVector = Icons.Default.DateRange,
                 contentDescription = null,
-                tint = colors.textPrimary,
+                tint = AppTheme.colors.textPrimary,
                 modifier = Modifier.size(14.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = date ?: strings.tba,
-                color = colors.textPrimary,
+                text = date ?: AppTheme.strings.tba,
+                color = AppTheme.colors.textPrimary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 maxLines = 1,
@@ -86,12 +83,12 @@ fun EventInfoCard(
                         .size(7.dp)
                         .alpha(dotAlpha)
                         .clip(CircleShape)
-                        .background(colors.winnerFrame)
+                        .background(AppTheme.colors.winnerFrame)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = strings.liveEvent,
-                    color = colors.winnerFrame,
+                    text = AppTheme.strings.liveEvent,
+                    color = AppTheme.colors.winnerFrame,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -107,12 +104,12 @@ fun EventInfoCard(
             Icon(
                 imageVector = Icons.Default.Place,
                 contentDescription = null,
-                tint = colors.dateColor,
+                tint = AppTheme.colors.dateColor,
                 modifier = Modifier.size(14.dp)
             )
             Text(
-                text = venueAndLocation ?: strings.tba,
-                color = colors.dateColor,
+                text = venueAndLocation ?: AppTheme.strings.tba,
+                color = AppTheme.colors.dateColor,
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

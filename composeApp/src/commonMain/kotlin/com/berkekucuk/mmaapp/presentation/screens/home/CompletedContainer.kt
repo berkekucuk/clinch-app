@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.home
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Event
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import androidx.compose.foundation.ScrollState
@@ -48,8 +47,6 @@ fun CompletedContainer(
     onYearSelected: (Int) -> Unit,
     listState: LazyListState
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     var showDropdownMenu by remember { mutableStateOf(false) }
     val dropdownScrollState = rememberScrollState()
 
@@ -76,7 +73,7 @@ fun CompletedContainer(
                         label = {
                             Text(
                                 text = selectedYear?.toString()
-                                    ?: strings.selectYear,
+                                    ?: AppTheme.strings.selectYear,
                                 fontWeight = FontWeight.Medium
                             )
                         },
@@ -88,9 +85,9 @@ fun CompletedContainer(
                             true
                         ),
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = colors.dropdownMenuBackground,
-                            selectedLabelColor = colors.textPrimary,
-                            selectedTrailingIconColor = colors.textPrimary
+                            selectedContainerColor = AppTheme.colors.dropdownMenuBackground,
+                            selectedLabelColor = AppTheme.colors.textPrimary,
+                            selectedTrailingIconColor = AppTheme.colors.textPrimary
                         )
                     )
 
@@ -102,17 +99,17 @@ fun CompletedContainer(
                             .heightIn(max = 300.dp)
                             .simpleVerticalScrollbar(
                                 state = dropdownScrollState,
-                                color = colors.textSecondary.copy(alpha = 0.5f),
-                                trackColor = colors.dividerColor.copy(alpha = 0.3f),
+                                color = AppTheme.colors.textSecondary.copy(alpha = 0.5f),
+                                trackColor = AppTheme.colors.dividerColor.copy(alpha = 0.3f),
                             ),
-                        containerColor = colors.dropdownMenuBackground
+                        containerColor = AppTheme.colors.dropdownMenuBackground
                     ) {
                         availableYears.forEach { year ->
                             DropdownMenuItem(
                                 text = {
                                     Text(
                                         text = year.toString(),
-                                        color = colors.textPrimary
+                                        color = AppTheme.colors.textPrimary
                                     )
                                 },
                                 onClick = {

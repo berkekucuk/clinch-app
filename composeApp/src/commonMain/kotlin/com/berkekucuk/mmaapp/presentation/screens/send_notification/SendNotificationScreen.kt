@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.send_notification
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
@@ -46,8 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.domain.enums.NotificationTarget
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
@@ -81,13 +80,16 @@ fun SendNotificationScreen(
     state: SendNotificationUiState,
     onAction: (SendNotificationUiAction) -> Unit,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
+    // Theme & Resources
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Compose Core States
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val errorMessage = strings.mapError(state.error)
+    // UI Data & Definitions
+    val errorMessage = AppTheme.strings.mapError(state.error)
+
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
@@ -97,7 +99,7 @@ fun SendNotificationScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
@@ -111,7 +113,7 @@ fun SendNotificationScreen(
             )
         },
         topBar = {
-            Column(modifier = Modifier.background(colors.topBarBackground)) {
+            Column(modifier = Modifier.background(AppTheme.colors.topBarBackground)) {
                 TopAppBar(
                     title = {
                         Text(
@@ -136,15 +138,15 @@ fun SendNotificationScreen(
                         IconButton(onClick = { onAction(SendNotificationUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     )
                 )
             }
@@ -164,7 +166,7 @@ fun SendNotificationScreen(
                 text = "Notification",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -213,7 +215,7 @@ fun SendNotificationScreen(
             text = "\"${state.title}\"\n${state.body}\n\nTarget: " +
                 if (state.target == NotificationTarget.USERS) "${state.parsedUsernames.size} user(s)" else state.target.label,
             confirmText = "Send",
-            dismissText = strings.commonCancel,
+            dismissText = AppTheme.strings.commonCancel,
             isDestructive = false
         )
     }
@@ -225,7 +227,6 @@ private fun TargetDropdown(
     selected: NotificationTarget,
     onSelected: (NotificationTarget) -> Unit,
 ) {
-    val colors = LocalAppColors.current
     val textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)
     var expanded by remember { mutableStateOf(false) }
 
@@ -241,14 +242,14 @@ private fun TargetDropdown(
             label = { Text("Target", style = textStyle) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = colors.textPrimary,
-                unfocusedTextColor = colors.textPrimary,
-                focusedBorderColor = colors.winnerFrame,
-                unfocusedBorderColor = colors.cardBorder,
-                focusedLabelColor = colors.textPrimary,
-                unfocusedLabelColor = colors.textSecondary,
-                focusedTrailingIconColor = colors.textSecondary,
-                unfocusedTrailingIconColor = colors.textSecondary,
+                focusedTextColor = AppTheme.colors.textPrimary,
+                unfocusedTextColor = AppTheme.colors.textPrimary,
+                focusedBorderColor = AppTheme.colors.winnerFrame,
+                unfocusedBorderColor = AppTheme.colors.cardBorder,
+                focusedLabelColor = AppTheme.colors.textPrimary,
+                unfocusedLabelColor = AppTheme.colors.textSecondary,
+                focusedTrailingIconColor = AppTheme.colors.textSecondary,
+                unfocusedTrailingIconColor = AppTheme.colors.textSecondary,
             ),
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
@@ -259,11 +260,11 @@ private fun TargetDropdown(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            containerColor = colors.topBarBackground,
+            containerColor = AppTheme.colors.topBarBackground,
         ) {
             NotificationTarget.entries.forEach { target ->
                 DropdownMenuItem(
-                    text = { Text(target.label, style = textStyle, color = colors.textPrimary) },
+                    text = { Text(target.label, style = textStyle, color = AppTheme.colors.textPrimary) },
                     onClick = {
                         onSelected(target)
                         expanded = false
@@ -282,7 +283,6 @@ private fun NotificationTextField(
     singleLine: Boolean = true,
     minLines: Int = 1,
 ) {
-    val colors = LocalAppColors.current
     val textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)
 
     OutlinedTextField(
@@ -291,17 +291,17 @@ private fun NotificationTextField(
         textStyle = textStyle,
         label = { Text(label, style = textStyle) },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = colors.textPrimary,
-            unfocusedTextColor = colors.textPrimary,
-            errorTextColor = colors.textPrimary,
-            focusedBorderColor = colors.winnerFrame,
-            unfocusedBorderColor = colors.cardBorder,
-            errorBorderColor = colors.ufcRed,
-            focusedLabelColor = colors.textPrimary,
-            unfocusedLabelColor = colors.textSecondary,
-            errorLabelColor = colors.ufcRed,
-            cursorColor = colors.textPrimary,
-            errorCursorColor = colors.ufcRed
+            focusedTextColor = AppTheme.colors.textPrimary,
+            unfocusedTextColor = AppTheme.colors.textPrimary,
+            errorTextColor = AppTheme.colors.textPrimary,
+            focusedBorderColor = AppTheme.colors.winnerFrame,
+            unfocusedBorderColor = AppTheme.colors.cardBorder,
+            errorBorderColor = AppTheme.colors.ufcRed,
+            focusedLabelColor = AppTheme.colors.textPrimary,
+            unfocusedLabelColor = AppTheme.colors.textSecondary,
+            errorLabelColor = AppTheme.colors.ufcRed,
+            cursorColor = AppTheme.colors.textPrimary,
+            errorCursorColor = AppTheme.colors.ufcRed
         ),
         singleLine = singleLine,
         minLines = minLines,

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.event_comments
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,8 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 import com.berkekucuk.mmaapp.core.utils.toRelativeTime
 import com.berkekucuk.mmaapp.domain.enums.ReportReason
@@ -92,18 +91,16 @@ fun EventCommentsScreen(
     state: EventCommentsUiState,
     onAction: (EventCommentsUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
+    // Theme & Resources
     val dateStrings = rememberLocalizedDateStrings()
 
-    // 2. Compose Core States
+    // Compose Core States
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var now by remember { mutableStateOf(Clock.System.now()) }
 
-    // 3. UI Data & Definitions
-    val message = strings.mapError(state.error) ?: strings.commentReported.takeIf { state.isReportSent }
+    // UI Data & Definitions
+    val message = AppTheme.strings.mapError(state.error) ?: AppTheme.strings.commentReported.takeIf { state.isReportSent }
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
@@ -116,7 +113,7 @@ fun EventCommentsScreen(
         message = message,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        actionLabel = strings.retry.takeIf { state.error != null && state.comments.isEmpty() },
+        actionLabel = AppTheme.strings.retry.takeIf { state.error != null && state.comments.isEmpty() },
         onAction = {
             onAction(EventCommentsUiAction.OnMessageShown)
             onAction(EventCommentsUiAction.OnRetryClicked)
@@ -145,7 +142,7 @@ fun EventCommentsScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -160,13 +157,13 @@ fun EventCommentsScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.eventDetailTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)
             ) {
                 TopAppBar(
                     title = {
                         Column(verticalArrangement = Arrangement.Center) {
                             Text(
-                                text = strings.commentsTitle,
+                                text = AppTheme.strings.commentsTitle,
                                 maxLines = 1,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -177,7 +174,7 @@ fun EventCommentsScreen(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontSize = 14.sp,
-                                    color = colors.textSecondary,
+                                    color = AppTheme.colors.textSecondary,
                                 )
                             }
                         }
@@ -186,15 +183,15 @@ fun EventCommentsScreen(
                         IconButton(onClick = { onAction(EventCommentsUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     ),
                 )
             }
@@ -224,7 +221,7 @@ fun EventCommentsScreen(
                         modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = colors.ufcRed)
+                        CircularProgressIndicator(color = AppTheme.colors.ufcRed)
                     }
                 }
             } else if (state.comments.isEmpty()) {
@@ -234,8 +231,8 @@ fun EventCommentsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = strings.commentsEmpty,
-                            color = colors.textSecondary,
+                            text = AppTheme.strings.commentsEmpty,
+                            color = AppTheme.colors.textSecondary,
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 24.dp)
@@ -252,10 +249,10 @@ fun EventCommentsScreen(
                         comment = comment,
                         timeText = comment.createdAt.toRelativeTime(
                             now = now,
-                            justNow = strings.commentJustNow,
-                            minutesAgo = strings.commentMinutesAgo,
-                            hoursAgo = strings.commentHoursAgo,
-                            daysAgo = strings.commentDaysAgo,
+                            justNow = AppTheme.strings.commentJustNow,
+                            minutesAgo = AppTheme.strings.commentMinutesAgo,
+                            hoursAgo = AppTheme.strings.commentHoursAgo,
+                            daysAgo = AppTheme.strings.commentDaysAgo,
                             months = dateStrings.months,
                         ),
                         canReport = state.currentUserId != null && comment.userId != state.currentUserId,
@@ -276,7 +273,7 @@ fun EventCommentsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = colors.ufcRed,
+                                color = AppTheme.colors.ufcRed,
                                 strokeWidth = 2.dp,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -291,10 +288,10 @@ fun EventCommentsScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(EventCommentsUiAction.OnDismissDeleteDialog) },
             onConfirmClick = { onAction(EventCommentsUiAction.OnConfirmDelete) },
-            title = strings.commentDeleteTitle,
-            text = strings.commentDeleteConfirm,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.commonCancel,
+            title = AppTheme.strings.commentDeleteTitle,
+            text = AppTheme.strings.commentDeleteConfirm,
+            confirmText = AppTheme.strings.dialogAccept,
+            dismissText = AppTheme.strings.commonCancel,
             isDestructive = true
         )
     }
@@ -303,9 +300,9 @@ fun EventCommentsScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(EventCommentsUiAction.OnDismissReportDialog) },
             onConfirmClick = { onAction(EventCommentsUiAction.OnSubmitReport) },
-            title = strings.reportUserTitle,
-            confirmText = strings.reportUserSubmit,
-            dismissText = strings.commonCancel,
+            title = AppTheme.strings.reportUserTitle,
+            confirmText = AppTheme.strings.reportUserSubmit,
+            dismissText = AppTheme.strings.commonCancel,
             confirmEnabled = state.selectedReportReason != null,
             isConfirmLoading = state.isReporting,
             isDestructive = true,
@@ -328,13 +325,13 @@ fun EventCommentsScreen(
                                 selected = (reason == state.selectedReportReason),
                                 onClick = null,
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.textPrimary,
-                                    unselectedColor = colors.textSecondary
+                                    selectedColor = AppTheme.colors.textPrimary,
+                                    unselectedColor = AppTheme.colors.textSecondary
                                 )
                             )
                             Text(
-                                text = strings.reportReasonDisplayName(reason),
-                                color = colors.textPrimary,
+                                text = AppTheme.strings.reportReasonDisplayName(reason),
+                                color = AppTheme.colors.textPrimary,
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         }

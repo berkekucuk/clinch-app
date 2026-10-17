@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile_edit
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,8 +36,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.ErrorBox
 import org.koin.compose.viewmodel.koinViewModel
@@ -91,18 +90,25 @@ fun ProfileEditScreen(
     state: ProfileEditUiState,
     onAction: (ProfileEditUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
+    // Theme & Resources
     val context = LocalPlatformContext.current
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val showDeleteDialog = remember { mutableStateOf(false) }
 
-    // 3. UI Data & Definitions
-    val errorMessage = strings.mapError(state.error)
+    // Compose Core States
+    val showDeleteDialog = remember { mutableStateOf(false) }
+    val picker = rememberImagePickerKMP(
+        config = ImagePickerKMPConfig(
+            galleryConfig = GalleryConfig(),
+            cropConfig = CropConfig(
+                enabled = true,
+                circularCrop = true
+            ),
+        )
+    )
+
+    // UI Data & Definitions
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     val avatarModel = remember(state.selectedImageBytes, state.avatarUrl) {
         state.selectedImageBytes ?: state.avatarUrl
@@ -115,17 +121,7 @@ fun ProfileEditScreen(
             .build()
     }
 
-    val picker = rememberImagePickerKMP(
-        config = ImagePickerKMPConfig(
-            galleryConfig = GalleryConfig(),
-            cropConfig = CropConfig(
-                enabled = true,
-                circularCrop = true
-            ),
-        )
-    )
     val result = picker.result
-
     LaunchedEffect(result) {
         if (result is ImagePickerResult.Success) {
             val photo = result.photos.firstOrNull()
@@ -144,22 +140,22 @@ fun ProfileEditScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         topBar = {
             Column(
-                modifier = Modifier.background(colors.topBarBackground)
+                modifier = Modifier.background(AppTheme.colors.topBarBackground)
             ){
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.profileEditTitle,
+                            text = AppTheme.strings.profileEditTitle,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
                     },
                     actions = {
                         SaveButton(
-                            text = strings.profileEditSaveChanges,
+                            text = AppTheme.strings.profileEditSaveChanges,
                             onClick = {
                                 focusManager.clearFocus()
                                 keyboardController?.hide()
@@ -172,15 +168,15 @@ fun ProfileEditScreen(
                         IconButton(onClick = { onAction(ProfileEditUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     )
                 )
             }
@@ -223,8 +219,8 @@ fun ProfileEditScreen(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(32.dp)
-                            .background(colors.winnerFrame, CircleShape)
-                            .border(1.5.dp, colors.topBarBackground, CircleShape)
+                            .background(AppTheme.colors.winnerFrame, CircleShape)
+                            .border(1.5.dp, AppTheme.colors.topBarBackground, CircleShape)
                             .clickable {
                                 picker.launchGallery()
                             },
@@ -233,7 +229,7 @@ fun ProfileEditScreen(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = null,
-                            tint = colors.white,
+                            tint = AppTheme.colors.white,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -241,10 +237,10 @@ fun ProfileEditScreen(
             }
 
             Text(
-                text = strings.profileEditPersonalInfo,
+                text = AppTheme.strings.profileEditPersonalInfo,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -253,14 +249,14 @@ fun ProfileEditScreen(
                 onValueChange = {},
                 readOnly = true,
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
-                label = { Text(strings.profileEditEmail, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
+                label = { Text(AppTheme.strings.profileEditEmail, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = colors.textSecondary,
-                    unfocusedTextColor = colors.textSecondary,
-                    focusedBorderColor = colors.cardBorder,
-                    unfocusedBorderColor = colors.cardBorder,
-                    focusedLabelColor = colors.textSecondary,
-                    unfocusedLabelColor = colors.textSecondary,
+                    focusedTextColor = AppTheme.colors.textSecondary,
+                    unfocusedTextColor = AppTheme.colors.textSecondary,
+                    focusedBorderColor = AppTheme.colors.cardBorder,
+                    unfocusedBorderColor = AppTheme.colors.cardBorder,
+                    focusedLabelColor = AppTheme.colors.textSecondary,
+                    unfocusedLabelColor = AppTheme.colors.textSecondary,
                     cursorColor = Color.Transparent
                 ),
                 singleLine = true,
@@ -274,19 +270,19 @@ fun ProfileEditScreen(
                 value = state.fullName,
                 onValueChange = { name -> onAction(ProfileEditUiAction.OnFullNameChanged(name)) },
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
-                label = { Text(strings.profileEditFullName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
+                label = { Text(AppTheme.strings.profileEditFullName, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = colors.textPrimary,
-                    unfocusedTextColor = colors.textPrimary,
-                    errorTextColor = colors.textPrimary,
-                    focusedBorderColor = colors.winnerFrame,
-                    unfocusedBorderColor = colors.cardBorder,
-                    errorBorderColor = colors.ufcRed,
-                    focusedLabelColor = colors.textPrimary,
-                    unfocusedLabelColor = colors.textSecondary,
-                    errorLabelColor = colors.ufcRed,
-                    cursorColor = colors.textPrimary,
-                    errorCursorColor = colors.ufcRed
+                    focusedTextColor = AppTheme.colors.textPrimary,
+                    unfocusedTextColor = AppTheme.colors.textPrimary,
+                    errorTextColor = AppTheme.colors.textPrimary,
+                    focusedBorderColor = AppTheme.colors.winnerFrame,
+                    unfocusedBorderColor = AppTheme.colors.cardBorder,
+                    errorBorderColor = AppTheme.colors.ufcRed,
+                    focusedLabelColor = AppTheme.colors.textPrimary,
+                    unfocusedLabelColor = AppTheme.colors.textSecondary,
+                    errorLabelColor = AppTheme.colors.ufcRed,
+                    cursorColor = AppTheme.colors.textPrimary,
+                    errorCursorColor = AppTheme.colors.ufcRed
                 ),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -299,19 +295,19 @@ fun ProfileEditScreen(
                 value = state.username,
                 onValueChange = { username -> onAction(ProfileEditUiAction.OnUsernameChanged(username)) },
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
-                label = { Text(strings.profileEditUsernameLabel, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
+                label = { Text(AppTheme.strings.profileEditUsernameLabel, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = colors.textPrimary,
-                    unfocusedTextColor = colors.textPrimary,
-                    errorTextColor = colors.textPrimary,
-                    focusedBorderColor = colors.winnerFrame,
-                    unfocusedBorderColor = colors.cardBorder,
-                    errorBorderColor = colors.ufcRed,
-                    focusedLabelColor = colors.textPrimary,
-                    unfocusedLabelColor = colors.textSecondary,
-                    errorLabelColor = colors.ufcRed,
-                    cursorColor = colors.textPrimary,
-                    errorCursorColor = colors.ufcRed
+                    focusedTextColor = AppTheme.colors.textPrimary,
+                    unfocusedTextColor = AppTheme.colors.textPrimary,
+                    errorTextColor = AppTheme.colors.textPrimary,
+                    focusedBorderColor = AppTheme.colors.winnerFrame,
+                    unfocusedBorderColor = AppTheme.colors.cardBorder,
+                    errorBorderColor = AppTheme.colors.ufcRed,
+                    focusedLabelColor = AppTheme.colors.textPrimary,
+                    unfocusedLabelColor = AppTheme.colors.textSecondary,
+                    errorLabelColor = AppTheme.colors.ufcRed,
+                    cursorColor = AppTheme.colors.textPrimary,
+                    errorCursorColor = AppTheme.colors.ufcRed
                 ),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -333,8 +329,8 @@ fun ProfileEditScreen(
                     onClick = { showDeleteDialog.value = true }
                 ) {
                     Text(
-                        text = strings.profileEditDeleteAccount,
-                        color = colors.ufcRed,
+                        text = AppTheme.strings.profileEditDeleteAccount,
+                        color = AppTheme.colors.ufcRed,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -349,10 +345,10 @@ fun ProfileEditScreen(
                 showDeleteDialog.value = false
                 onAction(ProfileEditUiAction.OnDeleteAccountClicked)
             },
-            title = strings.profileEditDeleteAccountTitle,
-            text = strings.profileEditDeleteAccountConfirm,
-            confirmText = strings.profileEditDeleteAccount,
-            dismissText = strings.commonCancel,
+            title = AppTheme.strings.profileEditDeleteAccountTitle,
+            text = AppTheme.strings.profileEditDeleteAccountConfirm,
+            confirmText = AppTheme.strings.profileEditDeleteAccount,
+            dismissText = AppTheme.strings.commonCancel,
             isDestructive = true
         )
     }

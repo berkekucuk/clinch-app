@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +14,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import com.berkekucuk.mmaapp.presentation.components.FighterImage
 
@@ -26,10 +26,9 @@ fun PredictionButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = LocalAppColors.current
     val borderColor = when {
-        isSelected -> colors.winnerFrame
-        else -> colors.cardBorder
+        isSelected -> AppTheme.colors.winnerFrame
+        else -> AppTheme.colors.cardBorder
     }
 
     val alpha = if (isOtherSelected) 0.5f else 1f
@@ -43,7 +42,7 @@ fun PredictionButton(
                 color = borderColor,
                 shape = RoundedCornerShape(20.dp)
             )
-            .background(if (isSelected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent)
+            .background(if (isSelected) AppTheme.colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent)
             .clickable(enabled = isEnabled) { onClick() }
             .padding(vertical = 4.dp),
         contentAlignment = Alignment.Center

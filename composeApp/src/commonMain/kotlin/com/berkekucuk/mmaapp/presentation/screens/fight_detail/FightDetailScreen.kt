@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -48,8 +49,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.NotificationPermissionHandler
 import com.berkekucuk.mmaapp.core.utils.isIos
 import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
@@ -124,31 +123,39 @@ fun FightDetailScreen(
     onStartGoogleSignIn: () -> Unit,
     onStartAppleSignIn: () -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val snackbarHostState = remember { SnackbarHostState() }
+    val selectedRisk = remember { mutableStateOf(50) }
+    val selectedNotificationIsAlarm = remember { mutableStateOf(false) }
+    val isSnackbarSuccess = remember { mutableStateOf(false) }
 
-    // 3. UI Data & Definitions
+    // UI Data & Definitions
     val eventId = state.fight?.eventId
     val displayTitle = state.fight?.eventName
     val fight = state.fight
     val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || !fight.roundSummary.isNullOrBlank() || fight.weightClassLbs != null || !fight.referee.isNullOrBlank())
-    val tabs = listOf(strings.tabFight, strings.tabFightCareer)
+    val tabs = listOf(AppTheme.strings.tabFight, AppTheme.strings.tabFightCareer)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val selectedRisk = remember { mutableStateOf(50) }
     val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
         fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
     }
-    val errorMessage = strings.mapError(state.error)
-    val selectedNotificationIsAlarm = remember { mutableStateOf(false) }
+    val errorMessage = AppTheme.strings.mapError(state.error)
+    val snackbarMessage = when {
+        state.error != null -> {
+            isSnackbarSuccess.value = false
+            errorMessage
+        }
+        state.showSignInSuccess -> {
+            isSnackbarSuccess.value = true
+            AppTheme.strings.signInSuccess
+        }
+        else -> null
+    }
 
-    // 4. UI Actions
+    // UI Actions
     val onRedCornerClick = fight?.redCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
     val onBlueCornerClick = fight?.blueCorner?.fighter?.fighterId?.let { id -> { onAction(FightDetailUiAction.OnFighterClicked(id)) } }
     val onEventLinkClick = {
@@ -169,19 +176,6 @@ fun FightDetailScreen(
         }
     }
 
-    val isSnackbarSuccess = remember { mutableStateOf(false) }
-    val snackbarMessage = when {
-        state.error != null -> {
-            isSnackbarSuccess.value = false
-            errorMessage
-        }
-        state.showSignInSuccess -> {
-            isSnackbarSuccess.value = true
-            strings.signInSuccess
-        }
-        else -> null
-    }
-
     AppSnackbarEffect(
         message = snackbarMessage,
         snackbarHostState = snackbarHostState,
@@ -193,7 +187,7 @@ fun FightDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -209,14 +203,14 @@ fun FightDetailScreen(
             )
         },
         topBar = {
-            Column(modifier = Modifier.background(colors.eventDetailTopBar)) {
+            Column(modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)) {
                 TopAppBar(
                     title = {},
                     navigationIcon = {
                         IconButton(onClick = { onAction(FightDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
@@ -231,9 +225,9 @@ fun FightDetailScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        titleContentColor = colors.textPrimary,
-                        navigationIconContentColor = colors.textPrimary,
-                        actionIconContentColor = colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        actionIconContentColor = AppTheme.colors.textPrimary,
                     ),
                     scrollBehavior = scrollBehavior,
                 )
@@ -260,7 +254,7 @@ fun FightDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(colors.pagerBackground),
+                .background(AppTheme.colors.pagerBackground),
             beyondViewportPageCount = 1,
         ) { page ->
             when (page) {
@@ -338,20 +332,20 @@ fun FightDetailScreen(
             AppAlertDialog(
                 onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
                 onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
-                title = strings.notificationTypeTitle,
-                confirmText = strings.dialogAccept,
-                dismissText = strings.dialogCancel,
+                title = AppTheme.strings.notificationTypeTitle,
+                confirmText = AppTheme.strings.dialogAccept,
+                dismissText = AppTheme.strings.dialogCancel,
                 isConfirmLoading = state.isSubmittingNotification,
                 content = {
                     Column(modifier = Modifier.selectableGroup()) {
                         Text(
-                            text = strings.notificationTypeMessage,
-                            color = colors.textSecondary,
+                            text = AppTheme.strings.notificationTypeMessage,
+                            color = AppTheme.colors.textSecondary,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         val options = listOf(
-                            false to strings.notificationTypeRegular,
-                            true to strings.notificationTypeAlarm
+                            false to AppTheme.strings.notificationTypeRegular,
+                            true to AppTheme.strings.notificationTypeAlarm
                         )
                         options.forEach { (isAlarm, label) ->
                             val selected = (selectedNotificationIsAlarm.value == isAlarm)
@@ -360,12 +354,12 @@ fun FightDetailScreen(
                                     .fillMaxWidth()
                                     .height(48.dp)
                                     .background(
-                                        color = if (selected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
+                                        color = if (selected) AppTheme.colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .border(
                                         width = 1.dp,
-                                        color = if (selected) colors.winnerFrame else Color.Transparent,
+                                        color = if (selected) AppTheme.colors.winnerFrame else Color.Transparent,
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .selectable(
@@ -380,13 +374,13 @@ fun FightDetailScreen(
                                     selected = selected,
                                     onClick = null,
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = colors.winnerFrame,
-                                        unselectedColor = colors.textSecondary
+                                        selectedColor = AppTheme.colors.winnerFrame,
+                                        unselectedColor = AppTheme.colors.textSecondary
                                     )
                                 )
                                 Text(
                                     text = label,
-                                    color = colors.textPrimary,
+                                    color = AppTheme.colors.textPrimary,
                                     modifier = Modifier.padding(start = 16.dp)
                                 )
                             }
@@ -399,13 +393,13 @@ fun FightDetailScreen(
                 onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationDialog) },
                 onConfirmClick = { onAction(FightDetailUiAction.OnSubmitNotificationClicked(selectedNotificationIsAlarm.value)) },
                 title = if (state.isNotificationEnabled) {
-                    strings.fightReminderRemoveDialogTitle
+                    AppTheme.strings.fightReminderRemoveDialogTitle
                 } else {
-                    strings.fightReminderDialogTitle
+                    AppTheme.strings.fightReminderDialogTitle
                 },
-                text = if (!state.isNotificationEnabled) strings.fightReminderDialogMessage else null,
-                confirmText = strings.dialogAccept,
-                dismissText = strings.dialogCancel,
+                text = if (!state.isNotificationEnabled) AppTheme.strings.fightReminderDialogMessage else null,
+                confirmText = AppTheme.strings.dialogAccept,
+                dismissText = AppTheme.strings.dialogCancel,
                 isConfirmLoading = state.isSubmittingNotification
             )
         }
@@ -415,10 +409,10 @@ fun FightDetailScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(FightDetailUiAction.OnDismissNotificationSettingsDialog) },
             onConfirmClick = { onAction(FightDetailUiAction.OnOpenNotificationSettingsClicked) },
-            title = strings.notificationPermissionSettingsTitle,
-            text = strings.notificationPermissionSettingsMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
+            title = AppTheme.strings.notificationPermissionSettingsTitle,
+            text = AppTheme.strings.notificationPermissionSettingsMessage,
+            confirmText = AppTheme.strings.dialogAccept,
+            dismissText = AppTheme.strings.dialogCancel
         )
     }
 
@@ -426,10 +420,10 @@ fun FightDetailScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(FightDetailUiAction.OnDismissFullScreenIntentSettingsDialog) },
             onConfirmClick = { onAction(FightDetailUiAction.OnOpenFullScreenIntentSettingsClicked) },
-            title = strings.fullScreenIntentSettingsTitle,
-            text = strings.fullScreenIntentSettingsMessage,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel
+            title = AppTheme.strings.fullScreenIntentSettingsTitle,
+            text = AppTheme.strings.fullScreenIntentSettingsMessage,
+            confirmText = AppTheme.strings.dialogAccept,
+            dismissText = AppTheme.strings.dialogCancel
         )
     }
 
@@ -437,22 +431,22 @@ fun FightDetailScreen(
         AppAlertDialog(
             onDismissRequest = { onAction(FightDetailUiAction.OnDismissPredictionDialog) },
             onConfirmClick = onPredictionConfirmed,
-            title = strings.predictionConfirmTitle,
-            confirmText = strings.dialogAccept,
-            dismissText = strings.dialogCancel,
+            title = AppTheme.strings.predictionConfirmTitle,
+            confirmText = AppTheme.strings.dialogAccept,
+            dismissText = AppTheme.strings.dialogCancel,
             isConfirmLoading = state.isSubmittingPrediction,
             content = {
                 Column(modifier = Modifier.selectableGroup()) {
                     Text(
-                        text = strings.predictionConfirmMessage(pendingPredictionFighterName),
-                        color = colors.textSecondary,
+                        text = AppTheme.strings.predictionConfirmMessage(pendingPredictionFighterName),
+                        color = AppTheme.colors.textSecondary,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
                     val options = listOf(
-                        25 to strings.riskUnsure,
-                        50 to strings.riskNormal,
-                        75 to strings.riskConfident,
-                        100 to strings.riskAllIn
+                        25 to AppTheme.strings.riskUnsure,
+                        50 to AppTheme.strings.riskNormal,
+                        75 to AppTheme.strings.riskConfident,
+                        100 to AppTheme.strings.riskAllIn
                     )
                     options.forEach { (value, label) ->
                         val selected = (selectedRisk.value == value)
@@ -461,12 +455,12 @@ fun FightDetailScreen(
                                 .fillMaxWidth()
                                 .height(48.dp)
                                 .background(
-                                    color = if (selected) colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
+                                    color = if (selected) AppTheme.colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = if (selected) colors.winnerFrame else Color.Transparent,
+                                    color = if (selected) AppTheme.colors.winnerFrame else Color.Transparent,
                                     shape = RoundedCornerShape(8.dp)
                                 )
                                 .selectable(
@@ -481,13 +475,13 @@ fun FightDetailScreen(
                                 selected = selected,
                                 onClick = null,
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.winnerFrame,
-                                    unselectedColor = colors.textSecondary
+                                    selectedColor = AppTheme.colors.winnerFrame,
+                                    unselectedColor = AppTheme.colors.textSecondary
                                 )
                             )
                             Text(
                                 text = label,
-                                color = colors.textPrimary,
+                                color = AppTheme.colors.textPrimary,
                                 modifier = Modifier.padding(start = 16.dp)
                             )
                         }

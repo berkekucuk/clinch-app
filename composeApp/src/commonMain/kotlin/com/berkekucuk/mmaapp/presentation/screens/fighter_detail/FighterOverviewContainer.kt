@@ -1,11 +1,11 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.calculateAgeAtDate
 import com.berkekucuk.mmaapp.core.utils.formatDateOfBirth
 import com.berkekucuk.mmaapp.domain.model.Fighter
@@ -21,9 +21,8 @@ fun FighterOverviewContainer(
     onRefresh: () -> Unit,
     extraBottomPadding: Dp = 0.dp,
 ) {
-    val strings = LocalAppStrings.current
     val dateStrings = rememberLocalizedDateStrings()
-    val weightClassDisplay = strings.weightClassDisplayName(fighter.weightClassId)
+    val weightClassDisplay = AppTheme.strings.weightClassDisplayName(fighter.weightClassId)
 
     val age = remember(fighter.dateOfBirth) {
         calculateAgeAtDate(fighter.dateOfBirth, Clock.System.now())

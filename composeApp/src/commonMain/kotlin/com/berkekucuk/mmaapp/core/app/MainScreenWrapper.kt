@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.core.app
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import com.berkekucuk.mmaapp.presentation.screens.home.HomeScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.rankings.RankingsScreenRoot
 import androidx.compose.foundation.layout.Column
@@ -23,8 +24,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.berkekucuk.mmaapp.presentation.screens.menu.MenuScreenRoot
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun MainScreenWrapper(
@@ -41,17 +40,15 @@ fun MainScreenWrapper(
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val navigationThrottle = remember { NavigationThrottle() }
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     Scaffold(
-        containerColor = colors.topBarBackground,
+        containerColor = AppTheme.colors.topBarBackground,
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
         bottomBar = {
             Column {
-                HorizontalDivider(color = colors.dividerColor, thickness = 0.5.dp)
+                HorizontalDivider(color = AppTheme.colors.dividerColor, thickness = 0.5.dp)
                 NavigationBar(
-                    containerColor = colors.topBarBackground,
+                    containerColor = AppTheme.colors.topBarBackground,
                     tonalElevation = 0.dp
                 ) {
                     bottomNavItems.forEach { item ->
@@ -60,9 +57,9 @@ fun MainScreenWrapper(
                         } == true
 
                         val label = when (item.route) {
-                            Route.Home -> strings.navEvents
-                            Route.Rankings -> strings.navRankings
-                            Route.Menu -> strings.navMenu
+                            Route.Home -> AppTheme.strings.navEvents
+                            Route.Rankings -> AppTheme.strings.navRankings
+                            Route.Menu -> AppTheme.strings.navMenu
                             else -> item.name
                         }
 
@@ -94,11 +91,11 @@ fun MainScreenWrapper(
                             },
                             alwaysShowLabel = true,
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = colors.ufcRed,
-                                selectedTextColor = colors.ufcRed,
+                                selectedIconColor = AppTheme.colors.ufcRed,
+                                selectedTextColor = AppTheme.colors.ufcRed,
                                 indicatorColor = Color.Transparent,
-                                unselectedIconColor = colors.textSecondary,
-                                unselectedTextColor = colors.textSecondary
+                                unselectedIconColor = AppTheme.colors.textSecondary,
+                                unselectedTextColor = AppTheme.colors.textSecondary
                             )
                         )
                     }

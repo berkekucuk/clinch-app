@@ -3,13 +3,11 @@ package com.berkekucuk.mmaapp.presentation.screens.home
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.berkekucuk.mmaapp.domain.model.Event
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpcomingContainer(
     events: List<Event>,

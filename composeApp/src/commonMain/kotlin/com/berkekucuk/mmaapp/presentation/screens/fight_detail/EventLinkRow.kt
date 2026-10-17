@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
 
 @Composable
 fun EventLinkRow(
@@ -29,13 +29,12 @@ fun EventLinkRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = LocalAppColors.current
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -45,12 +44,12 @@ fun EventLinkRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = null,
-                tint = colors.textSecondary,
+                tint = AppTheme.colors.textSecondary,
             )
         }
         Text(
             text = eventName,
-            color = colors.textPrimary,
+            color = AppTheme.colors.textPrimary,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.weight(1f),
@@ -60,7 +59,7 @@ fun EventLinkRow(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null,
-                tint = colors.textSecondary,
+                tint = AppTheme.colors.textSecondary,
             )
         }
     }

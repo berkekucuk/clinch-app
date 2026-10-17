@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.settings
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,8 +24,6 @@ import com.berkekucuk.mmaapp.core.presentation.LocalThemeMode
 import com.berkekucuk.mmaapp.core.presentation.MeasurementUnit
 import com.berkekucuk.mmaapp.core.presentation.OddsFormat
 import com.berkekucuk.mmaapp.core.presentation.ThemeMode
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
 import com.berkekucuk.mmaapp.core.utils.OnResumeEffect
 import org.koin.compose.koinInject
@@ -70,22 +69,18 @@ fun SettingsScreen(
     onBlockedUsersClick: () -> Unit,
     notificationStorage: NotificationStorage
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
+    // Theme & Resources
     val uriHandler = LocalUriHandler.current
+    val currentLanguage = AppTheme.strings.language
+    val currentMeasurementUnit = LocalMeasurementUnit.current
+    val currentOddsFormat = LocalOddsFormat.current
+    val currentThemeMode = LocalThemeMode.current
 
-    // 2. Compose Core States
+    // Compose Core States
     val scope = rememberCoroutineScope()
     var notificationsEnabled by remember { mutableStateOf(false) }
     var activeDialog by remember { mutableStateOf<SettingsDialogType?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    // 3. UI Data & Definitions
-    val currentLanguage = strings.language
-    val currentMeasurementUnit = LocalMeasurementUnit.current
-    val currentOddsFormat = LocalOddsFormat.current
-    val currentThemeMode = LocalThemeMode.current
 
     LaunchedEffect(Unit) {
         notificationsEnabled = notificationStorage.load()
@@ -99,15 +94,15 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         topBar = {
             Column(
-                modifier = Modifier.background(colors.topBarBackground)
+                modifier = Modifier.background(AppTheme.colors.topBarBackground)
             ) {
                 TopAppBar(
                     title = {
                         Text(
-                            text = strings.settingsTitle,
+                            text = AppTheme.strings.settingsTitle,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -116,15 +111,15 @@ fun SettingsScreen(
                         IconButton(onClick = onBackClick) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     ),
                 )
             }
@@ -140,17 +135,17 @@ fun SettingsScreen(
         ) {
             SettingsCard(
                 icon = Icons.Default.DarkMode,
-                title = strings.settingsSectionTheme,
+                title = AppTheme.strings.settingsSectionTheme,
                 subtitle = when (currentThemeMode) {
-                    ThemeMode.LIGHT -> strings.settingsThemeLight
-                    ThemeMode.DARK -> strings.settingsThemeDark
+                    ThemeMode.LIGHT -> AppTheme.strings.settingsThemeLight
+                    ThemeMode.DARK -> AppTheme.strings.settingsThemeDark
                 },
                 onClick = { activeDialog = SettingsDialogType.THEME }
             )
 
             SettingsCard(
                 icon = Icons.Default.Language,
-                title = strings.settingsSectionLanguage,
+                title = AppTheme.strings.settingsSectionLanguage,
                 subtitle = when (currentLanguage) {
                     AppLanguage.EN -> "English"
                     AppLanguage.TR -> "Türkçe"
@@ -160,7 +155,7 @@ fun SettingsScreen(
 
             SettingsCard(
                 icon = Icons.Default.AttachMoney,
-                title = strings.settingsSectionOdds,
+                title = AppTheme.strings.settingsSectionOdds,
                 subtitle = when (currentOddsFormat) {
                     OddsFormat.DECIMAL -> "Decimal"
                     OddsFormat.AMERICAN -> "American"
@@ -170,7 +165,7 @@ fun SettingsScreen(
 
             SettingsCard(
                 icon = Icons.Default.Straighten,
-                title = strings.settingsSectionMeasurements,
+                title = AppTheme.strings.settingsSectionMeasurements,
                 subtitle = when (currentMeasurementUnit) {
                     MeasurementUnit.METRIC -> "Metric (cm)"
                     MeasurementUnit.IMPERIAL -> "Imperial (ft/in)"
@@ -180,15 +175,15 @@ fun SettingsScreen(
 
             SettingsCard(
                 icon = if (notificationsEnabled) Icons.Default.Notifications else Icons.Default.NotificationsOff,
-                title = strings.menuItemNotifications,
-                subtitle = if (notificationsEnabled) strings.menuNotificationsEnabled else strings.menuNotificationsDisabled,
+                title = AppTheme.strings.menuItemNotifications,
+                subtitle = if (notificationsEnabled) AppTheme.strings.menuNotificationsEnabled else AppTheme.strings.menuNotificationsDisabled,
                 onClick = { notificationStorage.openNotificationSettings() }
             )
 
             SettingsCard(
                 icon = Icons.Default.Email,
-                title = strings.settingsSectionSupport,
-                subtitle = strings.settingsSectionSupportSub,
+                title = AppTheme.strings.settingsSectionSupport,
+                subtitle = AppTheme.strings.settingsSectionSupportSub,
                 onClick = {
                     try {
                         uriHandler.openUri("mailto:clinchapp0@gmail.com")
@@ -201,8 +196,8 @@ fun SettingsScreen(
             if (state.authState is AuthState.Authenticated) {
                 SettingsCard(
                     icon = Icons.Default.Block,
-                    title = strings.settingsSectionBlockedUsers,
-                    subtitle = strings.settingsSectionBlockedUsersSub,
+                    title = AppTheme.strings.settingsSectionBlockedUsers,
+                    subtitle = AppTheme.strings.settingsSectionBlockedUsersSub,
                     onClick = onBlockedUsersClick
                 )
             }
@@ -213,7 +208,7 @@ fun SettingsScreen(
         ModalBottomSheet(
             onDismissRequest = { activeDialog = null },
             sheetState = sheetState,
-            containerColor = colors.dropdownMenuBackground
+            containerColor = AppTheme.colors.dropdownMenuBackground
         ) {
             Column(
                 modifier = Modifier
@@ -224,13 +219,13 @@ fun SettingsScreen(
             ) {
                 Text(
                     text = when (activeDialog) {
-                        SettingsDialogType.THEME -> strings.settingsSectionTheme
-                        SettingsDialogType.LANGUAGE -> strings.settingsSectionLanguage
-                        SettingsDialogType.ODDS -> strings.settingsSectionOdds
-                        SettingsDialogType.MEASUREMENT -> strings.settingsSectionMeasurements
+                        SettingsDialogType.THEME -> AppTheme.strings.settingsSectionTheme
+                        SettingsDialogType.LANGUAGE -> AppTheme.strings.settingsSectionLanguage
+                        SettingsDialogType.ODDS -> AppTheme.strings.settingsSectionOdds
+                        SettingsDialogType.MEASUREMENT -> AppTheme.strings.settingsSectionMeasurements
                         else -> ""
                     },
-                    color = colors.textPrimary,
+                    color = AppTheme.colors.textPrimary,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -239,7 +234,7 @@ fun SettingsScreen(
                 when (activeDialog) {
                     SettingsDialogType.THEME -> {
                         SettingsBottomSheetOption(
-                            text = strings.settingsThemeLight,
+                            text = AppTheme.strings.settingsThemeLight,
                             isSelected = currentThemeMode == ThemeMode.LIGHT,
                             onClick = {
                                 onThemeModeChange(ThemeMode.LIGHT)
@@ -247,7 +242,7 @@ fun SettingsScreen(
                             }
                         )
                         SettingsBottomSheetOption(
-                            text = strings.settingsThemeDark,
+                            text = AppTheme.strings.settingsThemeDark,
                             isSelected = currentThemeMode == ThemeMode.DARK,
                             onClick = {
                                 onThemeModeChange(ThemeMode.DARK)

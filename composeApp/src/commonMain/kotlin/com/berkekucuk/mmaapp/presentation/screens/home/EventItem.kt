@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.home
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -37,8 +38,6 @@ import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.domain.enums.EventStatus
 import com.berkekucuk.mmaapp.domain.model.Event
 import com.berkekucuk.mmaapp.presentation.components.FightItem
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.core.utils.toUserFriendlyDate
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 
@@ -48,8 +47,6 @@ fun EventItem(
     onClick: (String) -> Unit
 ) {
     val mainFight = event.mainFight
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val dateStrings = rememberLocalizedDateStrings()
     val isLive = event.status == EventStatus.LIVE
     val infiniteTransition = rememberInfiniteTransition()
@@ -69,13 +66,13 @@ fun EventItem(
             .fillMaxWidth()
             .height(160.dp)
             .shadow(
-                elevation = colors.cardShadowElevation,
+                elevation = AppTheme.colors.cardShadowElevation,
                 shape = cardShape,
                 clip = false
             )
             .appClickable { onClick(event.eventId) },
         shape = cardShape,
-        border = BorderStroke(0.5.dp, colors.cardBorder),
+        border = BorderStroke(0.5.dp, AppTheme.colors.cardBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
@@ -84,13 +81,13 @@ fun EventItem(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.cardHeaderBackground)
+                    .background(AppTheme.colors.cardHeaderBackground)
                     .padding(10.dp)
             ) {
                 event.name?.let {
                     Text(
                         text = it,
-                        color = colors.textPrimary,
+                        color = AppTheme.colors.textPrimary,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -104,8 +101,8 @@ fun EventItem(
                 ) {
                     Text(
                         text = (event.datetimeUtcMain ?: event.datetimeUtc)
-                            ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek) ?: strings.tba,
-                        color = colors.dateColor,
+                            ?.toUserFriendlyDate(dateStrings.months, dateStrings.daysOfWeek) ?: AppTheme.strings.tba,
+                        color = AppTheme.colors.dateColor,
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -117,12 +114,12 @@ fun EventItem(
                                 .size(7.dp)
                                 .alpha(dotAlpha)
                                 .clip(CircleShape)
-                                .background(colors.winnerFrame)
+                                .background(AppTheme.colors.winnerFrame)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = strings.liveEvent,
-                            color = colors.winnerFrame,
+                            text = AppTheme.strings.liveEvent,
+                            color = AppTheme.colors.winnerFrame,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
@@ -142,12 +139,12 @@ fun EventItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .background(colors.fightItemBackground),
+                        .background(AppTheme.colors.fightItemBackground),
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = strings.toBeAnnounced,
-                        color = colors.textPrimary,
+                        text = AppTheme.strings.toBeAnnounced,
+                        color = AppTheme.colors.textPrimary,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )

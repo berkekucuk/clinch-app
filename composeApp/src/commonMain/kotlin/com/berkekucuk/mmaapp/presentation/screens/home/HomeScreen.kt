@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.home
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -42,8 +43,6 @@ import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.LoadingContent
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import mmaapp.composeapp.generated.resources.Res
 import mmaapp.composeapp.generated.resources.app_logo
 import mmaapp.composeapp.generated.resources.app_logo_light
@@ -83,35 +82,32 @@ fun HomeScreen(
     state: HomeUiState,
     onAction: (HomeUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-    val appLogoRes = if (colors.isDark) Res.drawable.app_logo else Res.drawable.app_logo_light
+    // Theme & Resources
+    val appLogoRes = if (AppTheme.colors.isDark) Res.drawable.app_logo else Res.drawable.app_logo_light
 
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val upcomingListState = rememberLazyListState()
     val completedListState = rememberLazyListState()
 
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.tabUpcoming, strings.tabCompleted)
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.tabUpcoming, AppTheme.strings.tabCompleted)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
-    // 4. Update Dialog Logic
     val isForceUpdate = state.updateStatus is AppUpdateStatus.ForceUpdate
     val showUpdateDialog = state.updateStatus != null && state.updateStatus != AppUpdateStatus.UpToDate
-    val updateDialogTitle = if (isForceUpdate) strings.updateForceTitle else strings.updateFlexibleTitle
-    val updateDialogText = if (isForceUpdate) strings.updateForceMessage else strings.updateFlexibleMessage
-    val updateDialogDismissText = if (!isForceUpdate) strings.updateLaterButton else null
+    val updateDialogTitle = if (isForceUpdate) AppTheme.strings.updateForceTitle else AppTheme.strings.updateFlexibleTitle
+    val updateDialogText = if (isForceUpdate) AppTheme.strings.updateForceMessage else AppTheme.strings.updateFlexibleMessage
+    val updateDialogDismissText = if (!isForceUpdate) AppTheme.strings.updateLaterButton else null
     val updateDialogDismissAction: (() -> Unit)? = if (!isForceUpdate) { { onAction(HomeUiAction.OnDismissFlexibleUpdate) } } else null
 
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
-        actionLabel = strings.retry,
+        actionLabel = AppTheme.strings.retry,
         onAction = { onAction(HomeUiAction.OnRefreshCompletedTab) },
     )
 
@@ -119,7 +115,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets(0),
         snackbarHost = {
             SnackbarHost(
@@ -134,7 +130,7 @@ fun HomeScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.eventsTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventsTopBar)
             ) {
                 TopAppBar(
                     title = {
@@ -158,14 +154,14 @@ fun HomeScreen(
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = null,
-                                tint = colors.textPrimary,
+                                tint = AppTheme.colors.textPrimary,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        titleContentColor = colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -189,7 +185,7 @@ fun HomeScreen(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.pagerBackground),
+                    .background(AppTheme.colors.pagerBackground),
                 beyondViewportPageCount = 1
             ) { page ->
                 when (page) {
@@ -222,7 +218,7 @@ fun HomeScreen(
             onDismissClick = updateDialogDismissAction,
             title = updateDialogTitle,
             text = updateDialogText,
-            confirmText = strings.updateButton,
+            confirmText = AppTheme.strings.updateButton,
             dismissText = updateDialogDismissText
         )
     }

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.components
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,19 +23,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Fight
 
 @Composable
 fun FightItem(
     fight: Fight,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = LocalAppColors.current.fightItemBackground,
+    backgroundColor: Color = AppTheme.colors.fightItemBackground,
     onClick: (() -> Unit)? = null,
     onRedCornerClick: (() -> Unit)? = null,
     onBlueCornerClick: (() -> Unit)? = null,
 ) {
+    val strings = AppTheme.strings
+    val colors = AppTheme.colors
     val redCorner = fight.redCorner
     val blueCorner = fight.blueCorner
 
@@ -49,8 +50,6 @@ fun FightItem(
         }
     }
 
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val isOpenWeight = fight.weightClassId.equals("OW", ignoreCase = true)
     val weightClassLabel = if (isOpenWeight) "" else strings.weightClassDisplayName(fight.weightClassId)
 

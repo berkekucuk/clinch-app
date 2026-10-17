@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,8 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 
 @Composable
 fun PredictionBoard(
@@ -32,14 +31,12 @@ fun PredictionBoard(
     onLeaderboardClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
     val fight = state.fight ?: return
 
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = colors.fightItemBackground
+            containerColor = AppTheme.colors.fightItemBackground
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -52,15 +49,15 @@ fun PredictionBoard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = strings.predictionQuestionTitle,
+                    text = AppTheme.strings.predictionQuestionTitle,
                     style = MaterialTheme.typography.titleSmall,
-                    color = colors.textPrimary,
+                    color = AppTheme.colors.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Icon(
                     imageVector = Icons.Outlined.EmojiEvents,
                     contentDescription = null,
-                    tint = colors.winnerFrame,
+                    tint = AppTheme.colors.winnerFrame,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable { onLeaderboardClick() }

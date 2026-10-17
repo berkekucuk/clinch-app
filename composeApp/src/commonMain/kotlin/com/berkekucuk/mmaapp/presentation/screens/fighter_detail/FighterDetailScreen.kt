@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -33,8 +34,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import com.berkekucuk.mmaapp.presentation.components.AppTabRow
@@ -74,20 +73,16 @@ fun FighterDetailScreen(
     state: FighterDetailUiState,
     onAction: (FighterDetailUiAction) -> Unit,
 ) {
-    // 1. Theme & Resources
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
-
-    // 2. Compose Core States
+    // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    // 3. UI Data & Definitions
-    val tabs = listOf(strings.tabOverview, strings.tabFights)
+    // UI Data & Definitions
+    val tabs = listOf(AppTheme.strings.tabOverview, AppTheme.strings.tabFights)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val errorMessage = strings.mapError(state.error)
+    val errorMessage = AppTheme.strings.mapError(state.error)
 
     AppSnackbarEffect(
         message = errorMessage,
@@ -100,7 +95,7 @@ fun FighterDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
-        containerColor = colors.pagerBackground,
+        containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         snackbarHost = {
             SnackbarHost(
@@ -116,7 +111,7 @@ fun FighterDetailScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(colors.fighterDetailTopBar)
+                modifier = Modifier.background(AppTheme.colors.fighterDetailTopBar)
             ){
                 MediumTopAppBar(
                     title = {
@@ -131,15 +126,15 @@ fun FighterDetailScreen(
                         IconButton(onClick = { onAction(FighterDetailUiAction.OnBackClicked) }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = strings.contentDescriptionBack,
+                                contentDescription = AppTheme.strings.contentDescriptionBack,
                             )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = colors.textPrimary,
-                        titleContentColor = colors.textPrimary,
+                        navigationIconContentColor = AppTheme.colors.textPrimary,
+                        titleContentColor = AppTheme.colors.textPrimary,
                     ),
                     scrollBehavior = scrollBehavior,
                 )
@@ -162,7 +157,7 @@ fun FighterDetailScreen(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colors.pagerBackground),
+                    .background(AppTheme.colors.pagerBackground),
                 beyondViewportPageCount = 1
             ) { page ->
                 val fighter = state.fighter

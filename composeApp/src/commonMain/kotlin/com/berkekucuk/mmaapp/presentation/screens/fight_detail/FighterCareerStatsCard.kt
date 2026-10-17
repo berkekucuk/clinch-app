@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,13 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.berkekucuk.mmaapp.core.presentation.colors.LocalAppColors
-import com.berkekucuk.mmaapp.core.presentation.strings.LocalAppStrings
 import com.berkekucuk.mmaapp.domain.model.Fighter
 import kotlin.math.roundToInt
 
@@ -72,8 +70,6 @@ fun FinishingStatsCard(
     blueFighter: Fighter?,
     modifier: Modifier = Modifier,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     // Win Rate
     val (redWinRateText, redWinRateFraction) = formatPercent(redFighter?.winRate)
@@ -91,7 +87,7 @@ fun FinishingStatsCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Column(
@@ -99,10 +95,10 @@ fun FinishingStatsCard(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
-                text = strings.statsFinishesHeader,
+                text = AppTheme.strings.statsFinishesHeader,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -111,7 +107,7 @@ fun FinishingStatsCard(
                 leftValue = redWinRateText,
                 leftNum = redFighter?.winRate,
                 leftFraction = redWinRateFraction,
-                label = strings.statsWinRate,
+                label = AppTheme.strings.statsWinRate,
                 rightValue = blueWinRateText,
                 rightNum = blueFighter?.winRate,
                 rightFraction = blueWinRateFraction
@@ -121,7 +117,7 @@ fun FinishingStatsCard(
                 leftValue = redKoRateText,
                 leftNum = redFighter?.koTkoRate,
                 leftFraction = redKoRateFraction,
-                label = strings.statsKoTkoRate,
+                label = AppTheme.strings.statsKoTkoRate,
                 rightValue = blueKoRateText,
                 rightNum = blueFighter?.koTkoRate,
                 rightFraction = blueKoRateFraction
@@ -131,7 +127,7 @@ fun FinishingStatsCard(
                 leftValue = redSubRateText,
                 leftNum = redFighter?.submissionRate,
                 leftFraction = redSubRateFraction,
-                label = strings.statsSubmissionRate,
+                label = AppTheme.strings.statsSubmissionRate,
                 rightValue = blueSubRateText,
                 rightNum = blueFighter?.submissionRate,
                 rightFraction = blueSubRateFraction
@@ -146,8 +142,6 @@ fun StrikingStatsCard(
     blueFighter: Fighter?,
     modifier: Modifier = Modifier,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     // Landed per min (SLpM)
     val maxLanded = maxOf(redFighter?.slpm ?: 0f, blueFighter?.slpm ?: 0f, 8f)
@@ -171,7 +165,7 @@ fun StrikingStatsCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Column(
@@ -179,10 +173,10 @@ fun StrikingStatsCard(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
-                text = strings.statsStrikingHeader,
+                text = AppTheme.strings.statsStrikingHeader,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -191,7 +185,7 @@ fun StrikingStatsCard(
                 leftValue = formatRate(redFighter?.slpm),
                 leftNum = redFighter?.slpm,
                 leftFraction = redLandedFraction,
-                label = strings.statsLandedPerMin,
+                label = AppTheme.strings.statsLandedPerMin,
                 rightValue = formatRate(blueFighter?.slpm),
                 rightNum = blueFighter?.slpm,
                 rightFraction = blueLandedFraction
@@ -201,7 +195,7 @@ fun StrikingStatsCard(
                 leftValue = redStrAccText,
                 leftNum = redFighter?.strAcc,
                 leftFraction = redStrAccFraction,
-                label = strings.statsSignificantStrikes,
+                label = AppTheme.strings.statsSignificantStrikes,
                 rightValue = blueStrAccText,
                 rightNum = blueFighter?.strAcc,
                 rightFraction = blueStrAccFraction
@@ -211,7 +205,7 @@ fun StrikingStatsCard(
                 leftValue = formatRate(redFighter?.sapm),
                 leftNum = redFighter?.sapm,
                 leftFraction = redAbsorbedFraction,
-                label = strings.statsAbsorbedPerMin,
+                label = AppTheme.strings.statsAbsorbedPerMin,
                 rightValue = formatRate(blueFighter?.sapm),
                 rightNum = blueFighter?.sapm,
                 rightFraction = blueAbsorbedFraction,
@@ -222,7 +216,7 @@ fun StrikingStatsCard(
                 leftValue = redStrDefText,
                 leftNum = redFighter?.strDef,
                 leftFraction = redStrDefFraction,
-                label = strings.statsDefense,
+                label = AppTheme.strings.statsDefense,
                 rightValue = blueStrDefText,
                 rightNum = blueFighter?.strDef,
                 rightFraction = blueStrDefFraction
@@ -237,8 +231,6 @@ fun GrapplingStatsCard(
     blueFighter: Fighter?,
     modifier: Modifier = Modifier,
 ) {
-    val strings = LocalAppStrings.current
-    val colors = LocalAppColors.current
 
     // Takedown Avg per 15 min
     val maxTd = maxOf(redFighter?.tdAvg ?: 0f, blueFighter?.tdAvg ?: 0f, 4f)
@@ -262,7 +254,7 @@ fun GrapplingStatsCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(colors.fightItemBackground)
+            .background(AppTheme.colors.fightItemBackground)
             .padding(horizontal = 16.dp, vertical = 14.dp)
     ) {
         Column(
@@ -270,10 +262,10 @@ fun GrapplingStatsCard(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Text(
-                text = strings.statsGrapplingHeader,
+                text = AppTheme.strings.statsGrapplingHeader,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -282,7 +274,7 @@ fun GrapplingStatsCard(
                 leftValue = formatRate(redFighter?.tdAvg),
                 leftNum = redFighter?.tdAvg,
                 leftFraction = redTdFraction,
-                label = strings.statsTakedownAvg,
+                label = AppTheme.strings.statsTakedownAvg,
                 rightValue = formatRate(blueFighter?.tdAvg),
                 rightNum = blueFighter?.tdAvg,
                 rightFraction = blueTdFraction
@@ -292,7 +284,7 @@ fun GrapplingStatsCard(
                 leftValue = redTdAccText,
                 leftNum = redFighter?.tdAcc,
                 leftFraction = redTdAccFraction,
-                label = strings.statsTakedownAccuracy,
+                label = AppTheme.strings.statsTakedownAccuracy,
                 rightValue = blueTdAccText,
                 rightNum = blueFighter?.tdAcc,
                 rightFraction = blueTdAccFraction
@@ -302,7 +294,7 @@ fun GrapplingStatsCard(
                 leftValue = redTdDefText,
                 leftNum = redFighter?.tdDef,
                 leftFraction = redTdDefFraction,
-                label = strings.statsTakedownDefense,
+                label = AppTheme.strings.statsTakedownDefense,
                 rightValue = blueTdDefText,
                 rightNum = blueFighter?.tdDef,
                 rightFraction = blueTdDefFraction
@@ -312,7 +304,7 @@ fun GrapplingStatsCard(
                 leftValue = formatRate(redFighter?.subAvg),
                 leftNum = redFighter?.subAvg,
                 leftFraction = redSubFraction,
-                label = strings.statsSubmissionAvg,
+                label = AppTheme.strings.statsSubmissionAvg,
                 rightValue = formatRate(blueFighter?.subAvg),
                 rightNum = blueFighter?.subAvg,
                 rightFraction = blueSubFraction
@@ -330,12 +322,11 @@ fun StatComparisonRow(
     rightValue: String,
     rightNum: Float?,
     rightFraction: Float,
-    lowerIsBetter: Boolean = false,
     modifier: Modifier = Modifier,
+    lowerIsBetter: Boolean = false,
 ) {
-    val colors = LocalAppColors.current
-    val trackColor = colors.statComparisonTrack
-    val mutedBarColor = colors.statComparisonMuted
+    val trackColor = AppTheme.colors.statComparisonTrack
+    val mutedBarColor = AppTheme.colors.statComparisonMuted
 
     val (isLeftWinner, isRightWinner) = when {
         leftNum == null || rightNum == null -> Pair(false, false)
@@ -348,13 +339,13 @@ fun StatComparisonRow(
         else -> Pair(leftNum > rightNum, rightNum > leftNum)
     }
 
-    val leftTextColor = if (isLeftWinner) colors.radarRed else colors.textSecondary
+    val leftTextColor = if (isLeftWinner) AppTheme.colors.radarRed else AppTheme.colors.textSecondary
     val leftTextWeight = if (isLeftWinner) FontWeight.SemiBold else FontWeight.Normal
-    val leftBarColor = if (isLeftWinner) colors.radarRed else mutedBarColor
+    val leftBarColor = if (isLeftWinner) AppTheme.colors.radarRed else mutedBarColor
 
-    val rightTextColor = if (isRightWinner) colors.radarBlue else colors.textSecondary
+    val rightTextColor = if (isRightWinner) AppTheme.colors.radarBlue else AppTheme.colors.textSecondary
     val rightTextWeight = if (isRightWinner) FontWeight.SemiBold else FontWeight.Normal
-    val rightBarColor = if (isRightWinner) colors.radarBlue else mutedBarColor
+    val rightBarColor = if (isRightWinner) AppTheme.colors.radarBlue else mutedBarColor
 
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
@@ -376,7 +367,7 @@ fun StatComparisonRow(
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary,
+                color = AppTheme.colors.textSecondary,
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 softWrap = false,

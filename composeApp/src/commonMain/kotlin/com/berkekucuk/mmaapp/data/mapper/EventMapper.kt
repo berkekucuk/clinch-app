@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.mapper
 
+import com.berkekucuk.mmaapp.core.utils.toCdnUrl
 import com.berkekucuk.mmaapp.data.local.entity.EventEntity
 import com.berkekucuk.mmaapp.data.local.relation.EventWithFightsRelation
 import com.berkekucuk.mmaapp.data.remote.dto.EventDto
@@ -30,7 +31,7 @@ fun EventWithFightsRelation.toDomain(): Event {
         venue = this.event.venue,
         location = this.event.location,
         eventYear = this.event.eventYear,
-        posterUrl = this.event.posterUrl,
+        posterUrl = this.event.posterUrl.toCdnUrl(),
         fights = this.fights
             .map { it.toDomain() }
             .sortedByDescending { it.fightOrder }

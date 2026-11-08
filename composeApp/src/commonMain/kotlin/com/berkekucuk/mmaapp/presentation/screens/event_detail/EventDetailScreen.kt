@@ -105,7 +105,7 @@ fun EventDetailScreen(
     }
 
     // Poster Header
-    val posterUrl = state.event?.posterUrl?.takeIf { it.isNotBlank() }
+    val posterUrl = state.event?.posterUrl
     val posterAreaHeight = 220.dp
     val posterScrollConnection = rememberEventPosterScrollConnection(
         posterAreaHeight = posterAreaHeight,

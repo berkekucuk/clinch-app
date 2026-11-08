@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.berkekucuk.mmaapp.core.utils.openStoreReview
 import com.berkekucuk.mmaapp.domain.enums.UserRole
 import com.berkekucuk.mmaapp.domain.model.AuthState
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
@@ -182,6 +184,12 @@ fun MenuScreen(
                 )
                 HorizontalDivider(color = AppTheme.colors.dividerColor)
             }
+            MenuItemRow(
+                icon = Icons.Filled.Star,
+                title = AppTheme.strings.menuItemRateApp,
+                onClick = { openStoreReview() }
+            )
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
             MenuItemRow(
                 icon = Icons.Filled.Settings,
                 title = AppTheme.strings.menuItemSettings,

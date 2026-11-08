@@ -30,17 +30,21 @@ actual fun getAppVersionCode(): Int {
 }
 
 actual fun openStore(androidPackage: String, iosAppId: String) {
+    openPlayStorePage(androidPackage)
+}
+
+actual fun openStoreReview(androidPackage: String, iosAppId: String) {
+    openPlayStorePage(androidPackage)
+}
+
+private fun openPlayStorePage(androidPackage: String) {
     val context = AndroidPlatformContext.context
     val marketUri = "market://details?id=$androidPackage".toUri()
     val webUri = "https://play.google.com/store/apps/details?id=$androidPackage".toUri()
 
-    val intent = try {
-        Intent(Intent.ACTION_VIEW, marketUri)
+    try {
+        context.startActivity(Intent(Intent.ACTION_VIEW, marketUri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     } catch (_: ActivityNotFoundException) {
-        Intent(Intent.ACTION_VIEW, webUri)
-    }.apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(Intent(Intent.ACTION_VIEW, webUri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
-
-    context.startActivity(intent)
 }

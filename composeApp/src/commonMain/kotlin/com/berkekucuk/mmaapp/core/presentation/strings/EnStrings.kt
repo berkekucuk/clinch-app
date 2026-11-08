@@ -165,6 +165,7 @@ val EnStrings = AppStrings(
     menuItemLeaderboard = "Leaderboard",
     menuItemNotifications = "Notifications",
     menuItemSettings = "Settings",
+    menuItemRateApp = "Rate Us",
     menuSignInButton = "Sign in",
     menuSignInTerms = "By signing in, you accept our Privacy Policy.",
     menuSignInPrivacyPolicy = "Privacy Policy",

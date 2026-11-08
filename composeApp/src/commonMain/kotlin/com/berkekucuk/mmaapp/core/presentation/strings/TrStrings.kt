@@ -165,6 +165,7 @@ val TrStrings = AppStrings(
     menuItemLeaderboard = "Liderlik Tablosu",
     menuItemNotifications = "Bildirimler",
     menuItemSettings = "Ayarlar",
+    menuItemRateApp = "Bizi Değerlendirin",
     menuSignInButton = "Giriş yap",
     menuSignInTerms = "Giriş yaparak Gizlilik Politikası'nı kabul etmiş olursunuz.",
     menuSignInPrivacyPolicy = "Gizlilik Politikası",

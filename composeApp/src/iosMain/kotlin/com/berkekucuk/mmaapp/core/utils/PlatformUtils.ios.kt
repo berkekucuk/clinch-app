@@ -13,7 +13,14 @@ actual fun getAppVersionCode(): Int {
 }
 
 actual fun openStore(androidPackage: String, iosAppId: String) {
-    val urlString = "https://apps.apple.com/tr/app/clinch-mobile/id$iosAppId"
+    openUrl("https://apps.apple.com/tr/app/clinch-mobile/id$iosAppId")
+}
+
+actual fun openStoreReview(androidPackage: String, iosAppId: String) {
+    openUrl("https://apps.apple.com/tr/app/clinch-mobile/id$iosAppId?action=write-review")
+}
+
+private fun openUrl(urlString: String) {
     val url = NSURL.URLWithString(urlString) ?: return
 
     UIApplication.sharedApplication.openURL(

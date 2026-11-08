@@ -155,6 +155,7 @@ data class AppStrings(
     val menuItemLeaderboard: String,
     val menuItemNotifications: String,
     val menuItemSettings: String,
+    val menuItemRateApp: String,
     val menuSignInButton: String,
     val menuSignInTerms: String,
     val menuSignInPrivacyPolicy: String,

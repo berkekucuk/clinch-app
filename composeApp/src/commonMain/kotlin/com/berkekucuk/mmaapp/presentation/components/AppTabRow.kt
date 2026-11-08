@@ -18,12 +18,14 @@ fun AppTabRow(
     selectedTabIndex: Int,
     onTabSelected: (Int) -> Unit,
     containerColor: Color = AppTheme.colors.topBarBackground,
+    selectedContentColor: Color = AppTheme.colors.textPrimary,
+    unselectedContentColor: Color = AppTheme.colors.textSecondary,
 ) {
 
     PrimaryTabRow(
         selectedTabIndex = selectedTabIndex,
         containerColor = containerColor,
-        contentColor = AppTheme.colors.textPrimary,
+        contentColor = selectedContentColor,
         indicator = {
             TabRowDefaults.PrimaryIndicator(
                 modifier = Modifier.tabIndicatorOffset(selectedTabIndex),
@@ -44,8 +46,8 @@ fun AppTabRow(
                         style = MaterialTheme.typography.labelLarge
                     )
                 },
-                selectedContentColor = AppTheme.colors.textPrimary,
-                unselectedContentColor = AppTheme.colors.textSecondary
+                selectedContentColor = selectedContentColor,
+                unselectedContentColor = unselectedContentColor
             )
         }
     }

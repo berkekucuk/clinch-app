@@ -104,6 +104,19 @@ fun EventDetailScreen(
         (state.event?.name ?: "").split(":", limit = 2).getOrNull(1)?.trim()
     }
 
+    // Poster Header
+    val posterUrl = state.event?.posterUrl?.takeIf { it.isNotBlank() }
+    val posterAreaHeight = 220.dp
+    val posterScrollConnection = rememberEventPosterScrollConnection(
+        posterAreaHeight = posterAreaHeight,
+        topBarScrollBehavior = scrollBehavior,
+        isListAtTop = {
+            val listState = if (pagerState.currentPage == 0) mainCardListState else prelimsListState
+            listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
+        },
+    )
+    val topBarContentColor = if (posterUrl != null) AppTheme.colors.white else AppTheme.colors.textPrimary
+
     AppSnackbarEffect(
         message = errorMessage,
         snackbarHostState = snackbarHostState,
@@ -114,7 +127,7 @@ fun EventDetailScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(if (posterUrl != null) posterScrollConnection else scrollBehavior.nestedScrollConnection),
         containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         floatingActionButton = {
@@ -143,9 +156,7 @@ fun EventDetailScreen(
             )
         },
         topBar = {
-            Column(
-                modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)
-            ) {
+            val eventTopAppBar: @Composable () -> Unit = {
                 TopAppBar(
                     title = {
                         Column(verticalArrangement = Arrangement.Center) {
@@ -162,7 +173,7 @@ fun EventDetailScreen(
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     fontSize = 14.sp,
-                                    color = AppTheme.colors.textSecondary,
+                                    color = if (posterUrl != null) AppTheme.colors.white.copy(alpha = 0.75f) else AppTheme.colors.textSecondary,
                                 )
                             }
                         }
@@ -178,18 +189,39 @@ fun EventDetailScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = AppTheme.colors.textPrimary,
-                        titleContentColor = AppTheme.colors.textPrimary,
+                        navigationIconContentColor = topBarContentColor,
+                        titleContentColor = topBarContentColor,
                     ),
                     scrollBehavior = scrollBehavior
                 )
+            }
 
+            val eventTabRow: @Composable () -> Unit = {
                 AppTabRow(
                     tabs = tabs,
                     selectedTabIndex = pagerState.currentPage,
                     onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                    containerColor = Color.Transparent
+                    containerColor = Color.Transparent,
+                    selectedContentColor = topBarContentColor,
+                    unselectedContentColor = if (posterUrl != null) AppTheme.colors.white.copy(alpha = 0.7f) else AppTheme.colors.textSecondary,
                 )
+            }
+
+            if (posterUrl != null) {
+                EventPosterHeader(
+                    posterUrl = posterUrl,
+                    posterAreaHeight = posterAreaHeight,
+                    collapseOffsetPx = { posterScrollConnection.collapseOffsetPx },
+                    tabRow = eventTabRow,
+                    topBar = eventTopAppBar,
+                )
+            } else {
+                Column(
+                    modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)
+                ) {
+                    eventTopAppBar()
+                    eventTabRow()
+                }
             }
         }
     ) { innerPadding ->

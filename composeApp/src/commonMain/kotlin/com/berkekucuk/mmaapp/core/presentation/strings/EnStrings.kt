@@ -280,6 +280,7 @@ val EnStrings = AppStrings(
     commentHoursAgo = { hours -> "${hours}h" },
     commentDaysAgo = { days -> "${days}d" },
     contentDescriptionComments = "Comments",
+    contentDescriptionEventPoster = "Event poster",
     contentDescriptionSendComment = "Send comment",
     contentDescriptionMoreOptions = "More options",
 )

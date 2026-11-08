@@ -15,7 +15,8 @@ fun EventDto.toEntity(): EventEntity {
         datetimeUtcMain = this.datetimeUtcMain,
         venue = this.venue,
         location = this.location,
-        eventYear = this.eventYear
+        eventYear = this.eventYear,
+        posterUrl = this.posterUrl
     )
 }
 
@@ -29,6 +30,7 @@ fun EventWithFightsRelation.toDomain(): Event {
         venue = this.event.venue,
         location = this.event.location,
         eventYear = this.event.eventYear,
+        posterUrl = this.event.posterUrl,
         fights = this.fights
             .map { it.toDomain() }
             .sortedByDescending { it.fightOrder }

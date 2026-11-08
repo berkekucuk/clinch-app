@@ -14,6 +14,7 @@ data class Event(
     val venue: String?,
     val location: String?,
     val eventYear: Int?,
+    val posterUrl: String?,
     val fights: List<Fight>
 ) {
     val mainFight: Fight? = fights.firstOrNull { it.boutType.equals("Main Event", ignoreCase = true) }

@@ -288,6 +288,7 @@ val TrStrings = AppStrings(
     commentHoursAgo = { hours -> "$hours sa" },
     commentDaysAgo = { days -> "$days g" },
     contentDescriptionComments = "Yorumlar",
+    contentDescriptionEventPoster = "Etkinlik posteri",
     contentDescriptionSendComment = "Yorumu gönder",
     contentDescriptionMoreOptions = "Diğer seçenekler",
 )

@@ -51,7 +51,7 @@ import kotlinx.coroutines.IO
         AppConfigEntity::class,
         WeeklyLeaderboardEntity::class
     ],
-    version = 38
+    version = 39
 )
 
 @TypeConverters(Converters::class)

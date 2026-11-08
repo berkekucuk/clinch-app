@@ -14,5 +14,6 @@ data class EventDto(
     val venue: String? = null,
     val location: String? = null,
     @SerialName("event_year") val eventYear: Int? = null,
+    @SerialName("poster_url") val posterUrl: String? = null,
     val fights: List<FightDto>? = null
 )

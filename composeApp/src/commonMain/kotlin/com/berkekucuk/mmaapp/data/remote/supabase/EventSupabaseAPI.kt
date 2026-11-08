@@ -14,7 +14,7 @@ class EventSupabaseAPI(
 
     override suspend fun fetchEventById(id: String): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v4",
+            function = "get_events_v5",
             parameters = buildJsonObject {
                 put("p_event_id", id)
             }
@@ -23,7 +23,7 @@ class EventSupabaseAPI(
 
     override suspend fun fetchEventsByYear(year: Int): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v4",
+            function = "get_events_v5",
             parameters = buildJsonObject {
                 put("p_year", year)
             }
@@ -32,7 +32,7 @@ class EventSupabaseAPI(
 
     override suspend fun fetchEventsAfter(date: Instant): List<EventDto> {
         return client.postgrest.rpc(
-            function = "get_events_v4",
+            function = "get_events_v5",
             parameters = buildJsonObject {
                 put("p_date", date.toString())
             }

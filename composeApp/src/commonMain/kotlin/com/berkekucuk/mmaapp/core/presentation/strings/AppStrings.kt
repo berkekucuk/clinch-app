@@ -220,6 +220,7 @@ data class AppStrings(
     val commentHoursAgo: (Int) -> String,
     val commentDaysAgo: (Int) -> String,
     val contentDescriptionComments: String,
+    val contentDescriptionEventPoster: String,
     val contentDescriptionSendComment: String,
     val contentDescriptionMoreOptions: String,
 )

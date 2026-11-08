@@ -105,7 +105,7 @@ fun EventCommentsScreen(
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
             val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: return@derivedStateOf false
-            lastVisibleIndex >= layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
+            layoutInfo.totalItemsCount > LOAD_MORE_THRESHOLD && lastVisibleIndex >= layoutInfo.totalItemsCount - LOAD_MORE_THRESHOLD
         }
     }
 
@@ -260,7 +260,7 @@ fun EventCommentsScreen(
                         onUserClick = { onAction(EventCommentsUiAction.OnUserClicked(comment.userId)) },
                         onDeleteClick = { onAction(EventCommentsUiAction.OnDeleteClicked(comment.id)) },
                         onReportClick = { onAction(EventCommentsUiAction.OnReportClicked(comment.id)) },
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                     )
                 }
 

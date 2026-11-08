@@ -55,34 +55,12 @@ fun FighterRadarChart(
     val colors = AppTheme.colors
     val textMeasurer = rememberTextMeasurer()
 
-    val axisLabels = remember(strings) {
-        listOf(
-            strings.radarLabelSlpm,
-            strings.radarLabelStrAcc,
-            strings.radarLabelStrDef,
-            strings.radarLabelTdAvg,
-            strings.radarLabelTdAcc,
-            strings.radarLabelTdDef,
-            strings.radarLabelSubAvg,
-        )
-    }
+    val axisLabels = remember(strings) { buildRadarLabels(strings) }
 
     val isSingleFighter = fighter != null
 
     val axisValues = remember(fighter) {
-        if (fighter != null) {
-            listOf(
-                formatRadarRate(fighter.slpm),
-                formatRadarPercent(fighter.strAcc),
-                formatRadarPercent(fighter.strDef),
-                formatRadarRate(fighter.tdAvg),
-                formatRadarPercent(fighter.tdAcc),
-                formatRadarPercent(fighter.tdDef),
-                formatRadarRate(fighter.subAvg),
-            )
-        } else {
-            emptyList()
-        }
+        fighter?.let { buildRadarDisplayValues(it) } ?: emptyList()
     }
 
     val singleFighterData = remember(fighter, colors) {

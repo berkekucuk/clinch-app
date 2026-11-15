@@ -59,4 +59,4 @@ Clinch is a comprehensive data and engagement platform designed for mixed martia
 
 ## 📬 Contact
 
-Please contact us with any questions, support requests, or feedback: **[clinchapp0@gmail.com](mailto:clinchapp0@gmail.com)**
+Please contact us with any questions, support requests, or feedback: **[support@clinchmobile.app](mailto:support@clinchmobile.app)**

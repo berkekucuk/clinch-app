@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -70,7 +69,6 @@ fun SettingsScreen(
     notificationStorage: NotificationStorage
 ) {
     // Theme & Resources
-    val uriHandler = LocalUriHandler.current
     val currentLanguage = AppTheme.strings.language
     val currentMeasurementUnit = LocalMeasurementUnit.current
     val currentOddsFormat = LocalOddsFormat.current
@@ -178,19 +176,6 @@ fun SettingsScreen(
                 title = AppTheme.strings.menuItemNotifications,
                 subtitle = if (notificationsEnabled) AppTheme.strings.menuNotificationsEnabled else AppTheme.strings.menuNotificationsDisabled,
                 onClick = { notificationStorage.openNotificationSettings() }
-            )
-
-            SettingsCard(
-                icon = Icons.Default.Email,
-                title = AppTheme.strings.settingsSectionSupport,
-                subtitle = AppTheme.strings.settingsSectionSupportSub,
-                onClick = {
-                    try {
-                        uriHandler.openUri("mailto:clinchapp0@gmail.com")
-                    } catch (e: Exception) {
-                        // ignore
-                    }
-                }
             )
 
             if (state.authState is AuthState.Authenticated) {

@@ -296,6 +296,7 @@ fun ProfileEditScreen(
                 onValueChange = { username -> onAction(ProfileEditUiAction.OnUsernameChanged(username)) },
                 textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal),
                 label = { Text(AppTheme.strings.profileEditUsernameLabel, style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal)) },
+                prefix = { Text("@", style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Normal), color = AppTheme.colors.textSecondary) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = AppTheme.colors.textPrimary,
                     unfocusedTextColor = AppTheme.colors.textPrimary,

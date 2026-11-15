@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
+import com.berkekucuk.mmaapp.presentation.components.BulletList
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -212,7 +213,7 @@ fun LeaderboardScreen(
             onDismissRequest = { showInfoDialog.value = false },
             onConfirmClick = { showInfoDialog.value = false },
             title = AppTheme.strings.leaderboardInfoTitle,
-            text = state.infoText ?: "",
+            content = { BulletList(items = AppTheme.strings.leaderboardInfoItems) },
             confirmText = AppTheme.strings.leaderboardInfoClose
         )
     }

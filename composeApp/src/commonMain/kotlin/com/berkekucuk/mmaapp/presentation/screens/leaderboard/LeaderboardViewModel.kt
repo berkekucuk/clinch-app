@@ -2,9 +2,7 @@ package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.berkekucuk.mmaapp.core.storage.LanguageStorage
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
-import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.LeaderboardRepository
 import kotlinx.coroutines.Job
@@ -20,8 +18,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 class LeaderboardViewModel(
     private val leaderboardRepository: LeaderboardRepository,
     private val authRepository: AuthRepository,
-    private val configRepository: AppConfigRepository,
-    private val languageStorage: LanguageStorage
 ) : ViewModel() {
 
     companion object {
@@ -40,7 +36,6 @@ class LeaderboardViewModel(
     init {
         observeOverallLeaderboard()
         observeWeeklyLeaderboard()
-        observeConfig()
         syncLeaderboard()
     }
 
@@ -82,19 +77,6 @@ class LeaderboardViewModel(
         }
     }
 
-    private fun observeConfig() {
-        viewModelScope.launch {
-            configRepository.getConfig("leaderboard_info_text")
-                .collect { config ->
-                    if (config != null) {
-                        val language = languageStorage.load()
-                        val text = if (language == "TR") config.valueTr else config.valueEn
-                        _state.update { it.copy(infoText = text) }
-                    }
-                }
-        }
-    }
-
     private fun syncLeaderboard(isRefreshing: Boolean = false, onlyOverall: Boolean = false) {
         if (syncJob?.isActive == true) return
 
@@ -106,10 +88,6 @@ class LeaderboardViewModel(
 
             val weeklyResult = if (!onlyOverall) leaderboardRepository.syncWeeklyLeaderboard() else null
             val overallResult = leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
-            
-            if (!onlyOverall) {
-                configRepository.syncConfig("leaderboard_info_text")
-            }
 
             val firstError = listOfNotNull(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
             if (firstError != null) {

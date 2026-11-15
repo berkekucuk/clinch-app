@@ -19,7 +19,7 @@ sealed interface FightDetailUiAction {
 
     // Predictions
     data class OnPredictClicked(val predictedWinnerId: String): FightDetailUiAction
-    data class OnSubmitPredictionClicked(val predictedWinnerId: String, val selectedRisk: Int): FightDetailUiAction
+    data class OnSubmitPredictionClicked(val predictedWinnerId: String): FightDetailUiAction
     data object OnDismissPredictionDialog: FightDetailUiAction
 
     // Auth

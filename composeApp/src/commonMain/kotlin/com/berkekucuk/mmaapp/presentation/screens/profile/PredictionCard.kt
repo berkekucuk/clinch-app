@@ -113,15 +113,14 @@ fun PredictionCard(
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
 
-                if (prediction.isCorrect != null) {
+                if (prediction.isCorrect == true) {
                     Row(
                         modifier = Modifier.align(Alignment.Center),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val sign = if (prediction.pointsEarned > 0) "+" else ""
                         Text(
-                            text = "$sign${prediction.pointsEarned}",
-                            color = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
+                            text = "+${prediction.pointsEarned}",
+                            color = AppTheme.colors.winnerFrame,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -129,7 +128,7 @@ fun PredictionCard(
                         Icon(
                             imageVector = Icons.Default.EmojiEvents,
                             contentDescription = null,
-                            tint = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
+                            tint = AppTheme.colors.winnerFrame,
                             modifier = Modifier.size(14.dp)
                         )
                     }

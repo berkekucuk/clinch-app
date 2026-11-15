@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.data.local
 
+import com.berkekucuk.mmaapp.core.utils.clearImageCache
+import androidx.sqlite.SQLiteConnection
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -80,6 +82,11 @@ fun getRoomDatabase(
 ): AppDatabase {
     return builder
         .fallbackToDestructiveMigration(true)
+        .addCallback(object : RoomDatabase.Callback() {
+            override fun onDestructiveMigration(connection: SQLiteConnection) {
+                runCatching { clearImageCache() }
+            }
+        })
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()

@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.core.utils
 
+import coil3.SingletonImageLoader
+import coil3.PlatformContext
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
@@ -28,4 +30,10 @@ private fun openUrl(urlString: String) {
         emptyMap<Any?, Any>(),
         null
     )
+}
+
+actual fun clearImageCache() {
+    val imageLoader = SingletonImageLoader.get(PlatformContext.INSTANCE)
+    imageLoader.memoryCache?.clear()
+    imageLoader.diskCache?.clear()
 }

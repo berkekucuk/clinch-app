@@ -1,8 +1,18 @@
 package com.berkekucuk.mmaapp.presentation.screens.menu
 
+import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
+import org.jetbrains.compose.resources.vectorResource
+import mmaapp.composeapp.generated.resources.ic_x_logo
+import mmaapp.composeapp.generated.resources.Res
+import com.berkekucuk.mmaapp.core.utils.X_USERNAME
+import com.berkekucuk.mmaapp.core.utils.SUPPORT_EMAIL
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.RateReview
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,7 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -86,9 +95,13 @@ fun MenuScreen(
     onStartGoogleSignIn: () -> Unit,
     onStartAppleSignIn: () -> Unit,
 ) {
+    // Theme & Resources
+    val uriHandler = LocalUriHandler.current
+
     // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val showSignInSheet = remember { mutableStateOf(false) }
+    val showSignOutDialog = remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val isSnackbarSuccess = remember { mutableStateOf(false) }
 
@@ -138,6 +151,17 @@ fun MenuScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
+                actions = {
+                    if (state.authState is AuthState.Authenticated) {
+                        IconButton(onClick = { showSignOutDialog.value = true }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = AppTheme.strings.profileSignOut,
+                                tint = AppTheme.colors.loseColor
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.topBarBackground,
                     titleContentColor = AppTheme.colors.textPrimary,
@@ -185,9 +209,35 @@ fun MenuScreen(
                 HorizontalDivider(color = AppTheme.colors.dividerColor)
             }
             MenuItemRow(
-                icon = Icons.Filled.Star,
+                icon = Icons.Filled.RateReview,
                 title = AppTheme.strings.menuItemRateApp,
                 onClick = { openStoreReview() }
+            )
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
+            MenuItemRow(
+                icon = vectorResource(Res.drawable.ic_x_logo),
+                title = AppTheme.strings.menuItemFollowUs,
+                subtitle = "@$X_USERNAME",
+                onClick = {
+                    try {
+                        uriHandler.openUri("https://x.com/$X_USERNAME")
+                    } catch (e: Exception) {
+                        // ignore
+                    }
+                }
+            )
+            HorizontalDivider(color = AppTheme.colors.dividerColor)
+            MenuItemRow(
+                icon = Icons.Filled.Email,
+                title = AppTheme.strings.menuItemContact,
+                subtitle = SUPPORT_EMAIL,
+                onClick = {
+                    try {
+                        uriHandler.openUri("mailto:$SUPPORT_EMAIL")
+                    } catch (e: Exception) {
+                        // ignore
+                    }
+                }
             )
             HorizontalDivider(color = AppTheme.colors.dividerColor)
             MenuItemRow(
@@ -196,19 +246,23 @@ fun MenuScreen(
                 onClick = { onAction(MenuUiAction.OnSettingsClicked) }
             )
             HorizontalDivider(color = AppTheme.colors.dividerColor)
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (state.authState is AuthState.Authenticated) {
-                HorizontalDivider(color = AppTheme.colors.dividerColor)
-                MenuItemRow(
-                    icon = Icons.AutoMirrored.Filled.Logout,
-                    title = AppTheme.strings.profileSignOut,
-                    tint = AppTheme.colors.loseColor,
-                    onClick = { onAction(MenuUiAction.OnSignOutClicked) },
-                )
-            }
         }
+    }
+
+    if (showSignOutDialog.value) {
+        AppAlertDialog(
+            onDismissRequest = { showSignOutDialog.value = false },
+            onConfirmClick = {
+                showSignOutDialog.value = false
+                onAction(MenuUiAction.OnSignOutClicked)
+            },
+            onDismissClick = { showSignOutDialog.value = false },
+            title = AppTheme.strings.profileSignOut,
+            text = AppTheme.strings.profileSignOutConfirm,
+            confirmText = AppTheme.strings.profileSignOut,
+            dismissText = AppTheme.strings.commonCancel,
+            isDestructive = true
+        )
     }
 
     if (showSignInSheet.value) {

@@ -1,32 +1,26 @@
 package com.berkekucuk.mmaapp.core
 
-import com.berkekucuk.mmaapp.presentation.screens.home.HomeViewModel
+import com.berkekucuk.mmaapp.core.app.AppStartupState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Duration.Companion.milliseconds
 
-class SplashController : KoinComponent {
+class SplashController {
 
-    private val homeViewModel: HomeViewModel by inject()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     fun observeLoadingState(onLoadingFinished: () -> Unit) {
         scope.launch {
-            homeViewModel.state
-                .map { it.isLoading }
-                .distinctUntilChanged()
-                .collect { isLoading ->
-                    if (!isLoading) {
-                        onLoadingFinished()
-                        scope.cancel()
-                    }
-                }
+            withTimeoutOrNull(AppStartupState.MAX_SPLASH_DURATION_MS.milliseconds) {
+                AppStartupState.isReady.first { it }
+            }
+            onLoadingFinished()
+            scope.cancel()
         }
     }
 

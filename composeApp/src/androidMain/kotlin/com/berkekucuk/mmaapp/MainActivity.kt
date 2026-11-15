@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp
 
+import com.berkekucuk.mmaapp.core.app.AppStartupState
+import android.os.SystemClock
 import android.Manifest
 import android.content.Intent
 import android.os.Build
@@ -11,13 +13,10 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.berkekucuk.mmaapp.core.app.App
 import com.berkekucuk.mmaapp.core.app.DeepLinkManager
 import com.berkekucuk.mmaapp.core.storage.NotificationStorage
-import com.berkekucuk.mmaapp.presentation.screens.home.HomeViewModel
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: HomeViewModel by viewModel()
     private val notificationStorage: NotificationStorage by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,8 +29,10 @@ class MainActivity : ComponentActivity() {
             notificationStorage.setRequestedPermission(true)
         }
 
+        val splashStartTime = SystemClock.uptimeMillis()
         splashScreen.setKeepOnScreenCondition {
-            viewModel.state.value.isLoading
+            !AppStartupState.isReady.value &&
+                SystemClock.uptimeMillis() - splashStartTime < AppStartupState.MAX_SPLASH_DURATION_MS
         }
         handleIntent(intent)
 

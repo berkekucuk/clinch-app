@@ -177,6 +177,7 @@ fun HomeScreen(
     ) { innerPadding ->
         LoadingContent(
             isLoading = state.isLoading,
+            animated = false,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)

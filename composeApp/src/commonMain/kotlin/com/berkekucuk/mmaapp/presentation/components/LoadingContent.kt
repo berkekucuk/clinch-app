@@ -17,8 +17,15 @@ import androidx.compose.ui.Modifier
 fun LoadingContent(
     isLoading: Boolean,
     modifier: Modifier = Modifier,
+    animated: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    if (!animated) {
+        Box(modifier = modifier) {
+            if (isLoading) LoadingIndicator() else content()
+        }
+        return
+    }
 
     AnimatedContent(
         targetState = isLoading,
@@ -28,15 +35,16 @@ fun LoadingContent(
         label = "LoadingContentTransition",
         modifier = modifier
     ) { loading ->
-        if (loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = AppTheme.colors.ufcRed)
-            }
-        } else {
-            content()
-        }
+        if (loading) LoadingIndicator() else content()
+    }
+}
+
+@Composable
+private fun LoadingIndicator() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = AppTheme.colors.ufcRed)
     }
 }

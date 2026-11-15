@@ -14,6 +14,8 @@ fun UserDto.toEntity(): UserEntity {
         avatarUrl = avatarUrl,
         points = points ?: 0,
         createdAt = createdAt,
+        correctCount = correctCount ?: 0,
+        decidedCount = decidedCount ?: 0,
     )
 }
 
@@ -25,6 +27,8 @@ fun UserDto.toDomain(): User {
         avatarUrl = avatarUrl,
         points = points ?: 0,
         createdAt = createdAt,
+        correctCount = correctCount ?: 0,
+        decidedCount = decidedCount ?: 0,
     )
 }
 
@@ -36,6 +40,8 @@ fun UserEntity.toDomain(): User {
         avatarUrl = avatarUrl,
         points = points,
         createdAt = createdAt,
+        correctCount = correctCount,
+        decidedCount = decidedCount,
     )
 }
 

@@ -12,4 +12,6 @@ data class UserDto(
     @SerialName("avatar_url") val avatarUrl: String? = null,
     @SerialName("points") val points: Int? = 0,
     @SerialName("created_at") val createdAt: Instant? = null,
+    @SerialName("correct_count") val correctCount: Int? = 0,
+    @SerialName("decided_count") val decidedCount: Int? = 0,
 )

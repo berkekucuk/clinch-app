@@ -17,10 +17,4 @@ data class User(
 ) {
     val accuracyPercent: Int? =
         if (decidedCount > 0) (correctCount * 100.0 / decidedCount).roundToInt() else null
-
-    val hasReliableAccuracy: Boolean = decidedCount >= MIN_DECIDED_FOR_ACCURACY
-
-    companion object {
-        const val MIN_DECIDED_FOR_ACCURACY = 5
-    }
 }

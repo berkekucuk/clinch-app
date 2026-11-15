@@ -105,7 +105,7 @@ fun LeaderboardContainer(
                                             )
                                         }
                                         val accuracyPercent = user.accuracyPercent
-                                        if (user.hasReliableAccuracy && accuracyPercent != null) {
+                                        if (accuracyPercent != null) {
                                             Row(verticalAlignment = Alignment.CenterVertically) {
                                                 Icon(
                                                     imageVector = Icons.Default.TrackChanges,

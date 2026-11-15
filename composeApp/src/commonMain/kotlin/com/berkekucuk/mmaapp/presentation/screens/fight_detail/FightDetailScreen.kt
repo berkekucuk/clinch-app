@@ -1,5 +1,8 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.presentation.components.BulletList
+import com.berkekucuk.mmaapp.core.presentation.toDecimalOdds
+import com.berkekucuk.mmaapp.core.utils.predictionPoints
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -128,7 +131,6 @@ fun FightDetailScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     val snackbarHostState = remember { SnackbarHostState() }
-    val selectedRisk = remember { mutableStateOf(50) }
     val selectedNotificationIsAlarm = remember { mutableStateOf(false) }
     val isSnackbarSuccess = remember { mutableStateOf(false) }
 
@@ -139,9 +141,11 @@ fun FightDetailScreen(
     val hasMetaInfo = fight != null && (fight.roundsFormat.isNotBlank() || !fight.roundSummary.isNullOrBlank() || fight.weightClassLbs != null || !fight.referee.isNullOrBlank())
     val tabs = listOf(AppTheme.strings.tabFight, AppTheme.strings.tabFightCareer)
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val pendingPredictionFighterName = remember(state.pendingPredictionFighterId, fight) {
-        fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }?.fighter?.name ?: ""
+    val pendingPredictionParticipant = remember(state.pendingPredictionFighterId, fight) {
+        fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }
     }
+    val pendingPredictionFighterName = pendingPredictionParticipant?.fighter?.name ?: ""
+    val pendingPredictionOdds = pendingPredictionParticipant?.oddsValue
     val errorMessage = AppTheme.strings.mapError(state.error)
     val snackbarMessage = when {
         state.error != null -> {
@@ -166,13 +170,12 @@ fun FightDetailScreen(
         }
     }
     val onPredict = { id: String ->
-        selectedRisk.value = 50
         onAction(FightDetailUiAction.OnPredictClicked(id))
     }
     val onPredictionConfirmed = {
         val id = state.pendingPredictionFighterId
         if (id != null) {
-            onAction(FightDetailUiAction.OnSubmitPredictionClicked(id, selectedRisk.value))
+            onAction(FightDetailUiAction.OnSubmitPredictionClicked(id))
         }
     }
 
@@ -436,55 +439,20 @@ fun FightDetailScreen(
             dismissText = AppTheme.strings.dialogCancel,
             isConfirmLoading = state.isSubmittingPrediction,
             content = {
-                Column(modifier = Modifier.selectableGroup()) {
+                Column {
                     Text(
                         text = AppTheme.strings.predictionConfirmMessage(pendingPredictionFighterName),
                         color = AppTheme.colors.textSecondary,
-                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    val options = listOf(
-                        25 to AppTheme.strings.riskUnsure,
-                        50 to AppTheme.strings.riskNormal,
-                        75 to AppTheme.strings.riskConfident,
-                        100 to AppTheme.strings.riskAllIn
-                    )
-                    options.forEach { (value, label) ->
-                        val selected = (selectedRisk.value == value)
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .background(
-                                    color = if (selected) AppTheme.colors.winnerFrame.copy(alpha = 0.1f) else Color.Transparent,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .border(
-                                    width = 1.dp,
-                                    color = if (selected) AppTheme.colors.winnerFrame else Color.Transparent,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                                .selectable(
-                                    selected = selected,
-                                    onClick = { selectedRisk.value = value },
-                                    role = Role.RadioButton
-                                )
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = selected,
-                                onClick = null,
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = AppTheme.colors.winnerFrame,
-                                    unselectedColor = AppTheme.colors.textSecondary
-                                )
-                            )
-                            Text(
-                                text = label,
-                                color = AppTheme.colors.textPrimary,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
+                    if (pendingPredictionOdds != null) {
+                        BulletList(
+                            items = listOf(
+                                AppTheme.strings.predictionPotentialPoints(predictionPoints(pendingPredictionOdds)),
+                                AppTheme.strings.predictionPointsFormula(pendingPredictionOdds.toDecimalOdds()),
+                                AppTheme.strings.predictionNoPointLoss,
+                            ),
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
                     }
                 }
             }

@@ -14,7 +14,7 @@ class LeaderboardSupabaseAPI(
 
     override suspend fun fetchLeaderboard(limit: Int, offset: Int): List<UserDto> {
         return client.postgrest.rpc(
-            function = "get_leaderboard",
+            function = "get_leaderboard_v2",
             parameters = buildJsonObject {
                 put("p_limit", limit)
                 put("p_offset", offset)
@@ -24,7 +24,7 @@ class LeaderboardSupabaseAPI(
 
     override suspend fun fetchWeeklyLeaderboard(): List<WeeklyLeaderboardDto> {
         return client.postgrest.rpc(
-            function ="get_weekly_leaderboard"
+            function = "get_weekly_leaderboard_v2"
         ).decodeList<WeeklyLeaderboardDto>()
     }
 }

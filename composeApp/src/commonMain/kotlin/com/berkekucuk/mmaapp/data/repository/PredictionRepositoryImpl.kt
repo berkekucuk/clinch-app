@@ -63,11 +63,10 @@ class PredictionRepositoryImpl(
         userId: String,
         fightId: String,
         predictedWinnerId: String,
-        lockedOdds: Int,
-        selectedRisk: Int
+        lockedOdds: Int
     ): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
-            val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds, selectedRisk)
+            val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds)
 
             predictionDao.upsertPredictions(listOf(remotePrediction.toEntity()))
         }

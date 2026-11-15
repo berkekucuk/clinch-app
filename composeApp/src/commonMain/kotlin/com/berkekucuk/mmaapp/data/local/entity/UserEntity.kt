@@ -13,4 +13,6 @@ data class UserEntity(
     @ColumnInfo(name = "avatar_url") val avatarUrl: String? = null,
     @ColumnInfo(name = "points") val points: Int = 0,
     @ColumnInfo(name = "created_at") val createdAt: Instant? = null,
+    @ColumnInfo(name = "correct_count", defaultValue = "0") val correctCount: Int = 0,
+    @ColumnInfo(name = "decided_count", defaultValue = "0") val decidedCount: Int = 0,
 )

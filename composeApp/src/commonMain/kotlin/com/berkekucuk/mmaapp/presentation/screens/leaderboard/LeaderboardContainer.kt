@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.leaderboard
 
+import androidx.compose.material.icons.filled.TrackChanges
+import androidx.compose.foundation.layout.Column
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -83,23 +85,42 @@ fun LeaderboardContainer(
                                 imageUrl = user.avatarUrl ?: "",
                                 countryCode = null,
                                 trailingContent = {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
+                                    Column(
+                                        horizontalAlignment = Alignment.End,
                                         modifier = Modifier.padding(end = 4.dp)
                                     ) {
-                                        Text(
-                                            text = user.points.toString(),
-                                            color = AppTheme.colors.winnerFrame,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp
-                                        )
-                                        Spacer(Modifier.width(4.dp))
-                                        Icon(
-                                            imageVector = Icons.Default.EmojiEvents,
-                                            contentDescription = null,
-                                            tint = AppTheme.colors.winnerFrame,
-                                            modifier = Modifier.size(18.dp)
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(
+                                                text = user.points.toString(),
+                                                color = AppTheme.colors.winnerFrame,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 16.sp
+                                            )
+                                            Spacer(Modifier.width(4.dp))
+                                            Icon(
+                                                imageVector = Icons.Default.EmojiEvents,
+                                                contentDescription = null,
+                                                tint = AppTheme.colors.winnerFrame,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                        val accuracyPercent = user.accuracyPercent
+                                        if (user.hasReliableAccuracy && accuracyPercent != null) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Icon(
+                                                    imageVector = Icons.Default.TrackChanges,
+                                                    contentDescription = null,
+                                                    tint = AppTheme.colors.textSecondary,
+                                                    modifier = Modifier.size(12.dp)
+                                                )
+                                                Spacer(Modifier.width(3.dp))
+                                                Text(
+                                                    text = AppTheme.strings.percentValue(accuracyPercent),
+                                                    color = AppTheme.colors.textSecondary,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
+                                        }
                                     }
                                 },
                                 onFighterClicked = { onAction(LeaderboardUiAction.OnUserClicked(user.id)) }

@@ -15,7 +15,7 @@ class PredictionSupabaseAPI(
 
     override suspend fun fetchPredictions(userId: String, limit: Int, offset: Int): List<PredictionDto> {
         return client.postgrest.rpc(
-            function = "get_user_predictions",
+            function = "get_user_predictions_v2",
             parameters = buildJsonObject {
                 put("p_user_id", userId)
                 put("p_limit", limit)
@@ -28,10 +28,9 @@ class PredictionSupabaseAPI(
         userId: String,
         fightId: String,
         predictedWinnerId: String,
-        lockedOdds: Int,
-        selectedRisk: Int
+        lockedOdds: Int
     ): PredictionDto {
-        val request = PredictionInsertDto(userId, fightId, predictedWinnerId, lockedOdds, selectedRisk)
+        val request = PredictionInsertDto(userId, fightId, predictedWinnerId, lockedOdds)
         return client.from("user_predictions").insert(request) {
             select()
         }.decodeSingle<PredictionDto>()

@@ -1,5 +1,9 @@
 package com.berkekucuk.mmaapp.presentation.screens.profile
 
+import com.berkekucuk.mmaapp.domain.model.Participant
+import com.berkekucuk.mmaapp.presentation.components.FighterImage
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -7,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +36,6 @@ import com.berkekucuk.mmaapp.core.presentation.OddsFormat
 import com.berkekucuk.mmaapp.core.presentation.toAmericanOdds
 import com.berkekucuk.mmaapp.core.presentation.toDecimalOdds
 import com.berkekucuk.mmaapp.domain.model.Prediction
-import com.berkekucuk.mmaapp.presentation.components.FightItem
 
 @Composable
 fun PredictionCard(
@@ -88,11 +89,43 @@ fun PredictionCard(
         )
     ) {
         Column {
-            FightItem(
-                fight = fight,
-                modifier = Modifier.height(108.dp),
-                backgroundColor = Color.Transparent
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PredictionFighterImage(participant = redCorner, alignment = Alignment.Start)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = redCorner?.fighter?.name ?: "",
+                    color = AppTheme.colors.textPrimary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "VS",
+                    color = AppTheme.colors.textSecondary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp)
+                )
+                Text(
+                    text = blueCorner?.fighter?.name ?: "",
+                    color = AppTheme.colors.textPrimary,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                PredictionFighterImage(participant = blueCorner, alignment = Alignment.End)
+            }
 
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -107,21 +140,20 @@ fun PredictionCard(
             ) {
                 Text(
                     text = AppTheme.strings.predictionQuestionTitle,
-                    color = AppTheme.colors.textPrimary,
+                    color = AppTheme.colors.textSecondary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.align(Alignment.CenterStart)
                 )
 
-                if (prediction.isCorrect != null) {
+                if (prediction.isCorrect == true) {
                     Row(
                         modifier = Modifier.align(Alignment.Center),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val sign = if (prediction.pointsEarned > 0) "+" else ""
                         Text(
-                            text = "$sign${prediction.pointsEarned}",
-                            color = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
+                            text = "+${prediction.pointsEarned}",
+                            color = AppTheme.colors.winnerFrame,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -129,7 +161,7 @@ fun PredictionCard(
                         Icon(
                             imageVector = Icons.Default.EmojiEvents,
                             contentDescription = null,
-                            tint = if (prediction.isCorrect) AppTheme.colors.winnerFrame else AppTheme.colors.ufcRed,
+                            tint = AppTheme.colors.winnerFrame,
                             modifier = Modifier.size(14.dp)
                         )
                     }
@@ -165,4 +197,21 @@ fun PredictionCard(
             }
         }
     }
+}
+
+@Composable
+private fun PredictionFighterImage(
+    participant: Participant?,
+    alignment: Alignment.Horizontal,
+) {
+    FighterImage(
+        imageUrl = participant?.fighter?.imageUrl ?: "",
+        name = participant?.fighter?.name ?: "",
+        countryCode = participant?.fighter?.countryCode ?: "",
+        alignment = alignment,
+        result = participant?.result?.name,
+        imageSize = 34.dp,
+        flagWidth = 14.dp,
+        flagHeight = 9.dp,
+    )
 }

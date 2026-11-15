@@ -17,7 +17,7 @@ class UserSupabaseAPI(
 
     override suspend fun fetchUser(userId: String): UserDto {
         return client.postgrest.rpc(
-            function = "get_profile",
+            function = "get_profile_v2",
             parameters = buildJsonObject {
                 put("p_user_id", userId)
             }

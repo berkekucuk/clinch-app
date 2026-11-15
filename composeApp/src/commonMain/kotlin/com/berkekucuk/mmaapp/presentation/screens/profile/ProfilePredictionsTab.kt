@@ -55,6 +55,13 @@ fun ProfilePredictionsTab(
         extraBottomPadding = navBarBottomPadding,
         modifier = modifier.fillMaxSize()
     ) {
+        val user = state.profile?.user
+        if (user != null && user.decidedCount > 0) {
+            item(key = "prediction_summary") {
+                PredictionSummaryCard(user = user)
+            }
+        }
+
         if (activePredictions.isEmpty()) {
             item(contentType = "EmptyStateAndControls") {
                 Box(

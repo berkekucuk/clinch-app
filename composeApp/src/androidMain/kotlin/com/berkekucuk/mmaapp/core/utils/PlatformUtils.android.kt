@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.core.utils
 
+import coil3.SingletonImageLoader
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -47,4 +48,10 @@ private fun openPlayStorePage(androidPackage: String) {
     } catch (_: ActivityNotFoundException) {
         context.startActivity(Intent(Intent.ACTION_VIEW, webUri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
+}
+
+actual fun clearImageCache() {
+    val imageLoader = SingletonImageLoader.get(AndroidPlatformContext.context)
+    imageLoader.memoryCache?.clear()
+    imageLoader.diskCache?.clear()
 }

@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.presentation.screens.home
 
+import com.berkekucuk.mmaapp.core.app.AppStartupState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
@@ -58,6 +59,7 @@ class HomeViewModel(
     private fun checkLoadingState() {
         if (isMinSplashTimePassed && isDataReady) {
             _state.update { it.copy(isLoading = false) }
+            AppStartupState.markReady()
         }
     }
 

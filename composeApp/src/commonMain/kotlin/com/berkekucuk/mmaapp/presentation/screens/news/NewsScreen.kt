@@ -75,15 +75,18 @@ fun NewsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var lastScrolledPage by rememberSaveable { mutableStateOf(-1) }
+    var lastTopArticleId by rememberSaveable { mutableStateOf<String?>(null) }
 
     // UI Data & Definitions
     val errorMessage = AppTheme.strings.mapError(state.error)
     val now = remember(state.articles) { Clock.System.now() }
 
     LaunchedEffect(state.articles) {
-        if (lastScrolledPage != state.currentPage) {
+        val topArticleId = state.articles.firstOrNull()?.id
+        if (lastScrolledPage != state.currentPage || lastTopArticleId != topArticleId) {
             listState.scrollToItem(0)
             lastScrolledPage = state.currentPage
+            lastTopArticleId = topArticleId
         }
     }
 

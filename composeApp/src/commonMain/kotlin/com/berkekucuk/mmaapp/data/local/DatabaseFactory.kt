@@ -1,5 +1,8 @@
 package com.berkekucuk.mmaapp.data.local
 
+import com.berkekucuk.mmaapp.data.local.dao.NewsDao
+import com.berkekucuk.mmaapp.data.local.entity.NewsArticleEntity
+import androidx.room.AutoMigration
 import com.berkekucuk.mmaapp.core.utils.clearImageCache
 import androidx.sqlite.SQLiteConnection
 import androidx.room.ConstructedBy
@@ -51,9 +54,11 @@ import kotlinx.coroutines.IO
         InteractionEntity::class,
         BlockedUserEntity::class,
         AppConfigEntity::class,
-        WeeklyLeaderboardEntity::class
+        WeeklyLeaderboardEntity::class,
+        NewsArticleEntity::class
     ],
-    version = 40
+    version = 41,
+    autoMigrations = [AutoMigration(from = 40, to = 41)]
 )
 
 @TypeConverters(Converters::class)
@@ -70,6 +75,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun interactionDao(): InteractionDao
     abstract fun appConfigDao(): AppConfigDao
     abstract fun weeklyLeaderboardDao(): WeeklyLeaderboardDao
+    abstract fun newsDao(): NewsDao
 }
 
 @Suppress("KotlinNoActualForExpect")

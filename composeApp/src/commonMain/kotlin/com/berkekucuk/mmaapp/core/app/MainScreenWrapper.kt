@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.core.app
 
+import com.berkekucuk.mmaapp.presentation.screens.news.NewsScreenRoot
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import com.berkekucuk.mmaapp.presentation.screens.home.HomeScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.rankings.RankingsScreenRoot
@@ -35,6 +36,7 @@ fun MainScreenWrapper(
     onNavigateToSettings: () -> Unit,
     onNavigateToLeaderboard: () -> Unit,
     onNavigateToSendNotification: () -> Unit,
+    onNavigateToNewsDetail: (String) -> Unit,
 ) {
     val bottomNavController = rememberNavController()
     val navBackStackEntry by bottomNavController.currentBackStackEntryAsState()
@@ -58,6 +60,7 @@ fun MainScreenWrapper(
 
                         val label = when (item.route) {
                             Route.Home -> AppTheme.strings.navEvents
+                            Route.News -> AppTheme.strings.navNews
                             Route.Rankings -> AppTheme.strings.navRankings
                             Route.Menu -> AppTheme.strings.navMenu
                             else -> item.name
@@ -118,6 +121,12 @@ fun MainScreenWrapper(
                 HomeScreenRoot(
                     onNavigateToEventDetail = onNavigateToEventDetail,
                     onNavigateToFighterSearch = onNavigateToFighterSearch,
+                )
+            }
+
+            composable<Route.News> {
+                NewsScreenRoot(
+                    onNavigateToNewsDetail = onNavigateToNewsDetail
                 )
             }
 

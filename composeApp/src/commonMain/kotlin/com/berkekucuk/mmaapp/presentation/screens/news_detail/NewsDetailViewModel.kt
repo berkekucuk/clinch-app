@@ -183,7 +183,7 @@ class NewsDetailViewModel(
 
         viewModelScope.launch {
             _state.update { it.copy(isSending = true, error = null) }
-            commentRepository.addComment(articleId, content, parentId = replyingTo?.id)
+            commentRepository.addComment(articleId, content, replyToCommentId = replyingTo?.id)
                 .onSuccess {
                     repository.adjustCommentCount(articleId, delta = 1)
                     val rootId = replyingTo?.let { it.parentId ?: it.id }

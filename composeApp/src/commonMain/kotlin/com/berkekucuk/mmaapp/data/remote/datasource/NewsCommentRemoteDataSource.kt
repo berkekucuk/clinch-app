@@ -10,6 +10,6 @@ interface NewsCommentRemoteDataSource {
         beforeCreatedAt: Instant? = null,
         beforeId: String? = null,
     ): List<NewsCommentDto>
-    suspend fun addComment(articleId: String, content: String, parentId: String?): NewsCommentDto
+    suspend fun addComment(articleId: String, content: String, replyToCommentId: String?): NewsCommentDto
     suspend fun deleteComment(commentId: String)
 }

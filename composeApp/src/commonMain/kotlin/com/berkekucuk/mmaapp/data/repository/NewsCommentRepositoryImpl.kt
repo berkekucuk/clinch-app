@@ -67,9 +67,9 @@ class NewsCommentRepositoryImpl(
         }
     }
 
-    override suspend fun addComment(articleId: String, content: String, parentId: String?): Result<Unit> {
+    override suspend fun addComment(articleId: String, content: String, replyToCommentId: String?): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
-            val comment = remoteDataSource.addComment(articleId, content, parentId)
+            val comment = remoteDataSource.addComment(articleId, content, replyToCommentId)
             addToCache(articleId, listOf(comment.toDomain()))
         }
     }

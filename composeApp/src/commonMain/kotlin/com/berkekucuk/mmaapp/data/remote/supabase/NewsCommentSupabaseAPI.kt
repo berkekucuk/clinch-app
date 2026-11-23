@@ -31,13 +31,13 @@ class NewsCommentSupabaseAPI(
         ).decodeList<NewsCommentDto>()
     }
 
-    override suspend fun addComment(articleId: String, content: String, parentId: String?): NewsCommentDto {
+    override suspend fun addComment(articleId: String, content: String, replyToCommentId: String?): NewsCommentDto {
         return client.postgrest.rpc(
             function = "add_news_comment",
             parameters = buildJsonObject {
                 put("p_article_id", articleId)
                 put("p_content", content)
-                parentId?.let { put("p_parent_id", it) }
+                replyToCommentId?.let { put("p_reply_to_comment_id", it) }
             }
         ).decodeList<NewsCommentDto>().first()
     }

@@ -6,6 +6,8 @@ import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -62,76 +64,84 @@ fun LeaderboardContainer(
                 }
             }
         } else {
-            item {
-                Column(
+            itemsIndexed(
+                items = leaderboard,
+                key = { _, user -> user.id },
+                contentType = { _, _ -> "LeaderboardRow" }
+            ) { index, user ->
+                val rowShape = when {
+                    leaderboard.size == 1 -> RoundedCornerShape(16.dp)
+                    index == 0 -> RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    index == leaderboard.lastIndex -> RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
+                    else -> RectangleShape
+                }
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(rowShape)
                         .background(AppTheme.colors.fightItemBackground)
                 ) {
-                    leaderboard.forEachIndexed { index, user ->
-                        val isCurrentUser = user.id == currentUserId
-                        val pageMultiplier = if (isOverall) currentPage else 0
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .then(if (isCurrentUser) Modifier.background(AppTheme.colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
-                                .padding(horizontal = 12.dp)
-                        ) {
-                            RankedFighterRow(
-                                rankNumber = (pageMultiplier * LeaderboardViewModel.PAGE_SIZE) + index + 1,
-                                name = user.fullName ?: user.username ?: "Unknown",
-                                record = user.username?.let { "@$it" } ?: "",
-                                imageUrl = user.avatarUrl ?: "",
-                                countryCode = null,
-                                trailingContent = {
-                                    Column(
-                                        horizontalAlignment = Alignment.End,
-                                        modifier = Modifier.padding(end = 4.dp)
-                                    ) {
+                    val isCurrentUser = user.id == currentUserId
+                    val pageMultiplier = if (isOverall) currentPage else 0
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(if (isCurrentUser) Modifier.background(AppTheme.colors.winnerFrame.copy(alpha = 0.15f)) else Modifier)
+                            .padding(horizontal = 12.dp)
+                    ) {
+                        RankedFighterRow(
+                            rankNumber = (pageMultiplier * LeaderboardViewModel.PAGE_SIZE) + index + 1,
+                            name = user.fullName ?: user.username ?: "Unknown",
+                            record = user.username?.let { "@$it" } ?: "",
+                            imageUrl = user.avatarUrl ?: "",
+                            countryCode = null,
+                            trailingContent = {
+                                Column(
+                                    horizontalAlignment = Alignment.End,
+                                    modifier = Modifier.padding(end = 4.dp)
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = user.points.toString(),
+                                            color = AppTheme.colors.winnerFrame,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                        Icon(
+                                            imageVector = Icons.Default.EmojiEvents,
+                                            contentDescription = null,
+                                            tint = AppTheme.colors.winnerFrame,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                    val accuracyPercent = user.accuracyPercent
+                                    if (accuracyPercent != null) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Text(
-                                                text = user.points.toString(),
-                                                color = AppTheme.colors.winnerFrame,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 16.sp
-                                            )
-                                            Spacer(Modifier.width(4.dp))
                                             Icon(
-                                                imageVector = Icons.Default.EmojiEvents,
+                                                imageVector = Icons.Default.TrackChanges,
                                                 contentDescription = null,
-                                                tint = AppTheme.colors.winnerFrame,
-                                                modifier = Modifier.size(18.dp)
+                                                tint = AppTheme.colors.textSecondary,
+                                                modifier = Modifier.size(12.dp)
                                             )
-                                        }
-                                        val accuracyPercent = user.accuracyPercent
-                                        if (accuracyPercent != null) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Default.TrackChanges,
-                                                    contentDescription = null,
-                                                    tint = AppTheme.colors.textSecondary,
-                                                    modifier = Modifier.size(12.dp)
-                                                )
-                                                Spacer(Modifier.width(3.dp))
-                                                Text(
-                                                    text = AppTheme.strings.percentValue(accuracyPercent),
-                                                    color = AppTheme.colors.textSecondary,
-                                                    fontSize = 12.sp
-                                                )
-                                            }
+                                            Spacer(Modifier.width(3.dp))
+                                            Text(
+                                                text = AppTheme.strings.percentValue(accuracyPercent),
+                                                color = AppTheme.colors.textSecondary,
+                                                fontSize = 12.sp
+                                            )
                                         }
                                     }
-                                },
-                                onFighterClicked = { onAction(LeaderboardUiAction.OnUserClicked(user.id)) }
-                            )
+                                }
+                            },
+                            onFighterClicked = { onAction(LeaderboardUiAction.OnUserClicked(user.id)) }
+                        )
 
-                            if (index < leaderboard.lastIndex) {
-                                HorizontalDivider(
-                                    color = AppTheme.colors.dividerColor,
-                                    thickness = 0.8.dp,
-                                )
-                            }
+                        if (index < leaderboard.lastIndex) {
+                            HorizontalDivider(
+                                color = AppTheme.colors.dividerColor,
+                                thickness = 0.8.dp,
+                            )
                         }
                     }
                 }

@@ -10,4 +10,6 @@ interface NewsRepository {
     fun getArticle(id: String): Flow<NewsArticle?>
     suspend fun syncArticle(id: String): Result<Unit>
     suspend fun adjustCommentCount(id: String, delta: Int)
+    suspend fun updateArticle(id: String, titleTr: String, summaryTr: String, titleEn: String, summaryEn: String): Result<Unit>
+    suspend fun deleteArticle(id: String): Result<Unit>
 }

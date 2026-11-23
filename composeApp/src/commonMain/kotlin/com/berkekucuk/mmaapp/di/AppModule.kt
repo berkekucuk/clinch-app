@@ -1,6 +1,7 @@
 package com.berkekucuk.mmaapp.di
 
 import com.berkekucuk.mmaapp.presentation.screens.news_detail.NewsDetailViewModel
+import com.berkekucuk.mmaapp.presentation.screens.news_edit.NewsEditViewModel
 import com.berkekucuk.mmaapp.presentation.screens.news.NewsViewModel
 import com.berkekucuk.mmaapp.domain.repository.NewsRepository
 import com.berkekucuk.mmaapp.data.repository.NewsRepositoryImpl
@@ -414,6 +415,13 @@ val appModule = module {
             userRepository = get(),
             authRepository = get(),
             observeBlockedUserIds = get(),
+            savedStateHandle = get()
+        )
+    }
+
+    viewModel {
+        NewsEditViewModel(
+            repository = get(),
             savedStateHandle = get()
         )
     }

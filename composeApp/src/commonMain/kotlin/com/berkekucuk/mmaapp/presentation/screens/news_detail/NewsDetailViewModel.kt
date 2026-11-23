@@ -114,6 +114,10 @@ class NewsDetailViewModel(
         when (action) {
             is NewsDetailUiAction.OnBackClicked -> navigateTo(NewsDetailNavigationEvent.Back)
             is NewsDetailUiAction.OnRefresh -> refresh()
+            is NewsDetailUiAction.OnEditArticleClicked -> navigateTo(NewsDetailNavigationEvent.ToEditArticle(articleId))
+            is NewsDetailUiAction.OnDeleteArticleClicked -> _state.update { it.copy(showDeleteArticleDialog = true) }
+            is NewsDetailUiAction.OnDismissDeleteArticleDialog -> _state.update { it.copy(showDeleteArticleDialog = false) }
+            is NewsDetailUiAction.OnConfirmDeleteArticle -> deleteArticle()
             is NewsDetailUiAction.OnLoadOlderComments -> loadOlderComments()
             is NewsDetailUiAction.OnCommentInputChanged -> _state.update { it.copy(commentInput = action.text.take(MAX_COMMENT_LENGTH)) }
             is NewsDetailUiAction.OnSendClicked -> sendComment()
@@ -153,6 +157,22 @@ class NewsDetailViewModel(
                 }
 
             _state.update { it.copy(isRefreshing = false) }
+        }
+    }
+
+    private fun deleteArticle() {
+        if (_state.value.isDeletingArticle) return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isDeletingArticle = true, error = null) }
+            repository.deleteArticle(articleId)
+                .onSuccess {
+                    _state.update { it.copy(isDeletingArticle = false, showDeleteArticleDialog = false) }
+                    _navigation.emit(NewsDetailNavigationEvent.Back)
+                }
+                .onFailure { e ->
+                    _state.update { it.copy(isDeletingArticle = false, showDeleteArticleDialog = false, error = AppErrorMapper.map(e)) }
+                }
         }
     }
 

@@ -29,4 +29,32 @@ class NewsSupabaseAPI(
             }
         ).decodeList<NewsArticleDto>().firstOrNull()
     }
+
+    override suspend fun updateArticle(
+        id: String,
+        titleTr: String,
+        summaryTr: String,
+        titleEn: String,
+        summaryEn: String,
+    ): NewsArticleDto {
+        return client.postgrest.rpc(
+            function = "update_news_article",
+            parameters = buildJsonObject {
+                put("p_id", id)
+                put("p_title_tr", titleTr)
+                put("p_summary_tr", summaryTr)
+                put("p_title_en", titleEn)
+                put("p_summary_en", summaryEn)
+            }
+        ).decodeList<NewsArticleDto>().first()
+    }
+
+    override suspend fun deleteArticle(id: String) {
+        client.postgrest.rpc(
+            function = "delete_news_article",
+            parameters = buildJsonObject {
+                put("p_id", id)
+            }
+        )
+    }
 }

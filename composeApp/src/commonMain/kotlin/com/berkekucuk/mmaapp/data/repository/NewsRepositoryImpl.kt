@@ -68,6 +68,26 @@ class NewsRepositoryImpl(
         }
     }
 
+    override suspend fun updateArticle(
+        id: String,
+        titleTr: String,
+        summaryTr: String,
+        titleEn: String,
+        summaryEn: String,
+    ): Result<Unit> {
+        return runSuspendCatching(Dispatchers.Default) {
+            val dto = remoteDataSource.updateArticle(id, titleTr, summaryTr, titleEn, summaryEn)
+            dao.upsertArticles(listOf(dto.toEntity()))
+        }
+    }
+
+    override suspend fun deleteArticle(id: String): Result<Unit> {
+        return runSuspendCatching(Dispatchers.Default) {
+            remoteDataSource.deleteArticle(id)
+            dao.deleteArticle(id)
+        }
+    }
+
     override suspend fun syncArticle(id: String): Result<Unit> {
         val key = articleSyncKey(id)
         return runSuspendCatching(Dispatchers.Default) {

@@ -25,6 +25,9 @@ interface NewsDao {
     @Upsert
     suspend fun upsertArticles(articles: List<NewsArticleEntity>)
 
+    @Query("DELETE FROM news_articles WHERE id = :id")
+    suspend fun deleteArticle(id: String)
+
     @Query("DELETE FROM news_articles")
     suspend fun deleteAll()
 

@@ -15,6 +15,8 @@ data class NewsDetailUiState(
     val focusInputTrigger: Int = 0,
     val currentUserId: String? = null,
     val canModerate: Boolean = false,
+    val showDeleteArticleDialog: Boolean = false,
+    val isDeletingArticle: Boolean = false,
     val isLoadingComments: Boolean = true,
     val commentsLoadFailed: Boolean = false,
     val isLoadingOlderComments: Boolean = false,

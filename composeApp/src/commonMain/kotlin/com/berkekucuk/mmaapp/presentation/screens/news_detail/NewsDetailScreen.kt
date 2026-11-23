@@ -27,6 +27,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
+import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -88,6 +94,7 @@ fun NewsDetailScreenRoot(
     viewModel: NewsDetailViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToProfile: (userId: String) -> Unit,
+    onNavigateToEditArticle: (articleId: String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -96,6 +103,7 @@ fun NewsDetailScreenRoot(
             when (event) {
                 is NewsDetailNavigationEvent.Back -> onNavigateBack()
                 is NewsDetailNavigationEvent.ToUserProfile -> onNavigateToProfile(event.userId)
+                is NewsDetailNavigationEvent.ToEditArticle -> onNavigateToEditArticle(event.articleId)
             }
         }
     }
@@ -192,10 +200,19 @@ fun NewsDetailScreen(
                         )
                     }
                 },
+                actions = {
+                    if (state.canModerate && state.article != null) {
+                        ArticleModerationMenu(
+                            onEditClick = { onAction(NewsDetailUiAction.OnEditArticleClicked) },
+                            onDeleteClick = { onAction(NewsDetailUiAction.OnDeleteArticleClicked) },
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.topBarBackground,
                     navigationIconContentColor = AppTheme.colors.textPrimary,
                     titleContentColor = AppTheme.colors.textPrimary,
+                    actionIconContentColor = AppTheme.colors.textPrimary,
                 )
             )
         },
@@ -301,6 +318,19 @@ fun NewsDetailScreen(
         }
     }
 
+    if (state.showDeleteArticleDialog) {
+        AppAlertDialog(
+            onDismissRequest = { onAction(NewsDetailUiAction.OnDismissDeleteArticleDialog) },
+            onConfirmClick = { onAction(NewsDetailUiAction.OnConfirmDeleteArticle) },
+            title = AppTheme.strings.newsDeleteTitle,
+            text = AppTheme.strings.newsDeleteConfirm,
+            confirmText = AppTheme.strings.commonDelete,
+            dismissText = AppTheme.strings.commonCancel,
+            isConfirmLoading = state.isDeletingArticle,
+            isDestructive = true
+        )
+    }
+
     if (state.pendingDeleteComment != null) {
         CommentDeleteDialog(
             onDismiss = { onAction(NewsDetailUiAction.OnDismissDeleteDialog) },
@@ -316,6 +346,49 @@ fun NewsDetailScreen(
             onDismiss = { onAction(NewsDetailUiAction.OnDismissReportDialog) },
             onSubmit = { onAction(NewsDetailUiAction.OnSubmitReport) },
         )
+    }
+}
+
+@Composable
+private fun ArticleModerationMenu(
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = AppTheme.strings.contentDescriptionMoreOptions,
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            containerColor = AppTheme.colors.dropdownMenuBackground
+        ) {
+            DropdownMenuItem(
+                text = { Text(AppTheme.strings.newsEdit, color = AppTheme.colors.textPrimary) },
+                leadingIcon = {
+                    Icon(Icons.Default.Edit, contentDescription = null, tint = AppTheme.colors.textPrimary)
+                },
+                onClick = {
+                    expanded = false
+                    onEditClick()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(AppTheme.strings.commonDelete, color = AppTheme.colors.textPrimary) },
+                leadingIcon = {
+                    Icon(Icons.Default.Delete, contentDescription = null, tint = AppTheme.colors.textPrimary)
+                },
+                onClick = {
+                    expanded = false
+                    onDeleteClick()
+                }
+            )
+        }
     }
 }
 

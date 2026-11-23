@@ -6,6 +6,10 @@ import com.berkekucuk.mmaapp.domain.model.NewsComment
 sealed interface NewsDetailUiAction {
     data object OnBackClicked : NewsDetailUiAction
     data object OnRefresh : NewsDetailUiAction
+    data object OnEditArticleClicked : NewsDetailUiAction
+    data object OnDeleteArticleClicked : NewsDetailUiAction
+    data object OnConfirmDeleteArticle : NewsDetailUiAction
+    data object OnDismissDeleteArticleDialog : NewsDetailUiAction
     data object OnLoadOlderComments : NewsDetailUiAction
     data class OnCommentInputChanged(val text: String) : NewsDetailUiAction
     data object OnSendClicked : NewsDetailUiAction

@@ -1,4 +1,4 @@
-package com.berkekucuk.mmaapp.presentation.screens.event_comments
+package com.berkekucuk.mmaapp.presentation.components.comment
 
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
@@ -33,15 +33,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.sp
-import com.berkekucuk.mmaapp.domain.model.EventComment
 import com.berkekucuk.mmaapp.presentation.components.FighterImage
 import com.berkekucuk.mmaapp.presentation.components.appClickable
 
+enum class CommentItemStyle {
+    Card,
+    Flat,
+}
+
 @Composable
-fun EventCommentItem(
-    comment: EventComment,
+fun CommentItem(
+    username: String,
+    avatarUrl: String,
+    content: String,
     timeText: String,
     canReport: Boolean,
     canDelete: Boolean,
@@ -49,23 +62,36 @@ fun EventCommentItem(
     onDeleteClick: () -> Unit,
     onReportClick: () -> Unit,
     modifier: Modifier = Modifier,
+    replyToUsername: String? = null,
+    onReplyToUserClick: (() -> Unit)? = null,
+    onReplyClick: (() -> Unit)? = null,
+    avatarSize: Dp = 40.dp,
+    style: CommentItemStyle = CommentItemStyle.Card,
 ) {
     val showMenu = canReport || canDelete
+    val isFlat = style == CommentItemStyle.Flat
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(AppTheme.colors.fightItemBackground)
-            .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (showMenu) 0.dp else 12.dp),
+            .then(
+                if (isFlat) {
+                    Modifier.padding(start = 16.dp, top = 12.dp, bottom = 4.dp, end = if (showMenu) 4.dp else 16.dp)
+                } else {
+                    Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(AppTheme.colors.fightItemBackground)
+                        .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = if (showMenu) 0.dp else 12.dp)
+                }
+            ),
         verticalAlignment = Alignment.Top
     ) {
         FighterImage(
-            imageUrl = comment.avatarUrl,
-            name = comment.username,
+            imageUrl = avatarUrl,
+            name = username,
             countryCode = "",
             alignment = Alignment.Start,
-            imageSize = 40.dp,
+            imageSize = avatarSize,
             showFlag = false,
             modifier = Modifier
                 .clip(CircleShape)
@@ -80,10 +106,10 @@ fun EventCommentItem(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "@${comment.username}",
+                    text = "@$username",
                     color = AppTheme.colors.textPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = if (isFlat) 15.sp else 14.sp,
+                    fontWeight = if (isFlat) FontWeight.Bold else FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
@@ -91,7 +117,7 @@ fun EventCommentItem(
                         .appClickable(onClick = onUserClick)
                 )
                 Text(
-                    text = timeText,
+                    text = if (isFlat) "· $timeText" else timeText,
                     color = AppTheme.colors.textSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
@@ -100,11 +126,41 @@ fun EventCommentItem(
                 )
             }
             Text(
-                text = comment.content,
+                text = buildAnnotatedString {
+                    if (replyToUsername != null) {
+                        val mentionStyle = SpanStyle(color = AppTheme.colors.mentionColor, fontWeight = FontWeight.SemiBold)
+                        if (onReplyToUserClick != null) {
+                            withLink(
+                                LinkAnnotation.Clickable(
+                                    tag = "mention",
+                                    styles = TextLinkStyles(style = mentionStyle),
+                                    linkInteractionListener = { onReplyToUserClick() }
+                                )
+                            ) {
+                                append("@$replyToUsername")
+                            }
+                        } else {
+                            withStyle(mentionStyle) { append("@$replyToUsername") }
+                        }
+                        append(" ")
+                    }
+                    append(content)
+                },
                 color = AppTheme.colors.textPrimary,
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
+                fontSize = if (isFlat) 15.sp else 14.sp,
+                lineHeight = if (isFlat) 21.sp else 20.sp,
             )
+            if (onReplyClick != null) {
+                Text(
+                    text = AppTheme.strings.commentReply,
+                    color = AppTheme.colors.textSecondary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .appClickable(onClick = onReplyClick)
+                        .padding(top = 2.dp, bottom = 2.dp, end = 8.dp)
+                )
+            }
         }
 
         if (showMenu) {

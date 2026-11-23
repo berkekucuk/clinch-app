@@ -61,12 +61,18 @@ class NewsViewModel(
         syncJob = viewModelScope.launch {
             _state.update { it.copy(isRefreshing = isRefreshing, error = null) }
 
-            val page = currentPageFlow.value
+            val offset = currentPageFlow.value * PAGE_SIZE
 
-            repository.syncArticles(limit = PAGE_SIZE, offset = page * PAGE_SIZE)
-                .onFailure { e -> _state.update { it.copy(error = AppErrorMapper.map(e)) } }
-
-            _state.update { it.copy(isRefreshing = false) }
+            repository.syncArticles(limit = PAGE_SIZE, offset = offset)
+                .onSuccess {
+                    _state.update { it.copy(isRefreshing = false) }
+                }
+                .onFailure { e ->
+                    val error = if (!repository.hasData(offset)) {
+                        AppErrorMapper.map(e)
+                    } else null
+                    _state.update { it.copy(isRefreshing = false, error = error) }
+                }
         }
     }
 

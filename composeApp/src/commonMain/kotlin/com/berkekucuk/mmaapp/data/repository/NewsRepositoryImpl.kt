@@ -51,6 +51,10 @@ class NewsRepositoryImpl(
         }
     }
 
+    override suspend fun hasData(offset: Int): Boolean {
+        return dao.hasArticles(offset)
+    }
+
     override fun getArticle(id: String): Flow<NewsArticle?> {
         return dao.getArticle(id)
             .map { it?.toDomain() }

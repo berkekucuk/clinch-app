@@ -13,6 +13,9 @@ interface NewsDao {
     @Query("SELECT * FROM news_articles ORDER BY published_at DESC, id DESC LIMIT :limit OFFSET :offset")
     fun getArticles(limit: Int, offset: Int): Flow<List<NewsArticleEntity>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM news_articles LIMIT 1 OFFSET :offset)")
+    suspend fun hasArticles(offset: Int): Boolean
+
     @Query("SELECT * FROM news_articles WHERE id = :id")
     fun getArticle(id: String): Flow<NewsArticleEntity?>
 

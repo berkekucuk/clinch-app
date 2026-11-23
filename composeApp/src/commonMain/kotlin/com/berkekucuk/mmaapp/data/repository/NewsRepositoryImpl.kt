@@ -62,6 +62,12 @@ class NewsRepositoryImpl(
             .flowOn(Dispatchers.Default)
     }
 
+    override suspend fun adjustCommentCount(id: String, delta: Int) {
+        runSuspendCatching(Dispatchers.Default) {
+            dao.adjustCommentCount(id, delta)
+        }
+    }
+
     override suspend fun syncArticle(id: String): Result<Unit> {
         val key = articleSyncKey(id)
         return runSuspendCatching(Dispatchers.Default) {

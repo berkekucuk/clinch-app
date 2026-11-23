@@ -16,4 +16,5 @@ data class NewsArticle(
     val fighterNames: List<String>,
     val publishedAt: Instant,
     val imageUrl: String?,
+    val commentCount: Int = 0,
 )

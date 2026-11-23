@@ -22,4 +22,5 @@ data class NewsArticleEntity(
     @ColumnInfo(name = "fighter_names") val fighterNames: List<String>,
     @ColumnInfo(name = "published_at") val publishedAt: Instant,
     @ColumnInfo(name = "image_url") val imageUrl: String? = null,
+    @ColumnInfo(name = "comment_count", defaultValue = "0") val commentCount: Int = 0,
 )

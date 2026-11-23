@@ -17,6 +17,7 @@ fun NewsArticleDto.toEntity(): NewsArticleEntity {
         fighterNames = fighterNames.orEmpty(),
         publishedAt = publishedAt,
         imageUrl = imageUrl?.takeIf { it.isNotBlank() },
+        commentCount = commentCount,
     )
 }
 
@@ -33,5 +34,6 @@ fun NewsArticleEntity.toDomain(): NewsArticle {
         fighterNames = fighterNames,
         publishedAt = publishedAt,
         imageUrl = imageUrl,
+        commentCount = commentCount,
     )
 }

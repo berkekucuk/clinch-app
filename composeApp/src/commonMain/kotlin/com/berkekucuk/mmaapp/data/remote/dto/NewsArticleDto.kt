@@ -17,4 +17,5 @@ data class NewsArticleDto(
     @SerialName("fighter_names") val fighterNames: List<String>? = null,
     @SerialName("published_at") val publishedAt: Instant,
     @SerialName("image_url") val imageUrl: String? = null,
+    @SerialName("comment_count") val commentCount: Int = 0,
 )

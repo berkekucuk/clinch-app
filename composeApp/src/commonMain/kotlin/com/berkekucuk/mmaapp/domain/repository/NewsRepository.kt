@@ -9,4 +9,5 @@ interface NewsRepository {
     suspend fun hasData(offset: Int): Boolean
     fun getArticle(id: String): Flow<NewsArticle?>
     suspend fun syncArticle(id: String): Result<Unit>
+    suspend fun adjustCommentCount(id: String, delta: Int)
 }

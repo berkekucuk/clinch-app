@@ -7,6 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,7 +45,6 @@ fun NewsArticleItem(
     val isTurkish = AppTheme.strings.language == AppLanguage.TR
     val title = if (isTurkish) article.titleTr else article.titleEn
     val summary = if (isTurkish) article.summaryTr else article.summaryEn
-    val metaText = timeText
     val cardShape = RoundedCornerShape(16.dp)
 
     Card(
@@ -60,9 +64,9 @@ fun NewsArticleItem(
         )
     ) {
         if (article.imageUrl != null) {
-            ImageNewsCard(imageUrl = article.imageUrl, title = title, metaText = metaText)
+            ImageNewsCard(imageUrl = article.imageUrl, title = title, timeText = timeText, commentCount = article.commentCount)
         } else {
-            TextNewsCard(title = title, summary = summary, metaText = metaText)
+            TextNewsCard(title = title, summary = summary, timeText = timeText, commentCount = article.commentCount)
         }
     }
 }
@@ -71,7 +75,8 @@ fun NewsArticleItem(
 private fun ImageNewsCard(
     imageUrl: String,
     title: String,
-    metaText: String,
+    timeText: String,
+    commentCount: Int,
 ) {
     Box(
         modifier = Modifier
@@ -114,12 +119,10 @@ private fun ImageNewsCard(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                text = metaText,
+            NewsMetaRow(
+                timeText = timeText,
+                commentCount = commentCount,
                 color = Color.White.copy(alpha = 0.8f),
-                fontSize = 12.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -129,7 +132,8 @@ private fun ImageNewsCard(
 private fun TextNewsCard(
     title: String,
     summary: String,
-    metaText: String,
+    timeText: String,
+    commentCount: Int,
 ) {
     Column(
         modifier = Modifier.padding(12.dp),
@@ -150,12 +154,43 @@ private fun TextNewsCard(
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
-        Text(
-            text = metaText,
+        NewsMetaRow(
+            timeText = timeText,
+            commentCount = commentCount,
             color = AppTheme.colors.textSecondary,
+        )
+    }
+}
+
+@Composable
+private fun NewsMetaRow(
+    timeText: String,
+    commentCount: Int,
+    color: Color,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = timeText,
+            color = color,
             fontSize = 12.sp,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = Icons.Outlined.ChatBubbleOutline,
+            contentDescription = AppTheme.strings.commentsTitle,
+            tint = color,
+            modifier = Modifier.size(14.dp)
+        )
+        Text(
+            text = commentCount.toString(),
+            color = color,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(start = 4.dp)
         )
     }
 }

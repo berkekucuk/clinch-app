@@ -19,6 +19,9 @@ interface NewsDao {
     @Query("SELECT * FROM news_articles WHERE id = :id")
     fun getArticle(id: String): Flow<NewsArticleEntity?>
 
+    @Query("UPDATE news_articles SET comment_count = MAX(comment_count + :delta, 0) WHERE id = :id")
+    suspend fun adjustCommentCount(id: String, delta: Int)
+
     @Upsert
     suspend fun upsertArticles(articles: List<NewsArticleEntity>)
 

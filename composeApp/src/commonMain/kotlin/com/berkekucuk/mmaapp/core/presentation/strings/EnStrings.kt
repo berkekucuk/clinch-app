@@ -177,6 +177,7 @@ val EnStrings = AppStrings(
     menuNotificationsEnabled = "Enabled",
     navEvents = "Events",
     navNews = "News",
+    navLeaderboard = "Leaders",
     newsTitle = "News",
     newsDetailTitle = "Article",
     newsEdit = "Edit",

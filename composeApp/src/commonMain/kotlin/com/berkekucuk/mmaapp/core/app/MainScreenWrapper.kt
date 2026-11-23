@@ -3,6 +3,7 @@ package com.berkekucuk.mmaapp.core.app
 import com.berkekucuk.mmaapp.presentation.screens.news.NewsScreenRoot
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import com.berkekucuk.mmaapp.presentation.screens.home.HomeScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.leaderboard.LeaderboardScreenRoot
 import com.berkekucuk.mmaapp.presentation.screens.rankings.RankingsScreenRoot
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,7 +36,7 @@ fun MainScreenWrapper(
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToFighterSearch: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToLeaderboard: () -> Unit,
+    onNavigateToUserSearch: () -> Unit,
     onNavigateToSendNotification: () -> Unit,
     onNavigateToNewsDetail: (String) -> Unit,
 ) {
@@ -60,6 +62,7 @@ fun MainScreenWrapper(
 
                         val label = when (item.route) {
                             Route.Home -> AppTheme.strings.navEvents
+                            Route.Leaderboard -> AppTheme.strings.navLeaderboard
                             Route.News -> AppTheme.strings.navNews
                             Route.Rankings -> AppTheme.strings.navRankings
                             Route.Menu -> AppTheme.strings.navMenu
@@ -89,7 +92,9 @@ fun MainScreenWrapper(
                             label = {
                                 Text(
                                     text = label,
-                                    style = MaterialTheme.typography.labelMedium
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             },
                             alwaysShowLabel = true,
@@ -124,6 +129,13 @@ fun MainScreenWrapper(
                 )
             }
 
+            composable<Route.Leaderboard> {
+                LeaderboardScreenRoot(
+                    onNavigateToProfile = onNavigateToProfile,
+                    onNavigateToUserSearch = onNavigateToUserSearch,
+                )
+            }
+
             composable<Route.News> {
                 NewsScreenRoot(
                     onNavigateToNewsDetail = onNavigateToNewsDetail
@@ -141,7 +153,6 @@ fun MainScreenWrapper(
                     onNavigateToProfile = onNavigateToProfile,
                     onNavigateToProfileEdit = onNavigateToProfileEdit,
                     onNavigateToSettings = onNavigateToSettings,
-                    onNavigateToLeaderboard = onNavigateToLeaderboard,
                     onNavigateToSendNotification = onNavigateToSendNotification,
                 )
             }

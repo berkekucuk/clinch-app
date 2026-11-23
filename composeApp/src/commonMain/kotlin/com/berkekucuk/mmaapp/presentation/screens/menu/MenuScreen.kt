@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,7 +54,6 @@ fun MenuScreenRoot(
     onNavigateToProfile: (String) -> Unit,
     onNavigateToProfileEdit: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onNavigateToLeaderboard: () -> Unit,
     onNavigateToSendNotification: () -> Unit,
     viewModel: MenuViewModel = koinViewModel(),
 ) {
@@ -67,7 +65,6 @@ fun MenuScreenRoot(
                 is MenuNavigationEvent.ToProfile -> onNavigateToProfile(event.userId)
                 is MenuNavigationEvent.ToProfileEdit -> onNavigateToProfileEdit()
                 is MenuNavigationEvent.ToSettings -> onNavigateToSettings()
-                is MenuNavigationEvent.ToLeaderboard -> onNavigateToLeaderboard()
                 is MenuNavigationEvent.ToSendNotification -> onNavigateToSendNotification()
             }
         }
@@ -191,13 +188,6 @@ fun MenuScreen(
                     )
                 }
             }
-
-            HorizontalDivider(color = AppTheme.colors.dividerColor)
-            MenuItemRow(
-                icon = Icons.Filled.EmojiEvents,
-                title = AppTheme.strings.menuItemLeaderboard,
-                onClick = { onAction(MenuUiAction.OnLeaderboardClicked) }
-            )
 
             HorizontalDivider(color = AppTheme.colors.dividerColor)
             if ((state.authState as? AuthState.Authenticated)?.role == UserRole.ADMIN) {

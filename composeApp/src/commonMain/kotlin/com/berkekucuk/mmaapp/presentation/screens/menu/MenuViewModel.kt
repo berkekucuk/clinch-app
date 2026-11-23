@@ -94,9 +94,6 @@ class MenuViewModel(
                         }
                 }
             }
-            MenuUiAction.OnLeaderboardClicked -> {
-                navigateTo(MenuNavigationEvent.ToLeaderboard)
-            }
             MenuUiAction.OnSendNotificationClicked -> {
                 navigateTo(MenuNavigationEvent.ToSendNotification)
             }

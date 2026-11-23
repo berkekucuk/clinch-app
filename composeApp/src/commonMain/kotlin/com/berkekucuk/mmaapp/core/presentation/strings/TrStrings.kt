@@ -177,6 +177,7 @@ val TrStrings = AppStrings(
     menuNotificationsEnabled = "Açık",
     navEvents = "Etkinlikler",
     navNews = "Haberler",
+    navLeaderboard = "Liderlik",
     newsTitle = "Haberler",
     newsDetailTitle = "Haber",
     newsEdit = "Düzenle",

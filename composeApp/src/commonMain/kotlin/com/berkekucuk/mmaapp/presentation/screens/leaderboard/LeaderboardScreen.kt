@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LeaderboardScreenRoot(
     viewModel: LeaderboardViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     onNavigateToProfile: (String) -> Unit,
     onNavigateToUserSearch: () -> Unit
 ) {
@@ -55,7 +55,7 @@ fun LeaderboardScreenRoot(
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { event ->
             when (event) {
-                is LeaderboardNavigationEvent.Back -> onNavigateBack()
+                is LeaderboardNavigationEvent.Back -> onNavigateBack?.invoke()
                 is LeaderboardNavigationEvent.ToUserProfile -> onNavigateToProfile(event.userId)
                 LeaderboardNavigationEvent.ToUserSearch -> onNavigateToUserSearch()
             }
@@ -64,7 +64,8 @@ fun LeaderboardScreenRoot(
 
     LeaderboardScreen(
         state = state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        showBackButton = onNavigateBack != null,
     )
 }
 
@@ -72,13 +73,18 @@ fun LeaderboardScreenRoot(
 @Composable
 fun LeaderboardScreen(
     state: LeaderboardUiState,
-    onAction: (LeaderboardUiAction) -> Unit
+    onAction: (LeaderboardUiAction) -> Unit,
+    showBackButton: Boolean = true,
 ) {
     // Compose Core States
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
-    val navBarBottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val navBarBottomPadding = if (showBackButton) {
+        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    } else {
+        0.dp
+    }
     val showInfoDialog = remember { mutableStateOf(false) }
     val weeklyListState = rememberLazyListState()
     val overallListState = rememberLazyListState()
@@ -134,11 +140,13 @@ fun LeaderboardScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { onAction(LeaderboardUiAction.OnBackClicked) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = AppTheme.strings.contentDescriptionBack
-                            )
+                        if (showBackButton) {
+                            IconButton(onClick = { onAction(LeaderboardUiAction.OnBackClicked) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = AppTheme.strings.contentDescriptionBack
+                                )
+                            }
                         }
                     },
                     actions = {

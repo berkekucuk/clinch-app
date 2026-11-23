@@ -212,7 +212,10 @@ fun App() {
                 popExitTransition = NavTransitions.slideOutToRight
             ) {
                 NewsDetailScreenRoot(
-                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
+                    onNavigateToProfile = { userId ->
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
+                    }
                 )
             }
 

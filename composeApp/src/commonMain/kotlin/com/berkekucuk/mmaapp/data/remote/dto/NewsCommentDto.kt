@@ -1,0 +1,19 @@
+package com.berkekucuk.mmaapp.data.remote.dto
+
+import kotlin.time.Instant
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class NewsCommentDto(
+    val id: String,
+    @SerialName("article_id") val articleId: String,
+    @SerialName("user_id") val userId: String,
+    val content: String,
+    @SerialName("created_at") val createdAt: Instant,
+    val username: String? = null,
+    @SerialName("avatar_url") val avatarUrl: String? = null,
+    @SerialName("parent_id") val parentId: String? = null,
+    @SerialName("reply_to_user_id") val replyToUserId: String? = null,
+    @SerialName("reply_to_username") val replyToUsername: String? = null,
+)

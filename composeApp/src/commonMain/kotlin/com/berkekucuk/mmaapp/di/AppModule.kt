@@ -6,6 +6,10 @@ import com.berkekucuk.mmaapp.domain.repository.NewsRepository
 import com.berkekucuk.mmaapp.data.repository.NewsRepositoryImpl
 import com.berkekucuk.mmaapp.data.remote.supabase.NewsSupabaseAPI
 import com.berkekucuk.mmaapp.data.remote.datasource.NewsRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.NewsCommentRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.NewsCommentSupabaseAPI
+import com.berkekucuk.mmaapp.data.repository.NewsCommentRepositoryImpl
+import com.berkekucuk.mmaapp.domain.repository.NewsCommentRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -215,6 +219,10 @@ val appModule = module {
         NewsSupabaseAPI(client = get())
     }
 
+    single<NewsCommentRemoteDataSource> {
+        NewsCommentSupabaseAPI(client = get())
+    }
+
     single<EventCommentRemoteDataSource> {
         EventCommentSupabaseAPI(client = get())
     }
@@ -339,6 +347,13 @@ val appModule = module {
         )
     }
 
+    single<NewsCommentRepository> {
+        NewsCommentRepositoryImpl(
+            remoteDataSource = get(),
+            rateLimiter = get()
+        )
+    }
+
     single<EventCommentRepository> {
         EventCommentRepositoryImpl(
             remoteDataSource = get(),
@@ -395,6 +410,9 @@ val appModule = module {
     viewModel {
         NewsDetailViewModel(
             repository = get(),
+            commentRepository = get(),
+            authRepository = get(),
+            observeBlockedUserIds = get(),
             savedStateHandle = get()
         )
     }

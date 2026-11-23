@@ -9,5 +9,4 @@ interface NewsCommentRepository {
     suspend fun loadOlderComments(articleId: String): Result<Boolean>
     suspend fun addComment(articleId: String, content: String, parentId: String? = null): Result<Unit>
     suspend fun deleteComment(articleId: String, comment: NewsComment): Result<Int>
-    suspend fun reportComment(commentId: String, reason: String): Result<Unit>
 }

@@ -81,12 +81,6 @@ class NewsCommentRepositoryImpl(
         }
     }
 
-    override suspend fun reportComment(commentId: String, reason: String): Result<Unit> {
-        return runSuspendCatching {
-            remoteDataSource.reportComment(commentId, reason)
-        }
-    }
-
     private suspend fun fetchFirstPage(articleId: String): Boolean {
         val comments = remoteDataSource.fetchComments(articleId = articleId, limit = PAGE_SIZE)
         cache.update { it + (articleId to comments.map { comment -> comment.toDomain() }.sortedWith(OLDEST_FIRST)) }

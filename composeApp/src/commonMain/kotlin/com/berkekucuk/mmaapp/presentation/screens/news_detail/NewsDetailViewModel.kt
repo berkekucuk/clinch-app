@@ -11,6 +11,7 @@ import com.berkekucuk.mmaapp.domain.model.NewsComment
 import com.berkekucuk.mmaapp.domain.repository.AuthRepository
 import com.berkekucuk.mmaapp.domain.repository.NewsCommentRepository
 import com.berkekucuk.mmaapp.domain.repository.NewsRepository
+import com.berkekucuk.mmaapp.domain.repository.UserRepository
 import com.berkekucuk.mmaapp.domain.usecase.ObserveBlockedUserIdsUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 class NewsDetailViewModel(
     private val repository: NewsRepository,
     private val commentRepository: NewsCommentRepository,
+    private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val observeBlockedUserIds: ObserveBlockedUserIdsUseCase,
     savedStateHandle: SavedStateHandle
@@ -221,7 +223,7 @@ class NewsDetailViewModel(
 
         viewModelScope.launch {
             _state.update { it.copy(isReporting = true, error = null) }
-            commentRepository.reportComment(commentId, reason.dbValue)
+            userRepository.reportNewsComment(commentId, reason.dbValue)
                 .onSuccess {
                     _state.update {
                         it.copy(isReporting = false, pendingReportCommentId = null, selectedReportReason = null, isReportSent = true)

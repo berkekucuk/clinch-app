@@ -411,6 +411,7 @@ val appModule = module {
         NewsDetailViewModel(
             repository = get(),
             commentRepository = get(),
+            userRepository = get(),
             authRepository = get(),
             observeBlockedUserIds = get(),
             savedStateHandle = get()

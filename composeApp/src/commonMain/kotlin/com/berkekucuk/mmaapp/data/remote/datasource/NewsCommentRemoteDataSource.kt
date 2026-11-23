@@ -12,5 +12,4 @@ interface NewsCommentRemoteDataSource {
     ): List<NewsCommentDto>
     suspend fun addComment(articleId: String, content: String, parentId: String?): NewsCommentDto
     suspend fun deleteComment(commentId: String)
-    suspend fun reportComment(commentId: String, reason: String)
 }

@@ -8,7 +8,7 @@ interface UserRemoteDataSource {
     suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String)
     suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): String
     suspend fun deleteUser(userId: String)
-    suspend fun reportUser(reason: String, reportedId: String? = null, commentId: String? = null)
+    suspend fun reportUser(reason: String, reportedId: String? = null, commentId: String? = null, newsCommentId: String? = null)
     suspend fun banUserFromComments(userId: String)
     suspend fun unbanUserFromComments(userId: String)
     suspend fun searchUsers(query: String): List<UserDto>

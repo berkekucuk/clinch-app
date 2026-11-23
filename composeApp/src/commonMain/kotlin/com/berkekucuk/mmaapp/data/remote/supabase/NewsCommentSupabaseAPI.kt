@@ -50,14 +50,4 @@ class NewsCommentSupabaseAPI(
             }
         )
     }
-
-    override suspend fun reportComment(commentId: String, reason: String) {
-        client.postgrest.rpc(
-            function = "report_news_comment",
-            parameters = buildJsonObject {
-                put("p_comment_id", commentId)
-                put("p_reason", reason)
-            }
-        )
-    }
 }

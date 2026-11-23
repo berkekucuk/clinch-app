@@ -6,27 +6,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -44,18 +38,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
 import com.berkekucuk.mmaapp.core.utils.toRelativeTime
-import com.berkekucuk.mmaapp.domain.enums.ReportReason
-import com.berkekucuk.mmaapp.presentation.components.AppAlertDialog
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
+import com.berkekucuk.mmaapp.presentation.components.comment.CommentDeleteDialog
+import com.berkekucuk.mmaapp.presentation.components.comment.CommentInputBar
+import com.berkekucuk.mmaapp.presentation.components.comment.CommentItem
+import com.berkekucuk.mmaapp.presentation.components.comment.CommentReportDialog
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
 import kotlinx.coroutines.delay
 import org.koin.compose.viewmodel.koinViewModel
@@ -98,6 +95,8 @@ fun EventCommentsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var now by remember { mutableStateOf(Clock.System.now()) }
+    val inputFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // UI Data & Definitions
     val message = AppTheme.strings.mapError(state.error) ?: AppTheme.strings.commentReported.takeIf { state.isReportSent }
@@ -113,11 +112,6 @@ fun EventCommentsScreen(
         message = message,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        actionLabel = AppTheme.strings.retry.takeIf { state.error != null && state.comments.isEmpty() },
-        onAction = {
-            onAction(EventCommentsUiAction.OnMessageShown)
-            onAction(EventCommentsUiAction.OnRetryClicked)
-        },
         onDismiss = { onAction(EventCommentsUiAction.OnMessageShown) },
     )
 
@@ -130,6 +124,13 @@ fun EventCommentsScreen(
 
     LaunchedEffect(shouldLoadMore, state.comments.size) {
         if (shouldLoadMore && state.comments.isNotEmpty()) onAction(EventCommentsUiAction.OnLoadOlderComments)
+    }
+
+    LaunchedEffect(state.focusInputTrigger) {
+        if (state.focusInputTrigger > 0) {
+            runCatching { inputFocusRequester.requestFocus() }
+            keyboardController?.show()
+        }
     }
 
     LaunchedEffect(state.scrollToLatestTrigger) {
@@ -201,8 +202,12 @@ fun EventCommentsScreen(
                 isAuthenticated = state.currentUserId != null,
                 input = state.commentInput,
                 isSending = state.isSending,
+                maxLength = EventCommentsViewModel.MAX_COMMENT_LENGTH,
                 onInputChanged = { onAction(EventCommentsUiAction.OnCommentInputChanged(it)) },
                 onSendClick = { onAction(EventCommentsUiAction.OnSendClicked) },
+                replyingToUsername = state.replyingTo?.username,
+                onCancelReply = { onAction(EventCommentsUiAction.OnCancelReply) },
+                focusRequester = inputFocusRequester,
             )
         }
     ) { innerPadding ->
@@ -224,7 +229,7 @@ fun EventCommentsScreen(
                         CircularProgressIndicator(color = AppTheme.colors.ufcRed)
                     }
                 }
-            } else if (state.comments.isEmpty()) {
+            } else if (state.comments.isEmpty() && !state.commentsLoadFailed) {
                 item(contentType = "EmptyState") {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),
@@ -245,8 +250,17 @@ fun EventCommentsScreen(
                     key = { it.id },
                     contentType = { "Comment" }
                 ) { comment ->
-                    EventCommentItem(
-                        comment = comment,
+                    CommentItem(
+                        username = comment.username,
+                        avatarUrl = comment.avatarUrl,
+                        content = comment.content,
+                        replyToUsername = comment.replyToUsername,
+                        onReplyToUserClick = comment.replyToUserId?.let { userId ->
+                            { onAction(EventCommentsUiAction.OnUserClicked(userId)) }
+                        },
+                        onReplyClick = if (state.currentUserId != null && comment.userId != state.currentUserId) {
+                            { onAction(EventCommentsUiAction.OnReplyClicked(comment)) }
+                        } else null,
                         timeText = comment.createdAt.toRelativeTime(
                             now = now,
                             justNow = AppTheme.strings.commentJustNow,
@@ -285,59 +299,19 @@ fun EventCommentsScreen(
     }
 
     if (state.pendingDeleteCommentId != null) {
-        AppAlertDialog(
-            onDismissRequest = { onAction(EventCommentsUiAction.OnDismissDeleteDialog) },
-            onConfirmClick = { onAction(EventCommentsUiAction.OnConfirmDelete) },
-            title = AppTheme.strings.commentDeleteTitle,
-            text = AppTheme.strings.commentDeleteConfirm,
-            confirmText = AppTheme.strings.dialogAccept,
-            dismissText = AppTheme.strings.commonCancel,
-            isDestructive = true
+        CommentDeleteDialog(
+            onDismiss = { onAction(EventCommentsUiAction.OnDismissDeleteDialog) },
+            onConfirm = { onAction(EventCommentsUiAction.OnConfirmDelete) },
         )
     }
 
     if (state.pendingReportCommentId != null) {
-        AppAlertDialog(
-            onDismissRequest = { onAction(EventCommentsUiAction.OnDismissReportDialog) },
-            onConfirmClick = { onAction(EventCommentsUiAction.OnSubmitReport) },
-            title = AppTheme.strings.reportUserTitle,
-            confirmText = AppTheme.strings.reportUserSubmit,
-            dismissText = AppTheme.strings.commonCancel,
-            confirmEnabled = state.selectedReportReason != null,
-            isConfirmLoading = state.isReporting,
-            isDestructive = true,
-            content = {
-                Column(modifier = Modifier.selectableGroup()) {
-                    ReportReason.commentReasons.forEach { reason ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .selectable(
-                                    selected = (reason == state.selectedReportReason),
-                                    onClick = { onAction(EventCommentsUiAction.OnReportReasonChanged(reason)) },
-                                    role = Role.RadioButton
-                                )
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = (reason == state.selectedReportReason),
-                                onClick = null,
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = AppTheme.colors.textPrimary,
-                                    unselectedColor = AppTheme.colors.textSecondary
-                                )
-                            )
-                            Text(
-                                text = AppTheme.strings.reportReasonDisplayName(reason),
-                                color = AppTheme.colors.textPrimary,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
-                    }
-                }
-            }
+        CommentReportDialog(
+            selectedReason = state.selectedReportReason,
+            isReporting = state.isReporting,
+            onReasonSelected = { onAction(EventCommentsUiAction.OnReportReasonChanged(it)) },
+            onDismiss = { onAction(EventCommentsUiAction.OnDismissReportDialog) },
+            onSubmit = { onAction(EventCommentsUiAction.OnSubmitReport) },
         )
     }
 }

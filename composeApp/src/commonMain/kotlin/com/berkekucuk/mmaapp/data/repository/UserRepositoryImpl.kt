@@ -96,6 +96,12 @@ class UserRepositoryImpl(
         }
     }
 
+    override suspend fun reportNewsComment(commentId: String, reason: String): Result<Unit> {
+        return runSuspendCatching {
+            remoteDataSource.reportUser(reason = reason, newsCommentId = commentId)
+        }
+    }
+
     override suspend fun banUserFromComments(userId: String): Result<Unit> {
         return runSuspendCatching {
             remoteDataSource.banUserFromComments(userId)

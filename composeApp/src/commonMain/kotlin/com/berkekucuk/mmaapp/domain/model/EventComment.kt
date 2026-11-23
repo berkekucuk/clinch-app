@@ -12,4 +12,6 @@ data class EventComment(
     val createdAt: Instant,
     val username: String,
     val avatarUrl: String,
+    val replyToUserId: String? = null,
+    val replyToUsername: String? = null,
 )

@@ -13,6 +13,8 @@ data class EventCommentDto(
     @SerialName("created_at") val createdAt: Instant,
     val username: String? = null,
     @SerialName("avatar_url") val avatarUrl: String? = null,
+    @SerialName("reply_to_user_id") val replyToUserId: String? = null,
+    @SerialName("reply_to_username") val replyToUsername: String? = null,
 )
 
 @Serializable

@@ -11,4 +11,6 @@ fun EventCommentDto.toDomain(): EventComment = EventComment(
     createdAt = createdAt,
     username = username ?: "",
     avatarUrl = avatarUrl ?: "",
+    replyToUserId = replyToUserId,
+    replyToUsername = replyToUsername,
 )

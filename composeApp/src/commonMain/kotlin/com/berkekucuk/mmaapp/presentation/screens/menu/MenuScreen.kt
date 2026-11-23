@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -194,7 +194,7 @@ fun MenuScreen(
 
             HorizontalDivider(color = AppTheme.colors.dividerColor)
             MenuItemRow(
-                icon = Icons.Filled.Leaderboard,
+                icon = Icons.Filled.EmojiEvents,
                 title = AppTheme.strings.menuItemLeaderboard,
                 onClick = { onAction(MenuUiAction.OnLeaderboardClicked) }
             )

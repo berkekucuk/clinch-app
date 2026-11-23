@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.data.local
 
+import com.berkekucuk.mmaapp.data.local.dao.NewsDao
+import com.berkekucuk.mmaapp.data.local.entity.NewsArticleEntity
 import com.berkekucuk.mmaapp.core.utils.clearImageCache
 import androidx.sqlite.SQLiteConnection
 import androidx.room.ConstructedBy
@@ -7,7 +9,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
@@ -51,9 +52,10 @@ import kotlinx.coroutines.IO
         InteractionEntity::class,
         BlockedUserEntity::class,
         AppConfigEntity::class,
-        WeeklyLeaderboardEntity::class
+        WeeklyLeaderboardEntity::class,
+        NewsArticleEntity::class
     ],
-    version = 40
+    version = 41,
 )
 
 @TypeConverters(Converters::class)
@@ -70,6 +72,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun interactionDao(): InteractionDao
     abstract fun appConfigDao(): AppConfigDao
     abstract fun weeklyLeaderboardDao(): WeeklyLeaderboardDao
+    abstract fun newsDao(): NewsDao
 }
 
 @Suppress("KotlinNoActualForExpect")
@@ -87,7 +90,6 @@ fun getRoomDatabase(
                 runCatching { clearImageCache() }
             }
         })
-        .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 }

@@ -50,12 +50,13 @@ class EventCommentSupabaseAPI(
         ).decodeList<EventCommentDto>()
     }
 
-    override suspend fun addComment(eventId: String, content: String): EventCommentDto {
+    override suspend fun addComment(eventId: String, content: String, replyToCommentId: String?): EventCommentDto {
         return client.postgrest.rpc(
             function = "add_event_comment",
             parameters = buildJsonObject {
                 put("p_event_id", eventId)
                 put("p_content", content)
+                replyToCommentId?.let { put("p_reply_to_comment_id", it) }
             }
         ).decodeList<EventCommentDto>().first()
     }

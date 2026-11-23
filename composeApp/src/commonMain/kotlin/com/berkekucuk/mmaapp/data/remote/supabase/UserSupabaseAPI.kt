@@ -49,13 +49,14 @@ class UserSupabaseAPI(
         client.postgrest.rpc("delete_my_account")
     }
 
-    override suspend fun reportUser(reason: String, reportedId: String?, commentId: String?) {
+    override suspend fun reportUser(reason: String, reportedId: String?, commentId: String?, newsCommentId: String?) {
         client.postgrest.rpc(
             function = "report_user",
             parameters = buildJsonObject {
                 put("p_reason", reason)
                 reportedId?.let { put("p_reported_id", it) }
                 commentId?.let { put("p_comment_id", it) }
+                newsCommentId?.let { put("p_news_comment_id", it) }
             }
         )
     }

@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.core.app
 
+import com.berkekucuk.mmaapp.presentation.screens.news_detail.NewsDetailScreenRoot
+import com.berkekucuk.mmaapp.presentation.screens.news_edit.NewsEditScreenRoot
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -172,6 +174,9 @@ fun App() {
                     onNavigateToSendNotification = {
                         rootNavController.safeNavigate(navigationThrottle, Route.SendNotification)
                     },
+                    onNavigateToNewsDetail = { articleId ->
+                        rootNavController.safeNavigate(navigationThrottle, Route.NewsDetail(articleId))
+                    },
                 )
             }
 
@@ -197,6 +202,34 @@ fun App() {
                             Route.EventComments(eventId = eventId, eventName = eventName)
                         )
                     },
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
+                )
+            }
+
+            composable<Route.NewsDetail>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                NewsDetailScreenRoot(
+                    onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) },
+                    onNavigateToProfile = { userId ->
+                        rootNavController.safeNavigate(navigationThrottle, Route.Profile(userId))
+                    },
+                    onNavigateToEditArticle = { articleId ->
+                        rootNavController.safeNavigate(navigationThrottle, Route.NewsEdit(articleId))
+                    }
+                )
+            }
+
+            composable<Route.NewsEdit>(
+                enterTransition = NavTransitions.slideFromRight,
+                exitTransition = NavTransitions.slideOutToLeft,
+                popEnterTransition = NavTransitions.slideFromLeft,
+                popExitTransition = NavTransitions.slideOutToRight
+            ) {
+                NewsEditScreenRoot(
                     onNavigateBack = { rootNavController.safeNavigateUp(navigationThrottle) }
                 )
             }

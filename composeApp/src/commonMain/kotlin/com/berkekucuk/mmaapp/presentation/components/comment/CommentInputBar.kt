@@ -1,4 +1,4 @@
-package com.berkekucuk.mmaapp.presentation.screens.event_comments
+package com.berkekucuk.mmaapp.presentation.components.comment
 
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -35,8 +38,12 @@ fun CommentInputBar(
     isAuthenticated: Boolean,
     input: String,
     isSending: Boolean,
+    maxLength: Int,
     onInputChanged: (String) -> Unit,
     onSendClick: () -> Unit,
+    replyingToUsername: String? = null,
+    onCancelReply: () -> Unit = {},
+    focusRequester: FocusRequester? = null,
 ) {
     val canSend = input.isNotBlank() && !isSending
 
@@ -46,8 +53,6 @@ fun CommentInputBar(
             .background(AppTheme.colors.pagerBackground)
             .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
     ) {
-        HorizontalDivider(color = AppTheme.colors.dividerColor, thickness = 0.8.dp)
-
         if (!isAuthenticated) {
             Text(
                 text = AppTheme.strings.commentLoginRequired,
@@ -59,6 +64,35 @@ fun CommentInputBar(
                     .padding(16.dp)
             )
             return@Column
+        }
+
+        if (replyingToUsername != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 4.dp, top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = AppTheme.strings.commentReplyingTo(replyingToUsername),
+                    color = AppTheme.colors.textSecondary,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(
+                    onClick = onCancelReply,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = AppTheme.strings.commonCancel,
+                        tint = AppTheme.colors.textSecondary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
         }
 
         Row(
@@ -85,10 +119,12 @@ fun CommentInputBar(
                     unfocusedContainerColor = AppTheme.colors.fightItemBackground,
                     cursorColor = AppTheme.colors.textPrimary,
                 ),
-                supportingText = if (input.length > COUNTER_VISIBLE_FROM) {
-                    { Text("${input.length}/${EventCommentsViewModel.MAX_COMMENT_LENGTH}", color = AppTheme.colors.textSecondary) }
+                supportingText = if (input.length > maxLength - COUNTER_VISIBLE_FROM_REMAINING) {
+                    { Text("${input.length}/$maxLength", color = AppTheme.colors.textSecondary) }
                 } else null,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
             )
 
             IconButton(
@@ -113,4 +149,4 @@ fun CommentInputBar(
     }
 }
 
-private const val COUNTER_VISIBLE_FROM = 450
+private const val COUNTER_VISIBLE_FROM_REMAINING = 50

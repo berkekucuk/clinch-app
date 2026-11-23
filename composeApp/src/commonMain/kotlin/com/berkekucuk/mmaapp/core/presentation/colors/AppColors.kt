@@ -43,6 +43,7 @@ data class AppColors(
     val radarRedFill: Color,
     val radarBlue: Color,
     val radarBlueFill: Color,
+    val mentionColor: Color,
     val statComparisonTrack: Color,
     val statComparisonMuted: Color,
     val statSingleBar: Color,

@@ -1,5 +1,16 @@
 package com.berkekucuk.mmaapp.di
 
+import com.berkekucuk.mmaapp.presentation.screens.news_detail.NewsDetailViewModel
+import com.berkekucuk.mmaapp.presentation.screens.news_edit.NewsEditViewModel
+import com.berkekucuk.mmaapp.presentation.screens.news.NewsViewModel
+import com.berkekucuk.mmaapp.domain.repository.NewsRepository
+import com.berkekucuk.mmaapp.data.repository.NewsRepositoryImpl
+import com.berkekucuk.mmaapp.data.remote.supabase.NewsSupabaseAPI
+import com.berkekucuk.mmaapp.data.remote.datasource.NewsRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.datasource.NewsCommentRemoteDataSource
+import com.berkekucuk.mmaapp.data.remote.supabase.NewsCommentSupabaseAPI
+import com.berkekucuk.mmaapp.data.repository.NewsCommentRepositoryImpl
+import com.berkekucuk.mmaapp.domain.repository.NewsCommentRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -164,6 +175,10 @@ val appModule = module {
         get<AppDatabase>().weeklyLeaderboardDao()
     }
 
+    single {
+        get<AppDatabase>().newsDao()
+    }
+
     // remote data source
     single<EventRemoteDataSource> {
         EventSupabaseAPI(client = get())
@@ -199,6 +214,14 @@ val appModule = module {
 
     single<FightRemoteDataSource> {
         FightSupabaseAPI(client = get())
+    }
+
+    single<NewsRemoteDataSource> {
+        NewsSupabaseAPI(client = get())
+    }
+
+    single<NewsCommentRemoteDataSource> {
+        NewsCommentSupabaseAPI(client = get())
     }
 
     single<EventCommentRemoteDataSource> {
@@ -317,6 +340,21 @@ val appModule = module {
         )
     }
 
+    single<NewsRepository> {
+        NewsRepositoryImpl(
+            remoteDataSource = get(),
+            dao = get(),
+            rateLimiter = get()
+        )
+    }
+
+    single<NewsCommentRepository> {
+        NewsCommentRepositoryImpl(
+            remoteDataSource = get(),
+            rateLimiter = get()
+        )
+    }
+
     single<EventCommentRepository> {
         EventCommentRepositoryImpl(
             remoteDataSource = get(),
@@ -360,6 +398,30 @@ val appModule = module {
     viewModel {
         EventDetailViewModel(
             eventRepository = get(),
+            savedStateHandle = get()
+        )
+    }
+
+    viewModel {
+        NewsViewModel(
+            repository = get(),
+        )
+    }
+
+    viewModel {
+        NewsDetailViewModel(
+            repository = get(),
+            commentRepository = get(),
+            userRepository = get(),
+            authRepository = get(),
+            observeBlockedUserIds = get(),
+            savedStateHandle = get()
+        )
+    }
+
+    viewModel {
+        NewsEditViewModel(
+            repository = get(),
             savedStateHandle = get()
         )
     }

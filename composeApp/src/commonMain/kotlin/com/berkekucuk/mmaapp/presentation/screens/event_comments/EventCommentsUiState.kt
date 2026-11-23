@@ -10,6 +10,7 @@ data class EventCommentsUiState(
     val currentUserId: String? = null,
     val canModerate: Boolean = false,
     val isLoading: Boolean = true,
+    val commentsLoadFailed: Boolean = false,
     val isLoadingOlderComments: Boolean = false,
     val hasOlderComments: Boolean = false,
     val commentInput: String = "",

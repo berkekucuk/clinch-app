@@ -250,7 +250,7 @@ fun NewsDetailScreen(
                             )
                         }
                     }
-                } else if (state.comments.isEmpty()) {
+                } else if (state.comments.isEmpty() && !state.commentsLoadFailed) {
                     item(contentType = "CommentsEmpty") {
                         Text(
                             text = AppTheme.strings.commentsEmpty,

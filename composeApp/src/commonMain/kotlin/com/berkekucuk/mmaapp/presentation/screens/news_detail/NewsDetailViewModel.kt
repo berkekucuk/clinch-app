@@ -99,11 +99,12 @@ class NewsDetailViewModel(
         viewModelScope.launch {
             commentRepository.refreshComments(articleId, force)
                 .onSuccess { hasMore ->
-                    _state.update { it.copy(hasOlderComments = hasMore) }
+                    _state.update { it.copy(hasOlderComments = hasMore, commentsLoadFailed = false) }
                 }
                 .onFailure { e ->
-                    val error = if (_state.value.comments.isEmpty()) AppErrorMapper.map(e) else null
-                    _state.update { it.copy(error = error) }
+                    val isEmpty = _state.value.comments.isEmpty()
+                    val error = if (isEmpty) AppErrorMapper.map(e) else null
+                    _state.update { it.copy(error = error, commentsLoadFailed = isEmpty) }
                 }
             _state.update { it.copy(isLoadingComments = false) }
         }
@@ -145,7 +146,10 @@ class NewsDetailViewModel(
             articleSync.await()
             commentsSync.await()
                 .onSuccess { hasMore ->
-                    _state.update { it.copy(hasOlderComments = hasMore) }
+                    _state.update { it.copy(hasOlderComments = hasMore, commentsLoadFailed = false) }
+                }
+                .onFailure {
+                    _state.update { it.copy(commentsLoadFailed = it.comments.isEmpty()) }
                 }
 
             _state.update { it.copy(isRefreshing = false) }

@@ -112,11 +112,6 @@ fun EventCommentsScreen(
         message = message,
         snackbarHostState = snackbarHostState,
         duration = SnackbarDuration.Short,
-        actionLabel = AppTheme.strings.retry.takeIf { state.error != null && state.comments.isEmpty() },
-        onAction = {
-            onAction(EventCommentsUiAction.OnMessageShown)
-            onAction(EventCommentsUiAction.OnRetryClicked)
-        },
         onDismiss = { onAction(EventCommentsUiAction.OnMessageShown) },
     )
 
@@ -234,7 +229,7 @@ fun EventCommentsScreen(
                         CircularProgressIndicator(color = AppTheme.colors.ufcRed)
                     }
                 }
-            } else if (state.comments.isEmpty()) {
+            } else if (state.comments.isEmpty() && !state.commentsLoadFailed) {
                 item(contentType = "EmptyState") {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),

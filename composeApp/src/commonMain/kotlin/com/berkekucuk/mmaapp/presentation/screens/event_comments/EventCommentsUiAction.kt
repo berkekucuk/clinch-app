@@ -5,7 +5,6 @@ import com.berkekucuk.mmaapp.domain.model.EventComment
 
 sealed interface EventCommentsUiAction {
     data object OnBackClicked : EventCommentsUiAction
-    data object OnRetryClicked : EventCommentsUiAction
     data object OnLoadOlderComments : EventCommentsUiAction
     data class OnCommentInputChanged(val text: String) : EventCommentsUiAction
     data object OnSendClicked : EventCommentsUiAction

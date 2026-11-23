@@ -74,15 +74,16 @@ class EventCommentsViewModel(
         }
     }
 
-    private fun refreshComments(force: Boolean = false) {
+    private fun refreshComments() {
         viewModelScope.launch {
-            commentRepository.refreshComments(eventId, force)
+            commentRepository.refreshComments(eventId)
                 .onSuccess { hasMore ->
-                    _state.update { it.copy(hasOlderComments = hasMore) }
+                    _state.update { it.copy(hasOlderComments = hasMore, commentsLoadFailed = false) }
                 }
                 .onFailure { e ->
-                    val error = if (_state.value.comments.isEmpty()) AppErrorMapper.map(e) else null
-                    _state.update { it.copy(error = error) }
+                    val isEmpty = _state.value.comments.isEmpty()
+                    val error = if (isEmpty) AppErrorMapper.map(e) else null
+                    _state.update { it.copy(error = error, commentsLoadFailed = isEmpty) }
                 }
             _state.update { it.copy(isLoading = false) }
         }
@@ -97,7 +98,6 @@ class EventCommentsViewModel(
     fun onAction(action: EventCommentsUiAction) {
         when (action) {
             is EventCommentsUiAction.OnBackClicked -> navigateTo(EventCommentsNavigationEvent.Back)
-            is EventCommentsUiAction.OnRetryClicked -> refreshComments(force = true)
             is EventCommentsUiAction.OnLoadOlderComments -> loadOlderComments()
             is EventCommentsUiAction.OnCommentInputChanged -> _state.update { it.copy(commentInput = action.text.take(MAX_COMMENT_LENGTH)) }
             is EventCommentsUiAction.OnSendClicked -> sendComment()

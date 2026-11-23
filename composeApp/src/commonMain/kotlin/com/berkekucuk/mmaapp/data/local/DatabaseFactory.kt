@@ -2,7 +2,6 @@ package com.berkekucuk.mmaapp.data.local
 
 import com.berkekucuk.mmaapp.data.local.dao.NewsDao
 import com.berkekucuk.mmaapp.data.local.entity.NewsArticleEntity
-import androidx.room.AutoMigration
 import com.berkekucuk.mmaapp.core.utils.clearImageCache
 import androidx.sqlite.SQLiteConnection
 import androidx.room.ConstructedBy
@@ -57,7 +56,6 @@ import kotlinx.coroutines.IO
         NewsArticleEntity::class
     ],
     version = 41,
-    autoMigrations = [AutoMigration(from = 40, to = 41)]
 )
 
 @TypeConverters(Converters::class)

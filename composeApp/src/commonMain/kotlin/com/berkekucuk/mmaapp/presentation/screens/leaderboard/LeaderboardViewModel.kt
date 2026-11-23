@@ -89,12 +89,12 @@ class LeaderboardViewModel(
             val weeklyResult = if (!onlyOverall) leaderboardRepository.syncWeeklyLeaderboard() else null
             val overallResult = leaderboardRepository.syncLeaderboard(PAGE_SIZE, page * PAGE_SIZE, currentUserId)
 
-            val firstError = listOfNotNull(overallResult, weeklyResult).firstNotNullOfOrNull { it.exceptionOrNull() }
-            if (firstError != null) {
-                _state.update { it.copy(error = AppErrorMapper.map(firstError)) }
-            }
+            val currentState = _state.value
+            val overallError = overallResult.exceptionOrNull()?.takeIf { currentState.overallLeaderboard.isEmpty() }
+            val weeklyError = weeklyResult?.exceptionOrNull()?.takeIf { currentState.weeklyLeaderboard.isEmpty() }
+            val error = (overallError ?: weeklyError)?.let { AppErrorMapper.map(it) }
 
-            _state.update { it.copy(isRefreshing = false) }
+            _state.update { it.copy(isRefreshing = false, error = error) }
         }
     }
 

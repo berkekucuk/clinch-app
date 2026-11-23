@@ -168,8 +168,8 @@ fun App() {
                     onNavigateToSettings = {
                         rootNavController.safeNavigate(navigationThrottle, Route.Settings)
                     },
-                    onNavigateToLeaderboard = {
-                        rootNavController.safeNavigate(navigationThrottle, Route.Leaderboard)
+                    onNavigateToUserSearch = {
+                        rootNavController.safeNavigate(navigationThrottle, Route.UserSearch)
                     },
                     onNavigateToSendNotification = {
                         rootNavController.safeNavigate(navigationThrottle, Route.SendNotification)

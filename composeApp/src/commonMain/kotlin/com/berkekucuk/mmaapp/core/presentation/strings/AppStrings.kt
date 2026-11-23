@@ -167,6 +167,7 @@ data class AppStrings(
     val menuNotificationsDisabled: String,
     val navEvents: String,
     val navNews: String,
+    val navLeaderboard: String,
     val newsTitle: String,
     val newsDetailTitle: String,
     val newsEdit: String,

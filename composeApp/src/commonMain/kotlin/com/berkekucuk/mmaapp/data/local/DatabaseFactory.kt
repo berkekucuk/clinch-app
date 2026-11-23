@@ -10,7 +10,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
-import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
@@ -93,7 +92,6 @@ fun getRoomDatabase(
                 runCatching { clearImageCache() }
             }
         })
-        .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)
         .build()
 }

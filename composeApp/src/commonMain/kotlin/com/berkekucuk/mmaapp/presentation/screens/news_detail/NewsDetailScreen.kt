@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -134,7 +132,6 @@ fun NewsDetailScreen(
 private fun NewsDetailContent(
     article: NewsArticle,
     bottomPadding: Dp,
-    modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
     val dateStrings = rememberLocalizedDateStrings()
@@ -146,7 +143,7 @@ private fun NewsDetailContent(
     }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(bottom = bottomPadding + 16.dp)
@@ -208,12 +205,8 @@ private fun NewsDetailContent(
                 lineHeight = 23.sp
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-            HorizontalDivider(color = AppTheme.colors.dividerColor)
-
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .appClickable {
                         try {
                             uriHandler.openUri(article.sourceUrl)
@@ -221,22 +214,20 @@ private fun NewsDetailContent(
                             // ignore
                         }
                     }
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = AppTheme.strings.newsSource(article.sourceName),
-                    color = AppTheme.colors.textPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    text = AppTheme.strings.newsReadOnSource(article.sourceName),
+                    color = AppTheme.colors.textSecondary,
+                    fontSize = 13.sp,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
                     tint = AppTheme.colors.textSecondary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(14.dp)
                 )
             }
         }

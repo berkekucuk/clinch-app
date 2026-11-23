@@ -40,7 +40,7 @@ fun NewsArticleItem(
     val isTurkish = AppTheme.strings.language == AppLanguage.TR
     val title = if (isTurkish) article.titleTr else article.titleEn
     val summary = if (isTurkish) article.summaryTr else article.summaryEn
-    val metaText = "${article.sourceName} · $timeText"
+    val metaText = timeText
     val cardShape = RoundedCornerShape(16.dp)
 
     Card(

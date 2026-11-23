@@ -169,7 +169,7 @@ data class AppStrings(
     val navNews: String,
     val newsTitle: String,
     val newsDetailTitle: String,
-    val newsSource: (String) -> String,
+    val newsReadOnSource: (String) -> String,
     val navRankings: String,
     val navMenu: String,
     val weightClassDisplayName: (String) -> String,

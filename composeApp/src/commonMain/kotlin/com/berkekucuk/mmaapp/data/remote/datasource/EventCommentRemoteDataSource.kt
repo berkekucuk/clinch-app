@@ -13,7 +13,7 @@ interface EventCommentRemoteDataSource {
         afterCreatedAt: Instant? = null,
         afterId: String? = null,
     ): List<EventCommentDto>
-    suspend fun addComment(eventId: String, content: String): EventCommentDto
+    suspend fun addComment(eventId: String, content: String, replyToCommentId: String?): EventCommentDto
     suspend fun deleteComment(commentId: String)
     fun observeComments(eventId: String): Flow<EventCommentRealtimeEvent>
 }

@@ -94,9 +94,9 @@ class EventCommentRepositoryImpl(
         }
     }
 
-    override suspend fun addComment(eventId: String, content: String): Result<Unit> {
+    override suspend fun addComment(eventId: String, content: String, replyToCommentId: String?): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
-            val comment = remoteDataSource.addComment(eventId, content)
+            val comment = remoteDataSource.addComment(eventId, content, replyToCommentId)
             addToCache(eventId, listOf(comment.toDomain()))
         }
     }
@@ -128,7 +128,7 @@ class EventCommentRepositoryImpl(
 
     private fun addToCache(eventId: String, newComments: List<EventComment>) {
         cache.update { caches ->
-            val comments = (newComments + caches[eventId].orEmpty())
+            val comments = (caches[eventId].orEmpty() + newComments)
                 .distinctBy { it.id }
                 .sortedWith(NEWEST_FIRST)
             caches + (eventId to comments)

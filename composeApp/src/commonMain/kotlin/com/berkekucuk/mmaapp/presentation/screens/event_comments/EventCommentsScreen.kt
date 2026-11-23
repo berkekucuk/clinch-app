@@ -42,6 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.berkekucuk.mmaapp.core.utils.rememberLocalizedDateStrings
@@ -93,6 +95,8 @@ fun EventCommentsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     var now by remember { mutableStateOf(Clock.System.now()) }
+    val inputFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     // UI Data & Definitions
     val message = AppTheme.strings.mapError(state.error) ?: AppTheme.strings.commentReported.takeIf { state.isReportSent }
@@ -125,6 +129,13 @@ fun EventCommentsScreen(
 
     LaunchedEffect(shouldLoadMore, state.comments.size) {
         if (shouldLoadMore && state.comments.isNotEmpty()) onAction(EventCommentsUiAction.OnLoadOlderComments)
+    }
+
+    LaunchedEffect(state.focusInputTrigger) {
+        if (state.focusInputTrigger > 0) {
+            runCatching { inputFocusRequester.requestFocus() }
+            keyboardController?.show()
+        }
     }
 
     LaunchedEffect(state.scrollToLatestTrigger) {
@@ -199,6 +210,9 @@ fun EventCommentsScreen(
                 maxLength = EventCommentsViewModel.MAX_COMMENT_LENGTH,
                 onInputChanged = { onAction(EventCommentsUiAction.OnCommentInputChanged(it)) },
                 onSendClick = { onAction(EventCommentsUiAction.OnSendClicked) },
+                replyingToUsername = state.replyingTo?.username,
+                onCancelReply = { onAction(EventCommentsUiAction.OnCancelReply) },
+                focusRequester = inputFocusRequester,
             )
         }
     ) { innerPadding ->
@@ -245,6 +259,13 @@ fun EventCommentsScreen(
                         username = comment.username,
                         avatarUrl = comment.avatarUrl,
                         content = comment.content,
+                        replyToUsername = comment.replyToUsername,
+                        onReplyToUserClick = comment.replyToUserId?.let { userId ->
+                            { onAction(EventCommentsUiAction.OnUserClicked(userId)) }
+                        },
+                        onReplyClick = if (state.currentUserId != null && comment.userId != state.currentUserId) {
+                            { onAction(EventCommentsUiAction.OnReplyClicked(comment)) }
+                        } else null,
                         timeText = comment.createdAt.toRelativeTime(
                             now = now,
                             justNow = AppTheme.strings.commentJustNow,

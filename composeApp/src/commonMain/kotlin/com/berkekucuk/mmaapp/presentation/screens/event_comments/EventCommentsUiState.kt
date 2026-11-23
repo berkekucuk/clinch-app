@@ -13,6 +13,8 @@ data class EventCommentsUiState(
     val isLoadingOlderComments: Boolean = false,
     val hasOlderComments: Boolean = false,
     val commentInput: String = "",
+    val replyingTo: EventComment? = null,
+    val focusInputTrigger: Int = 0,
     val isSending: Boolean = false,
     val pendingDeleteCommentId: String? = null,
     val pendingReportCommentId: String? = null,

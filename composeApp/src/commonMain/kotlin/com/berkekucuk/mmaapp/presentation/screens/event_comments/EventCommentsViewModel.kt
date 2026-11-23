@@ -101,6 +101,10 @@ class EventCommentsViewModel(
             is EventCommentsUiAction.OnLoadOlderComments -> loadOlderComments()
             is EventCommentsUiAction.OnCommentInputChanged -> _state.update { it.copy(commentInput = action.text.take(MAX_COMMENT_LENGTH)) }
             is EventCommentsUiAction.OnSendClicked -> sendComment()
+            is EventCommentsUiAction.OnReplyClicked -> _state.update {
+                it.copy(replyingTo = action.comment, focusInputTrigger = it.focusInputTrigger + 1)
+            }
+            is EventCommentsUiAction.OnCancelReply -> _state.update { it.copy(replyingTo = null) }
             is EventCommentsUiAction.OnUserClicked -> navigateTo(EventCommentsNavigationEvent.ToUserProfile(action.userId))
             is EventCommentsUiAction.OnDeleteClicked -> _state.update { it.copy(pendingDeleteCommentId = action.commentId) }
             is EventCommentsUiAction.OnConfirmDelete -> deleteComment()
@@ -136,12 +140,13 @@ class EventCommentsViewModel(
 
         viewModelScope.launch {
             _state.update { it.copy(isSending = true, error = null) }
-            commentRepository.addComment(eventId, content)
+            commentRepository.addComment(eventId, content, replyToCommentId = currentState.replyingTo?.id)
                 .onSuccess {
                     _state.update {
                         it.copy(
                             commentInput = "",
                             isSending = false,
+                            replyingTo = null,
                             scrollToLatestTrigger = it.scrollToLatestTrigger + 1,
                         )
                     }

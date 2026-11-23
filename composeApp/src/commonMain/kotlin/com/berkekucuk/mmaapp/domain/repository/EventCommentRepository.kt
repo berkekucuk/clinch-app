@@ -7,7 +7,7 @@ interface EventCommentRepository {
     fun getComments(eventId: String): Flow<List<EventComment>>
     suspend fun refreshComments(eventId: String, force: Boolean = false): Result<Boolean>
     suspend fun loadOlderComments(eventId: String): Result<Boolean>
-    suspend fun addComment(eventId: String, content: String): Result<Unit>
+    suspend fun addComment(eventId: String, content: String, replyToCommentId: String? = null): Result<Unit>
     suspend fun deleteComment(eventId: String, commentId: String): Result<Unit>
     suspend fun listenForCommentChanges(eventId: String): Result<Unit>
 }

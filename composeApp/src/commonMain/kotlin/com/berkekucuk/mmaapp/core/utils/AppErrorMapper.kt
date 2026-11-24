@@ -13,6 +13,7 @@ object AppErrorMapper {
                 val message = e.error.lowercase()
                 when {
                     message.contains("profiles_username_key") -> AppError.USERNAME_TAKEN
+                    message.contains("invalid_username") -> AppError.INVALID_USERNAME
                     message.contains("unique_user_fighter_interaction") -> AppError.FIGHTER_ALREADY_IN_LIST
                     message.contains("unique_user_fight_prediction") -> AppError.ALREADY_PREDICTED
                     message.contains("already_reported") -> AppError.ALREADY_REPORTED

@@ -3,12 +3,15 @@ package com.berkekucuk.mmaapp.data.repository
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
+import com.berkekucuk.mmaapp.data.local.dao.FightOddsDao
+import com.berkekucuk.mmaapp.data.mapper.toOddsEntities
 import com.berkekucuk.mmaapp.data.local.dao.PredictionDao
 import com.berkekucuk.mmaapp.data.remote.datasource.PredictionRemoteDataSource
 import com.berkekucuk.mmaapp.domain.repository.PredictionRepository
 import kotlinx.coroutines.Dispatchers
 import com.berkekucuk.mmaapp.data.mapper.toDomain
 import com.berkekucuk.mmaapp.data.mapper.toEntity
+import com.berkekucuk.mmaapp.domain.model.OddsMethod
 import com.berkekucuk.mmaapp.domain.model.Prediction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.map
 class PredictionRepositoryImpl(
     private val predictionDao: PredictionDao,
     private val fightDao: FightDao,
+    private val fightOddsDao: FightOddsDao,
     private val remoteDataSource: PredictionRemoteDataSource,
     private val rateLimiter: RateLimiter
 ) : PredictionRepository {
@@ -51,6 +55,7 @@ class PredictionRepositoryImpl(
                 val remoteFights = remotePredictions.mapNotNull { it.fight }
                 if (remoteFights.isNotEmpty()) {
                     fightDao.insertFightsIfNotExist(remoteFights.map { it.toEntity() })
+                    fightOddsDao.replaceMoneylines(remoteFights.map { it.fightId }, remoteFights.toOddsEntities())
                 }
                 predictionDao.upsertPredictions(remotePredictions.map { it.toEntity() })
             }
@@ -59,14 +64,9 @@ class PredictionRepositoryImpl(
         }
     }
 
-    override suspend fun addPrediction(
-        userId: String,
-        fightId: String,
-        predictedWinnerId: String,
-        lockedOdds: Int
-    ): Result<Unit> {
+    override suspend fun addPrediction(fightId: String, predictedWinnerId: String, method: OddsMethod?, round: Int?): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
-            val remotePrediction = remoteDataSource.addPrediction(userId, fightId, predictedWinnerId, lockedOdds)
+            val remotePrediction = remoteDataSource.addPrediction(fightId, predictedWinnerId, method?.dbValue, round)
 
             predictionDao.upsertPredictions(listOf(remotePrediction.toEntity()))
         }

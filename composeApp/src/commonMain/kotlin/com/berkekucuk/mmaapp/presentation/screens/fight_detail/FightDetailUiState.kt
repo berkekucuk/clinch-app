@@ -2,6 +2,7 @@ package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
 import com.berkekucuk.mmaapp.core.utils.AppError
 import com.berkekucuk.mmaapp.domain.model.Fight
+import com.berkekucuk.mmaapp.domain.model.OddsMethod
 
 data class FightDetailUiState(
     val isRefreshing: Boolean = false,
@@ -22,5 +23,7 @@ data class FightDetailUiState(
     val predictedWinnerId: String? = null,
     val showPredictionDialog: Boolean = false,
     val pendingPredictionFighterId: String? = null,
+    val pendingPredictionMethod: OddsMethod? = null,
+    val pendingPredictionRound: Int? = null,
     val isSubmittingPrediction: Boolean = false,
 )

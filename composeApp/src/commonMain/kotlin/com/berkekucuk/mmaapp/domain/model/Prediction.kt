@@ -12,6 +12,8 @@ data class Prediction(
     val pointsEarned: Int,
     val isCorrect: Boolean?,
     val lockedOdds: Int?,
+    val predictedMethod: OddsMethod? = null,
+    val predictedRound: Int? = null,
     val createdAt: Instant,
     val fight: Fight?
 ) {

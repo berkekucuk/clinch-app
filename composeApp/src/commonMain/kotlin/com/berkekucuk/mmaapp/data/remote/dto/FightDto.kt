@@ -22,5 +22,6 @@ data class FightDto(
     @SerialName("referee") val referee: String? = null,
     @SerialName("bonuses") val bonuses: List<String>? = null,
     @SerialName("participants") val participants: List<ParticipantDto>? = null,
-    @SerialName("stats") val stats: List<FightStatDto>? = null
+    @SerialName("stats") val stats: List<FightStatDto>? = null,
+    @SerialName("odds") val odds: List<FightOddsDto>? = null
 )

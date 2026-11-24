@@ -7,14 +7,14 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.berkekucuk.mmaapp.data.local.entity.FightEntity
-import com.berkekucuk.mmaapp.data.local.relation.FightWithStatsRelation
+import com.berkekucuk.mmaapp.data.local.relation.FightWithDetailsRelation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FightDao {
     @Transaction
     @Query("SELECT * FROM fights WHERE fight_id = :fightId")
-    fun getFight(fightId: String): Flow<FightWithStatsRelation?>
+    fun getFight(fightId: String): Flow<FightWithDetailsRelation?>
 
     @Upsert
     suspend fun upsertFights(fights: List<FightEntity>)

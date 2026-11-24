@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ParticipantDto(
-    @SerialName("odds_value") val oddsValue: Int? = null,
-    @SerialName("odds_label") val oddsLabel: String? = null,
     val result: String? = null,
     @SerialName("record_after_fight") val recordAfterFight: RecordDto? = null,
     @SerialName("is_red_corner") val isRedCorner: Boolean? = null,

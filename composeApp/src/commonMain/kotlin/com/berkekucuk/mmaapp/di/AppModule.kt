@@ -81,10 +81,6 @@ import com.berkekucuk.mmaapp.presentation.screens.profile_edit.ProfileEditViewMo
 import com.berkekucuk.mmaapp.presentation.screens.ranking_detail.RankingDetailViewModel
 import com.berkekucuk.mmaapp.presentation.screens.fighter_search.FighterSearchViewModel
 import com.berkekucuk.mmaapp.presentation.screens.rankings.RankingViewModel
-import com.berkekucuk.mmaapp.data.remote.datasource.AppConfigRemoteDataSource
-import com.berkekucuk.mmaapp.data.remote.supabase.AppConfigSupabaseAPI
-import com.berkekucuk.mmaapp.domain.repository.AppConfigRepository
-import com.berkekucuk.mmaapp.data.repository.AppConfigRepositoryImpl
 import com.berkekucuk.mmaapp.data.remote.datasource.AppVersionRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.supabase.AppVersionSupabaseAPI
 import com.berkekucuk.mmaapp.data.repository.AppVersionRepositoryImpl
@@ -172,10 +168,6 @@ val appModule = module {
     }
 
     single {
-        get<AppDatabase>().appConfigDao()
-    }
-
-    single {
         get<AppDatabase>().weeklyLeaderboardDao()
     }
 
@@ -234,10 +226,6 @@ val appModule = module {
 
     single<InteractionRemoteDataSource> {
         InteractionSupabaseAPI(client = get())
-    }
-
-    single<AppConfigRemoteDataSource> {
-        AppConfigSupabaseAPI(client = get())
     }
 
     single<AppVersionRemoteDataSource> {
@@ -366,14 +354,6 @@ val appModule = module {
     single<EventCommentRepository> {
         EventCommentRepositoryImpl(
             remoteDataSource = get(),
-            rateLimiter = get()
-        )
-    }
-
-    single<AppConfigRepository> {
-        AppConfigRepositoryImpl(
-            remoteDataSource = get(),
-            configDao = get(),
             rateLimiter = get()
         )
     }

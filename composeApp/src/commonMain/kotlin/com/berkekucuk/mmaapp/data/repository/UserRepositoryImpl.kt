@@ -52,7 +52,7 @@ class UserRepositoryImpl(
 
     override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String): Result<Unit> {
         return runSuspendCatching {
-            remoteDataSource.updateUser(userId, fullName, username, avatarUrl)
+            remoteDataSource.updateUser(fullName, username, avatarUrl)
             dao.updateUser(userId, fullName, username, avatarUrl)
         }
     }

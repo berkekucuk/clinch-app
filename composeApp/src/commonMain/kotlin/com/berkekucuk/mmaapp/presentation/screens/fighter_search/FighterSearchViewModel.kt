@@ -121,14 +121,12 @@ class FighterSearchViewModel(
         viewModelScope.launch {
             _state.update { it.copy(error = null, addingInteractionFighterId = fighter.fighterId) }
 
-            val userId = authRepository.getAuthenticatedUserId()
-            if (userId == null) {
+            if (authRepository.getAuthenticatedUserId() == null) {
                 _state.update { it.copy(error = AppError.UNAUTHENTICATED, addingInteractionFighterId = null) }
                 return@launch
             }
 
             interactionRepository.addInteraction(
-                userId = userId,
                 interactionType = type,
                 fighter = fighter,
             ).onSuccess {

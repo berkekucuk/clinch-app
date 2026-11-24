@@ -4,7 +4,6 @@ import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
 import com.berkekucuk.mmaapp.data.remote.datasource.UserRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.UserDto
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import kotlinx.serialization.json.buildJsonObject
@@ -24,16 +23,15 @@ class UserSupabaseAPI(
         ).decodeList<UserDto>().first()
     }
 
-    override suspend fun updateUser(userId: String, fullName: String, username: String, avatarUrl: String){
-        client.from("profiles").update({
-            set("username", username)
-            set("full_name", fullName)
-            set("avatar_url", avatarUrl)
-        }) {
-            filter {
-                eq("id", userId)
+    override suspend fun updateUser(fullName: String, username: String, avatarUrl: String) {
+        client.postgrest.rpc(
+            function = "update_profile",
+            parameters = buildJsonObject {
+                put("p_full_name", fullName)
+                put("p_username", username)
+                put("p_avatar_url", avatarUrl)
             }
-        }
+        )
     }
 
     override suspend fun uploadAvatar(userId: String, imageBytes: ByteArray): String {

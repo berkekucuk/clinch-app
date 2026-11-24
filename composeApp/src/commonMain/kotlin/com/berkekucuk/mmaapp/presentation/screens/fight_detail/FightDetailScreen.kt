@@ -60,6 +60,7 @@ import com.berkekucuk.mmaapp.presentation.components.AppSnackbar
 import com.berkekucuk.mmaapp.presentation.components.FightItem
 import com.berkekucuk.mmaapp.presentation.components.ListContainer
 import com.berkekucuk.mmaapp.presentation.components.AppSnackbarEffect
+import com.berkekucuk.mmaapp.presentation.components.pickDetailText
 import com.berkekucuk.mmaapp.presentation.screens.menu.SignInBottomSheet
 import com.berkekucuk.mmaapp.presentation.screens.menu.rememberSocialAuthHandler
 import kotlinx.coroutines.launch
@@ -144,8 +145,11 @@ fun FightDetailScreen(
     val pendingPredictionParticipant = remember(state.pendingPredictionFighterId, fight) {
         fight?.participants?.find { it.fighter.fighterId == state.pendingPredictionFighterId }
     }
-    val pendingPredictionFighterName = pendingPredictionParticipant?.fighter?.name ?: ""
-    val pendingPredictionOdds = pendingPredictionParticipant?.oddsValue
+    val pendingPredictionDetail = pickDetailText(state.pendingPredictionMethod, state.pendingPredictionRound)
+    val pendingPredictionFighterName = listOfNotNull(pendingPredictionParticipant?.fighter?.name, pendingPredictionDetail).joinToString(" · ")
+    val pendingPredictionOdds = state.pendingPredictionFighterId?.let { id ->
+        fight?.pickOdds(id, state.pendingPredictionMethod, state.pendingPredictionRound)
+    }
     val errorMessage = AppTheme.strings.mapError(state.error)
     val snackbarMessage = when {
         state.error != null -> {
@@ -282,6 +286,8 @@ fun FightDetailScreen(
                             redCorner = fight?.redCorner,
                             blueCorner = fight?.blueCorner,
                             eventDate = state.fight?.eventDate,
+                            odds = fight?.odds.orEmpty(),
+                            isCompleted = fight?.isCompleted == true,
                         )
                     }
                     if (hasMetaInfo) {
@@ -444,6 +450,18 @@ fun FightDetailScreen(
                         text = AppTheme.strings.predictionConfirmMessage(pendingPredictionFighterName),
                         color = AppTheme.colors.textSecondary,
                     )
+                    val pendingFighterId = state.pendingPredictionFighterId
+                    if (fight != null && pendingFighterId != null) {
+                        PredictionDetailSelector(
+                            fight = fight,
+                            fighterId = pendingFighterId,
+                            selectedMethod = state.pendingPredictionMethod,
+                            selectedRound = state.pendingPredictionRound,
+                            onMethodSelected = { onAction(FightDetailUiAction.OnPredictionMethodSelected(it)) },
+                            onRoundSelected = { onAction(FightDetailUiAction.OnPredictionRoundSelected(it)) },
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+                    }
                     if (pendingPredictionOdds != null) {
                         BulletList(
                             items = listOf(

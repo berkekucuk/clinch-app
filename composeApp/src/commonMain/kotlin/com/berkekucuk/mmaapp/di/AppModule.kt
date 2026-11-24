@@ -164,6 +164,10 @@ val appModule = module {
     }
 
     single {
+        get<AppDatabase>().fightOddsDao()
+    }
+
+    single {
         get<AppDatabase>().interactionDao()
     }
 
@@ -256,6 +260,7 @@ val appModule = module {
         FightRepositoryImpl(
             fightDao = get(),
             fightStatDao = get(),
+            fightOddsDao = get(),
             remoteDataSource = get(),
             rateLimiter = get()
         )
@@ -266,6 +271,7 @@ val appModule = module {
             remoteDataSource = get(),
             eventDao = get(),
             fightDao = get(),
+            fightOddsDao = get(),
             dateTimeProvider = get(),
             rateLimiter = get()
         )
@@ -284,6 +290,7 @@ val appModule = module {
             fighterRemoteDataSource = get(),
             fighterDao = get(),
             fightDao = get(),
+            fightOddsDao = get(),
             rateLimiter = get()
         )
     }
@@ -326,6 +333,7 @@ val appModule = module {
         PredictionRepositoryImpl(
             predictionDao = get(),
             fightDao = get(),
+            fightOddsDao = get(),
             remoteDataSource = get(),
             rateLimiter = get()
         )

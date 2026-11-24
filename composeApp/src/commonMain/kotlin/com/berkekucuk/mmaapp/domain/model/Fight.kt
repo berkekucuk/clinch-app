@@ -21,11 +21,16 @@ data class Fight(
     val referee: String?,
     val bonuses: List<String> = emptyList(),
     val participants: List<Participant> = emptyList(),
-    val stats: List<FightStat> = emptyList()
+    val stats: List<FightStat> = emptyList(),
+    val odds: List<FightOdds> = emptyList()
 ) {
     val redCorner: Participant? = participants.find { it.isRedCorner }
 
     val blueCorner: Participant? = participants.find { !it.isRedCorner }
 
     val isCancelledOrFizzled: Boolean = boutType == "cancelled" || boutType == "fizzled"
+
+    val isCompleted: Boolean = !methodType.isNullOrBlank() || !methodDetail.isNullOrBlank()
+
+    fun moneyline(fighterId: String?): Int? = odds.moneyline(fighterId)
 }

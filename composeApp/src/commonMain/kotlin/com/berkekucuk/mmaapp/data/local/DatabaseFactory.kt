@@ -12,6 +12,7 @@ import androidx.room.TypeConverters
 import com.berkekucuk.mmaapp.data.local.dao.AppConfigDao
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
+import com.berkekucuk.mmaapp.data.local.dao.FightOddsDao
 import com.berkekucuk.mmaapp.data.local.dao.FightStatDao
 import com.berkekucuk.mmaapp.data.local.dao.FighterDao
 import com.berkekucuk.mmaapp.data.local.dao.InteractionDao
@@ -25,6 +26,7 @@ import com.berkekucuk.mmaapp.data.local.entity.BlockedUserEntity
 import com.berkekucuk.mmaapp.data.local.entity.EventEntity
 import com.berkekucuk.mmaapp.data.local.entity.FightEntity
 import com.berkekucuk.mmaapp.data.local.entity.FightNotificationEntity
+import com.berkekucuk.mmaapp.data.local.entity.FightOddsEntity
 import com.berkekucuk.mmaapp.data.local.entity.FightStatEntity
 import com.berkekucuk.mmaapp.data.local.entity.FighterEntity
 import com.berkekucuk.mmaapp.data.local.entity.FighterFightCrossRef
@@ -48,6 +50,7 @@ import kotlinx.coroutines.IO
         FightNotificationEntity::class,
         FightEntity::class,
         FightStatEntity::class,
+        FightOddsEntity::class,
         FighterFightCrossRef::class,
         InteractionEntity::class,
         BlockedUserEntity::class,
@@ -55,7 +58,7 @@ import kotlinx.coroutines.IO
         WeeklyLeaderboardEntity::class,
         NewsArticleEntity::class
     ],
-    version = 41,
+    version = 42,
 )
 
 @TypeConverters(Converters::class)
@@ -69,6 +72,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun predictionDao(): PredictionDao
     abstract fun fightDao(): FightDao
     abstract fun fightStatDao(): FightStatDao
+    abstract fun fightOddsDao(): FightOddsDao
     abstract fun interactionDao(): InteractionDao
     abstract fun appConfigDao(): AppConfigDao
     abstract fun weeklyLeaderboardDao(): WeeklyLeaderboardDao

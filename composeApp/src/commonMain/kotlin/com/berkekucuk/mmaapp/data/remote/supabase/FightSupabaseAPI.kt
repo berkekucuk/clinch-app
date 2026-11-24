@@ -13,7 +13,7 @@ class FightSupabaseAPI(
 
     override suspend fun fetchFight(fightId: String): FightDto {
         return client.postgrest.rpc(
-            function = "get_fight_v4",
+            function = "get_fight_v5",
             parameters = buildJsonObject {
                 put("p_fight_id", fightId)
             }

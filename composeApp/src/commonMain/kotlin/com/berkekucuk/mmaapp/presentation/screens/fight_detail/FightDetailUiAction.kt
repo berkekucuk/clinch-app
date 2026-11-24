@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.presentation.screens.fight_detail
 
+import com.berkekucuk.mmaapp.domain.model.OddsMethod
+
 sealed interface FightDetailUiAction {
     data class OnFighterClicked(val fighterId: String): FightDetailUiAction
     data object OnBackClicked: FightDetailUiAction
@@ -19,6 +21,8 @@ sealed interface FightDetailUiAction {
 
     // Predictions
     data class OnPredictClicked(val predictedWinnerId: String): FightDetailUiAction
+    data class OnPredictionMethodSelected(val method: OddsMethod?): FightDetailUiAction
+    data class OnPredictionRoundSelected(val round: Int?): FightDetailUiAction
     data class OnSubmitPredictionClicked(val predictedWinnerId: String): FightDetailUiAction
     data object OnDismissPredictionDialog: FightDetailUiAction
 

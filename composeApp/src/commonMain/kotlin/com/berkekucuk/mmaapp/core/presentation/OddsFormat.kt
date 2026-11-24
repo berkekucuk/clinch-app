@@ -24,3 +24,6 @@ fun Int.toAmericanOdds(): String {
     val sign = if (this >= 0) "+" else ""
     return "$sign$this"
 }
+
+fun Int.formatOdds(format: OddsFormat): String =
+    if (format == OddsFormat.DECIMAL) toDecimalOdds() else toAmericanOdds()

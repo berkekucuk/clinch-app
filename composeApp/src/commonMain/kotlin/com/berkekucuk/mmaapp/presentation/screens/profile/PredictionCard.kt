@@ -32,10 +32,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.LocalOddsFormat
-import com.berkekucuk.mmaapp.core.presentation.OddsFormat
-import com.berkekucuk.mmaapp.core.presentation.toAmericanOdds
-import com.berkekucuk.mmaapp.core.presentation.toDecimalOdds
+import com.berkekucuk.mmaapp.core.presentation.formatOdds
 import com.berkekucuk.mmaapp.domain.model.Prediction
+import com.berkekucuk.mmaapp.presentation.components.pickDetailText
 
 @Composable
 fun PredictionCard(
@@ -56,12 +55,7 @@ fun PredictionCard(
 
     val oddsFormat = LocalOddsFormat.current
     val formattedOdds = remember(prediction.lockedOdds, oddsFormat) {
-        val oddsValue = prediction.lockedOdds ?: 0
-        if (oddsFormat == OddsFormat.AMERICAN) {
-            oddsValue.toAmericanOdds()
-        } else {
-            oddsValue.toDecimalOdds()
-        }
+        (prediction.lockedOdds ?: 0).formatOdds(oddsFormat)
     }
     val circleBgColor = when (prediction.isCorrect) {
         true -> AppTheme.colors.winnerFrame
@@ -139,7 +133,7 @@ fun PredictionCard(
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = AppTheme.strings.predictionQuestionTitle,
+                    text = pickDetailText(prediction.predictedMethod, prediction.predictedRound).orEmpty(),
                     color = AppTheme.colors.textSecondary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,

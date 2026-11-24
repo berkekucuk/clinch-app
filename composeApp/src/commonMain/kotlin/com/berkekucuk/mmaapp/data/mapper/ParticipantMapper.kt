@@ -9,8 +9,6 @@ import com.berkekucuk.mmaapp.domain.model.Record
 
 fun ParticipantDto.toDomain(): Participant {
     return Participant(
-        oddsValue = oddsValue,
-        oddsLabel = oddsLabel ?: "",
         result = Result.fromString(result),
         recordAfterFight = recordAfterFight?.toDomain(),
         isRedCorner = isRedCorner ?: false,

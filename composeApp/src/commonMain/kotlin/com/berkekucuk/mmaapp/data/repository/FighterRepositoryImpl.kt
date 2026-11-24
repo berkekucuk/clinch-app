@@ -1,5 +1,7 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.data.local.dao.FightOddsDao
+import com.berkekucuk.mmaapp.data.mapper.toOddsEntities
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.FightDao
@@ -23,6 +25,7 @@ class FighterRepositoryImpl(
     private val fighterRemoteDataSource: FighterRemoteDataSource,
     private val fighterDao: FighterDao,
     private val fightDao: FightDao,
+    private val fightOddsDao: FightOddsDao,
     private val rateLimiter: RateLimiter
 ) : FighterRepository {
 
@@ -58,6 +61,7 @@ class FighterRepositoryImpl(
         if (fightEntities.isNotEmpty()) {
             fightDao.insertFightsIfNotExist(fightEntities)
         }
+        fightOddsDao.replaceMoneylines(fights.map { it.fightId }, fights.toOddsEntities())
         
         // 3. Update Junction table (Fighter <-> Fights)
         val crossRefs = fights.map { 

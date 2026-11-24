@@ -13,6 +13,8 @@ data class PredictionDto(
     @SerialName("points_earned") val pointsEarned: Int? = null,
     @SerialName("is_correct") val isCorrect: Boolean? = null,
     @SerialName("locked_odds") val lockedOdds: Int? = null,
+    @SerialName("predicted_method") val predictedMethod: String? = null,
+    @SerialName("predicted_round") val predictedRound: Int? = null,
     @SerialName("created_at") val createdAt: Instant? = null,
     @SerialName("fight") val fight: FightDto? = null
 )

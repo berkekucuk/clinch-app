@@ -91,7 +91,7 @@ class FightDetailViewModel(
                     _state.update {
                         it.copy(
                             fight = fight,
-                            showPredictionBoard = !isFightCompleted(fight)
+                            showPredictionBoard = !fight.isCompleted
                         )
                     }
                 }
@@ -126,10 +126,10 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnBackClicked -> navigateTo(FightDetailNavigationEvent.Back)
             is FightDetailUiAction.OnRefresh -> syncFight(isRefreshing = true)
             is FightDetailUiAction.OnEventClicked -> navigateTo(FightDetailNavigationEvent.ToEventDetail(action.eventId))
+            is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
             is FightDetailUiAction.OnSnackbarDismissed -> {
                 _state.update { it.copy(error = null, showSignInSuccess = false) }
             }
-            is FightDetailUiAction.OnLeaderboardClicked -> navigateTo(FightDetailNavigationEvent.ToLeaderboard)
 
             // Notifications
             is FightDetailUiAction.OnNotificationIconClicked -> {
@@ -166,7 +166,9 @@ class FightDetailViewModel(
                     _state.update {
                         it.copy(
                             showPredictionDialog = true,
-                            pendingPredictionFighterId = action.predictedWinnerId
+                            pendingPredictionFighterId = action.predictedWinnerId,
+                            pendingPredictionMethod = null,
+                            pendingPredictionRound = null,
                         )
                     }
                 }
@@ -174,6 +176,12 @@ class FightDetailViewModel(
             is FightDetailUiAction.OnSubmitPredictionClicked -> submitPrediction(action.predictedWinnerId)
             is FightDetailUiAction.OnDismissPredictionDialog -> {
                 _state.update { it.copy(showPredictionDialog = false, pendingPredictionFighterId = null) }
+            }
+            is FightDetailUiAction.OnPredictionMethodSelected -> {
+                _state.update { it.copy(pendingPredictionMethod = action.method, pendingPredictionRound = null) }
+            }
+            is FightDetailUiAction.OnPredictionRoundSelected -> {
+                _state.update { it.copy(pendingPredictionRound = action.round) }
             }
 
             // Auth
@@ -205,12 +213,8 @@ class FightDetailViewModel(
         }
     }
 
-    private fun isFightCompleted(fight: Fight): Boolean {
-        return !fight.methodType.isNullOrBlank() || !fight.methodDetail.isNullOrBlank()
-    }
-
     private fun canToggleNotification(fight: Fight, isNotificationEnabled: Boolean): Boolean {
-        if (isFightCompleted(fight) && !isNotificationEnabled) {
+        if (fight.isCompleted && !isNotificationEnabled) {
             _state.update { it.copy(error = AppError.FIGHT_OVER, showNotificationDialog = false) }
             return false
         }
@@ -263,10 +267,10 @@ class FightDetailViewModel(
     }
 
     private fun submitPrediction(predictedWinnerId: String) {
-        val userId = currentUserId ?: return
+        if (currentUserId == null) return
         val fight = _state.value.fight ?: return
 
-        if (isFightCompleted(fight)) {
+        if (fight.isCompleted) {
             _state.update { 
                 it.copy(
                     error = AppError.FIGHT_OVER,
@@ -288,12 +292,16 @@ class FightDetailViewModel(
             return
         }
 
-        val lockedOdds = getLockedOdds(fight, predictedWinnerId)
-
         viewModelScope.launch {
             _state.update { it.copy(isSubmittingPrediction = true, error = null) }
             
-            predictionRepository.addPrediction(userId, fight.fightId, predictedWinnerId, lockedOdds)
+            val currentState = _state.value
+            predictionRepository.addPrediction(
+                fightId = fight.fightId,
+                predictedWinnerId = predictedWinnerId,
+                method = currentState.pendingPredictionMethod,
+                round = currentState.pendingPredictionRound,
+            )
                 .onSuccess {
                     _state.update { 
                         it.copy(
@@ -317,11 +325,7 @@ class FightDetailViewModel(
     }
 
     private fun areOddsPublished(fight: Fight): Boolean {
-        return fight.participants.all { it.oddsValue != null && it.oddsValue != 0 }
-    }
-
-    private fun getLockedOdds(fight: Fight, predictedWinnerId: String): Int {
-        return fight.participants.find { it.fighter.fighterId == predictedWinnerId }?.oddsValue ?: 0
+        return fight.participants.all { fight.moneyline(it.fighter.fighterId).let { odds -> odds != null && odds != 0 } }
     }
 
     private fun navigateTo(event: FightDetailNavigationEvent) {

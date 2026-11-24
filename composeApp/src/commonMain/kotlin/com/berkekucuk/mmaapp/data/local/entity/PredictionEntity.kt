@@ -25,5 +25,7 @@ data class PredictionEntity(
     @ColumnInfo(name = "points_earned") val pointsEarned: Int,
     @ColumnInfo(name = "is_correct") val isCorrect: Boolean?,
     @ColumnInfo(name = "locked_odds") val lockedOdds: Int?,
+    @ColumnInfo(name = "predicted_method") val predictedMethod: String? = null,
+    @ColumnInfo(name = "predicted_round") val predictedRound: Int? = null,
     @ColumnInfo(name = "created_at") val createdAt: Instant
 )

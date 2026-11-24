@@ -51,12 +51,11 @@ class InteractionRepositoryImpl(
     }
 
     override suspend fun addInteraction(
-        userId: String,
         interactionType: String,
         fighter: Fighter,
     ): Result<Unit> {
         return runSuspendCatching(Dispatchers.Default) {
-            val remoteInteraction = remoteDataSource.addInteraction(userId, fighter.fighterId, interactionType)
+            val remoteInteraction = remoteDataSource.addInteraction(fighter.fighterId, interactionType)
 
             fighterDao.insertFighter(fighter.toEntity())
 

@@ -3,32 +3,36 @@ package com.berkekucuk.mmaapp.data.remote.supabase
 import com.berkekucuk.mmaapp.data.remote.datasource.NotificationRemoteDataSource
 import com.berkekucuk.mmaapp.data.remote.dto.FightNotificationDto
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class NotificationSupabaseAPI(
     private val client: SupabaseClient
 ) : NotificationRemoteDataSource {
 
-    override suspend fun fetchFightNotifications(userId: String): List<FightNotificationDto> {
-        return client.from("user_fight_notifications").select {
-            filter {
-                eq("user_id", userId)
-            }
-        }.decodeList<FightNotificationDto>()
+    override suspend fun fetchFightNotifications(): List<FightNotificationDto> {
+        return client.postgrest.rpc(
+            function = "get_my_fight_notifications"
+        ).decodeList<FightNotificationDto>()
     }
 
-    override suspend fun upsertFightNotification(fightId: String, userId: String, isAlarm: Boolean) {
-        client.from("user_fight_notifications").upsert(
-            FightNotificationDto(userId = userId, fightId = fightId, isAlarm = isAlarm)
+    override suspend fun upsertFightNotification(fightId: String, isAlarm: Boolean) {
+        client.postgrest.rpc(
+            function = "set_fight_notification",
+            parameters = buildJsonObject {
+                put("p_fight_id", fightId)
+                put("p_is_alarm", isAlarm)
+            }
         )
     }
 
-    override suspend fun deleteFightNotification(fightId: String, userId: String) {
-        client.from("user_fight_notifications").delete {
-            filter {
-                eq("fight_id", fightId)
-                eq("user_id", userId)
+    override suspend fun deleteFightNotification(fightId: String) {
+        client.postgrest.rpc(
+            function = "remove_fight_notification",
+            parameters = buildJsonObject {
+                put("p_fight_id", fightId)
             }
-        }
+        )
     }
 }

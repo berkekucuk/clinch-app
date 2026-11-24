@@ -29,7 +29,7 @@ class NotificationRepositoryImpl(
             if (!rateLimiter.shouldFetch(syncKey(userId))) {
                 return@runSuspendCatching
             }
-            val remoteNotifications = remoteDataSource.fetchFightNotifications(userId)
+            val remoteNotifications = remoteDataSource.fetchFightNotifications()
             dao.upsertFightNotifications(remoteNotifications.map { it.toEntity() })
         }.onFailure {
             rateLimiter.reset(syncKey(userId))
@@ -38,14 +38,14 @@ class NotificationRepositoryImpl(
 
     override suspend fun addFightNotification(fightId: String, userId: String, isAlarm: Boolean): Result<Unit> {
         return runSuspendCatching {
-            remoteDataSource.upsertFightNotification(fightId, userId, isAlarm)
+            remoteDataSource.upsertFightNotification(fightId, isAlarm)
             dao.upsertFightNotification(FightNotificationEntity(fightId = fightId, userId = userId))
         }
     }
 
     override suspend fun removeFightNotification(fightId: String, userId: String): Result<Unit> {
         return runSuspendCatching {
-            remoteDataSource.deleteFightNotification(fightId, userId)
+            remoteDataSource.deleteFightNotification(fightId)
             dao.deleteFightNotification(fightId, userId)
         }
     }

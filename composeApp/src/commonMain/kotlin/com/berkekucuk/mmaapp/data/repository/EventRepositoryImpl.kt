@@ -1,6 +1,8 @@
 package com.berkekucuk.mmaapp.data.repository
 
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
+import com.berkekucuk.mmaapp.data.local.dao.FightOddsDao
+import com.berkekucuk.mmaapp.data.mapper.toOddsEntities
 import com.berkekucuk.mmaapp.core.utils.DateTimeProvider
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.data.local.dao.EventDao
@@ -24,6 +26,7 @@ class EventRepositoryImpl(
     private val remoteDataSource: EventRemoteDataSource,
     private val eventDao: EventDao,
     private val fightDao: FightDao,
+    private val fightOddsDao: FightOddsDao,
     private val dateTimeProvider: DateTimeProvider,
     private val rateLimiter: RateLimiter
 ) : EventRepository {
@@ -126,6 +129,9 @@ class EventRepositoryImpl(
             event.eventId to (event.fights?.map { it.toEntity() } ?: emptyList())
         }
         fightDao.replaceFights(eventsMap)
+
+        val fights = events.flatMap { it.fights.orEmpty() }
+        fightOddsDao.replaceMoneylines(fights.map { it.fightId }, fights.toOddsEntities())
     }
 
     private suspend fun needsInitialSync(year: Int): Boolean {

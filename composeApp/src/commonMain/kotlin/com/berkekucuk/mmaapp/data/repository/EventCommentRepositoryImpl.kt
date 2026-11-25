@@ -1,5 +1,6 @@
 package com.berkekucuk.mmaapp.data.repository
 
+import com.berkekucuk.mmaapp.core.storage.EventCommentSeenStorage
 import com.berkekucuk.mmaapp.core.utils.RateLimiter
 import com.berkekucuk.mmaapp.core.utils.runSuspendCatching
 import com.berkekucuk.mmaapp.data.mapper.toDomain
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 
 class EventCommentRepositoryImpl(
     private val remoteDataSource: EventCommentRemoteDataSource,
+    private val seenStorage: EventCommentSeenStorage,
     private val rateLimiter: RateLimiter
 ) : EventCommentRepository {
 
@@ -117,6 +119,20 @@ class EventCommentRepositoryImpl(
                     is EventCommentRealtimeEvent.Deleted -> removeFromCache(eventId, event.commentId)
                 }
             }
+        }
+    }
+
+    override suspend fun getNewCommentCount(eventId: String): Result<Int> {
+        return runSuspendCatching(Dispatchers.Default) {
+            remoteDataSource.fetchCommentCountSince(eventId, seenStorage.getLastSeenAt(eventId))
+        }
+    }
+
+    override fun markCommentsSeen(eventId: String) {
+        val newestCreatedAt = cache.value[eventId]?.firstOrNull()?.createdAt ?: return
+        val lastSeenAt = seenStorage.getLastSeenAt(eventId)
+        if (lastSeenAt == null || newestCreatedAt > lastSeenAt) {
+            seenStorage.saveLastSeenAt(eventId, newestCreatedAt)
         }
     }
 

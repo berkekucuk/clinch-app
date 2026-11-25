@@ -63,6 +63,7 @@ class EventCommentsViewModel(
             ) { comments, userId, blockedUserIds ->
                 userId to comments.filterNot { it.userId in blockedUserIds }
             }.collect { (userId, comments) ->
+                commentRepository.markCommentsSeen(eventId)
                 _state.update {
                     it.copy(
                         currentUserId = userId,

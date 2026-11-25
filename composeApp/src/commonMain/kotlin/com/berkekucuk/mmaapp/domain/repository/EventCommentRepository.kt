@@ -10,4 +10,6 @@ interface EventCommentRepository {
     suspend fun addComment(eventId: String, content: String, replyToCommentId: String? = null): Result<Unit>
     suspend fun deleteComment(eventId: String, commentId: String): Result<Unit>
     suspend fun listenForCommentChanges(eventId: String): Result<Unit>
+    suspend fun getNewCommentCount(eventId: String): Result<Int>
+    fun markCommentsSeen(eventId: String)
 }

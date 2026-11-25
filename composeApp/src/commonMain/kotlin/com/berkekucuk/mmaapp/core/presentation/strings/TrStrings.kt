@@ -41,6 +41,7 @@ val TrStrings = AppStrings(
     fightOddsRoundMethod = { round, method -> "$round. Raund · $method" },
     fightOddsRound = { round -> "$round. Raund" },
     predictionAnyOption = "Herhangi",
+    predictionMatchResult = "Maç Sonucu",
     predictionMethodLabel = "Yöntem",
     predictionRoundLabel = "Raund",
     fightOddsNotAnnounced = "Yöntem ve raund oranları henüz açıklanmadı.",

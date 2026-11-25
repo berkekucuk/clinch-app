@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.berkekucuk.mmaapp.core.app.Route
 import com.berkekucuk.mmaapp.core.utils.AppErrorMapper
+import com.berkekucuk.mmaapp.domain.repository.EventCommentRepository
 import com.berkekucuk.mmaapp.domain.repository.EventRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 
 class EventDetailViewModel(
     private val eventRepository: EventRepository,
+    private val commentRepository: EventCommentRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -28,6 +30,7 @@ class EventDetailViewModel(
 
     init {
         observeEvent()
+        loadNewCommentCount()
         if (route.fromFightDetail) {
             syncEvent()
         }
@@ -51,8 +54,21 @@ class EventDetailViewModel(
         when(action){
             is EventDetailUiAction.OnFightClicked -> navigateTo(EventDetailNavigationEvent.ToFightDetail(action.fightId))
             is EventDetailUiAction.OnBackClicked -> navigateTo(EventDetailNavigationEvent.Back)
-            is EventDetailUiAction.OnRefresh -> syncEvent(isRefreshing = true)
-            is EventDetailUiAction.OnCommentsClicked -> navigateTo(EventDetailNavigationEvent.ToComments(eventId, _state.value.event?.name))
+            is EventDetailUiAction.OnRefresh -> {
+                syncEvent(isRefreshing = true)
+                loadNewCommentCount()
+            }
+            is EventDetailUiAction.OnCommentsClicked -> {
+                _state.update { it.copy(newCommentCount = 0) }
+                navigateTo(EventDetailNavigationEvent.ToComments(eventId, _state.value.event?.name))
+            }
+        }
+    }
+
+    private fun loadNewCommentCount() {
+        viewModelScope.launch {
+            commentRepository.getNewCommentCount(eventId)
+                .onSuccess { count -> _state.update { it.copy(newCommentCount = count) } }
         }
     }
 

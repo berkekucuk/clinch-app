@@ -41,6 +41,7 @@ val EnStrings = AppStrings(
     fightOddsRoundMethod = { round, method -> "Round $round · $method" },
     fightOddsRound = { round -> "Round $round" },
     predictionAnyOption = "Any",
+    predictionMatchResult = "Fight Result",
     predictionMethodLabel = "Method",
     predictionRoundLabel = "Round",
     fightOddsNotAnnounced = "Method and round odds haven't been released yet.",

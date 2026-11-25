@@ -3,6 +3,8 @@ package com.berkekucuk.mmaapp.di
 import androidx.room.RoomDatabase
 import com.berkekucuk.mmaapp.core.storage.AndroidAppVersionStorage
 import com.berkekucuk.mmaapp.core.storage.AppVersionStorage
+import com.berkekucuk.mmaapp.core.storage.AndroidEventCommentSeenStorage
+import com.berkekucuk.mmaapp.core.storage.EventCommentSeenStorage
 import com.berkekucuk.mmaapp.core.storage.AndroidLanguageStorage
 import com.berkekucuk.mmaapp.core.storage.AndroidMeasurementUnitStorage
 import com.berkekucuk.mmaapp.core.storage.AndroidNotificationStorage
@@ -30,6 +32,9 @@ actual val platformModule = module {
     }
     single<AppVersionStorage> {
         AndroidAppVersionStorage(androidContext())
+    }
+    single<EventCommentSeenStorage> {
+        AndroidEventCommentSeenStorage(androidContext())
     }
     single<MeasurementUnitStorage> {
         AndroidMeasurementUnitStorage(androidContext())

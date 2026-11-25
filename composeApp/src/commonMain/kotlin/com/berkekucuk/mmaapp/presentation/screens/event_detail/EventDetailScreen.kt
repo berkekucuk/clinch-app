@@ -15,6 +15,8 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Comment
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -131,16 +133,32 @@ fun EventDetailScreen(
         containerColor = AppTheme.colors.pagerBackground,
         contentWindowInsets = WindowInsets.statusBars,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onAction(EventDetailUiAction.OnCommentsClicked) },
-                containerColor = AppTheme.colors.ufcRed,
-                contentColor = AppTheme.colors.white,
+            BadgedBox(
+                badge = {
+                    if (state.newCommentCount > 0) {
+                        Badge(
+                            containerColor = AppTheme.colors.textPrimary,
+                            contentColor = AppTheme.colors.pagerBackground,
+                        ) {
+                            Text(
+                                text = if (state.newCommentCount > 99) "99+" else state.newCommentCount.toString(),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                },
                 modifier = Modifier.padding(bottom = navBarBottomPadding),
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Comment,
-                    contentDescription = AppTheme.strings.contentDescriptionComments,
-                )
+                FloatingActionButton(
+                    onClick = { onAction(EventDetailUiAction.OnCommentsClicked) },
+                    containerColor = AppTheme.colors.ufcRed,
+                    contentColor = AppTheme.colors.white,
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Comment,
+                        contentDescription = AppTheme.strings.contentDescriptionComments,
+                    )
+                }
             }
         },
         snackbarHost = {

@@ -70,6 +70,16 @@ class EventCommentSupabaseAPI(
         )
     }
 
+    override suspend fun fetchCommentCountSince(eventId: String, since: Instant?): Int {
+        return client.postgrest.rpc(
+            function = "get_event_comment_count_since",
+            parameters = buildJsonObject {
+                put("p_event_id", eventId)
+                since?.let { put("p_since", it.toString()) }
+            }
+        ).decodeAs<Int>()
+    }
+
     override fun observeComments(eventId: String): Flow<EventCommentRealtimeEvent> = channelFlow {
         val channel = client.channel("event_comments:$eventId") {
             isPrivate = true

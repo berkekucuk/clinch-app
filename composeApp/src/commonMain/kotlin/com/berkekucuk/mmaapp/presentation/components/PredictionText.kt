@@ -17,3 +17,9 @@ fun pickDetailText(method: OddsMethod?, round: Int?): String? {
     if (method == null) return null
     return listOfNotNull(method.label(), round?.let { AppTheme.strings.fightOddsRound(it) }).joinToString(" · ")
 }
+
+@Composable
+fun pickShortText(method: OddsMethod?, round: Int?): String {
+    if (method == null) return AppTheme.strings.predictionMatchResult
+    return listOfNotNull(method.label(), round?.let { "R$it" }).joinToString(" · ")
+}

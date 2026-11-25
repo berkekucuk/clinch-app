@@ -34,6 +34,7 @@ data class AppStrings(
     val fightOddsRoundMethod: (Int, String) -> String,
     val fightOddsRound: (Int) -> String,
     val predictionAnyOption: String,
+    val predictionMatchResult: String,
     val predictionMethodLabel: String,
     val predictionRoundLabel: String,
     val fightOddsNotAnnounced: String,

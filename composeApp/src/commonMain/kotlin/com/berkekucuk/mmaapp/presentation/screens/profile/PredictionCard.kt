@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.berkekucuk.mmaapp.core.presentation.LocalOddsFormat
 import com.berkekucuk.mmaapp.core.presentation.formatOdds
 import com.berkekucuk.mmaapp.domain.model.Prediction
-import com.berkekucuk.mmaapp.presentation.components.pickDetailText
+import com.berkekucuk.mmaapp.presentation.components.pickShortText
 
 @Composable
 fun PredictionCard(
@@ -133,7 +133,7 @@ fun PredictionCard(
                     .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = pickDetailText(prediction.predictedMethod, prediction.predictedRound).orEmpty(),
+                    text = pickShortText(prediction.predictedMethod, prediction.predictedRound),
                     color = AppTheme.colors.textSecondary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,

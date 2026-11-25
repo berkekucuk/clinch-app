@@ -97,7 +97,7 @@ fun BlockedUsersScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.topBarBackground)
             ) {
                 TopAppBar(
                     title = {

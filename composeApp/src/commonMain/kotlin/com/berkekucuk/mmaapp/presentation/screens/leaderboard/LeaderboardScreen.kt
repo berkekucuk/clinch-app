@@ -129,7 +129,7 @@ fun LeaderboardScreen(
         },
         topBar = {
             Column(
-                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventsTopBar)
             ) {
                 TopAppBar(
                     title = {

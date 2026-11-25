@@ -8,4 +8,5 @@ data class EventDetailUiState(
     val isRefreshing: Boolean = false,
     val event: Event? = null,
     val error: AppError? = null,
+    val newCommentCount: Int = 0,
 )

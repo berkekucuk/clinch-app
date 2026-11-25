@@ -387,6 +387,7 @@ val appModule = module {
     viewModel {
         EventDetailViewModel(
             eventRepository = get(),
+            commentRepository = get(),
             savedStateHandle = get()
         )
     }

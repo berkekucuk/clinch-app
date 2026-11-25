@@ -111,7 +111,7 @@ fun InteractionListScreen(
             )
         },
         topBar = {
-            Column(modifier = Modifier.background(AppTheme.colors.rankingTopBar)) {
+            Column(modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)) {
                 TopAppBar(
                     title = {
                         val title = when (state.type) {

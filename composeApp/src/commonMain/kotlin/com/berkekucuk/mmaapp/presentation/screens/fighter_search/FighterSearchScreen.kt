@@ -91,7 +91,7 @@ fun FighterSearchScreen(
         contentWindowInsets = WindowInsets.statusBars,
         topBar = {
             Column(
-                modifier = Modifier.background(AppTheme.colors.rankingTopBar)
+                modifier = Modifier.background(AppTheme.colors.eventDetailTopBar)
             ){
                 TopAppBar(
                     navigationIcon = {

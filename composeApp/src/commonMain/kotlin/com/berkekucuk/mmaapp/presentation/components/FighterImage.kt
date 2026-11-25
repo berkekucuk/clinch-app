@@ -26,6 +26,21 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 
 @Composable
+fun rememberFlagImageRequest(countryCode: String?): ImageRequest? {
+    val context = LocalPlatformContext.current
+    return remember(countryCode) {
+        if (countryCode.isNullOrBlank()) return@remember null
+        val flagUrl = "https://d18vwyi4kwpgwa.cloudfront.net/flags/${countryCode.lowercase()}.png"
+        ImageRequest.Builder(context)
+            .data(flagUrl)
+            .crossfade(true)
+            .size(100, 100)
+            .memoryCacheKey(flagUrl)
+            .build()
+    }
+}
+
+@Composable
 fun FighterImage(
     imageUrl: String,
     name: String,
@@ -55,22 +70,7 @@ fun FighterImage(
             .build()
     }
 
-    val flagUrl = remember(countryCode) {
-        if (countryCode.isNotBlank()) {
-            "https://d18vwyi4kwpgwa.cloudfront.net/flags/${countryCode.lowercase()}.png"
-        } else null
-    }
-
-    val flagRequest = remember(flagUrl) {
-        flagUrl?.let {
-            ImageRequest.Builder(context)
-                .data(it)
-                .crossfade(true)
-                .size(100, 100)
-                .memoryCacheKey(it)
-                .build()
-        }
-    }
+    val flagRequest = rememberFlagImageRequest(countryCode)
 
     Box(modifier = modifier) {
         AsyncImage(

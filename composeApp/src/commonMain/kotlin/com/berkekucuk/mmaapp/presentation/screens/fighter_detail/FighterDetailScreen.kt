@@ -2,6 +2,7 @@ package com.berkekucuk.mmaapp.presentation.screens.fighter_detail
 
 import com.berkekucuk.mmaapp.core.presentation.AppTheme
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -110,40 +111,44 @@ fun FighterDetailScreen(
             )
         },
         topBar = {
-            Column(
-                modifier = Modifier.background(AppTheme.colors.fighterDetailTopBar)
-            ){
-                MediumTopAppBar(
-                    title = {
-                        FighterTopBarTitle(
-                            imageUrl = state.fighter?.imageUrl ?: "",
-                            name = state.fighter?.name ?: "",
-                            countryCode = state.fighter?.countryCode ?: "",
-                            nickname = state.fighter?.nickname,
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { onAction(FighterDetailUiAction.OnBackClicked) }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = AppTheme.strings.contentDescriptionBack,
+            Box(modifier = Modifier.background(AppTheme.colors.eventsTopBar)) {
+                FighterFlagBackdrop(
+                    countryCode = state.fighter?.countryCode,
+                    modifier = Modifier.matchParentSize(),
+                )
+                Column {
+                    MediumTopAppBar(
+                        title = {
+                            FighterTopBarTitle(
+                                imageUrl = state.fighter?.imageUrl ?: "",
+                                name = state.fighter?.name ?: "",
+                                countryCode = state.fighter?.countryCode ?: "",
+                                nickname = state.fighter?.nickname,
                             )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        scrolledContainerColor = Color.Transparent,
-                        navigationIconContentColor = AppTheme.colors.textPrimary,
-                        titleContentColor = AppTheme.colors.textPrimary,
-                    ),
-                    scrollBehavior = scrollBehavior,
-                )
-                AppTabRow(
-                    tabs = tabs,
-                    selectedTabIndex = pagerState.currentPage,
-                    onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                    containerColor = Color.Transparent
-                )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = { onAction(FighterDetailUiAction.OnBackClicked) }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = AppTheme.strings.contentDescriptionBack,
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                            scrolledContainerColor = Color.Transparent,
+                            navigationIconContentColor = AppTheme.colors.textPrimary,
+                            titleContentColor = AppTheme.colors.textPrimary,
+                        ),
+                        scrollBehavior = scrollBehavior,
+                    )
+                    AppTabRow(
+                        tabs = tabs,
+                        selectedTabIndex = pagerState.currentPage,
+                        onTabSelected = { index -> coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                        containerColor = Color.Transparent
+                    )
+                }
             }
         }
     ) { innerPadding ->

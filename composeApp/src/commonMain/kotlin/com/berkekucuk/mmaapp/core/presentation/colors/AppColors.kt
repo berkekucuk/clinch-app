@@ -34,7 +34,6 @@ data class AppColors(
     val fighterDetailTopBar: Brush,
     val eventDetailTopBar: Brush,
     val eventsTopBar: Brush,
-    val rankingTopBar: Brush,
     val rankingChampionBadge: Brush,
     val rankingWeightClassAccent: Color,
     val radarGrid: Color,

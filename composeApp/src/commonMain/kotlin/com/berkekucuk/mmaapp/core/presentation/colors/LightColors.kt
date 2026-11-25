@@ -35,7 +35,6 @@ val LightColors = AppColors(
     fighterDetailTopBar = SolidColor(Color.White),
     eventDetailTopBar = SolidColor(Color.White),
     eventsTopBar = SolidColor(Color.White),
-    rankingTopBar = SolidColor(Color.White),
     rankingChampionBadge = Brush.horizontalGradient(
         colors = listOf(Color(0xFFD4A843), Color(0xFFB8922E))
     ),

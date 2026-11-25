@@ -40,9 +40,6 @@ val DarkColors = AppColors(
     eventsTopBar = Brush.verticalGradient(
         colors = listOf(Color(0xFF161B1F), Color(0xFF101418), Color(0xFF0A0C0F))
     ),
-    rankingTopBar = Brush.verticalGradient(
-        colors = listOf(Color(0xFF1A1020), Color(0xFF14121C), Color(0xFF100E18))
-    ),
     rankingChampionBadge = Brush.horizontalGradient(
         colors = listOf(Color(0xFFD4A843), Color(0xFFB8922E))
     ),
